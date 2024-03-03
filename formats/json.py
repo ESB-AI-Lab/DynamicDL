@@ -11,8 +11,9 @@ format = {
             "label": Token.IMAGES,
             "type": Token.DIRECTORY,
             "item": {
-                "label": 
-                "type": Token.IMAGE
+                "label": Token.IMAGE,
+                "type": Token.IMAGE,
+                "filename": Token.IMAGE_FILENAME
             }
         }
         "result.json": {
@@ -21,7 +22,7 @@ format = {
             "format": "coco_format"
         }
     }
-    "formats": [
+    "formats": {
         "coco_format": {
             "label": Token.ANNOTATION_FILE,
             "type": Token.JSON_FILE,
@@ -65,8 +66,12 @@ format = {
                 }
             }
         }
-    ]
+    }
 }
+
+
+
+
 Filestructure specifications:
 
 Valid labels for any folder: 
@@ -136,4 +141,8 @@ Warnings:
 - If the list of classes contains extra classes than which that is present in
   the dataset, or missing classes which are present in the dataset, throw a
   warning.
+- If there is an item detected that is unrecognizable, throw a warning.
 '''
+
+class JSON:
+    pass
