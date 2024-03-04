@@ -3,6 +3,7 @@ PathToken module
 '''
 
 import os
+from typing import Self
 
 from ..Token import Token
 
@@ -24,11 +25,26 @@ class PathToken(Token):
         '''
         Initialize the PathToken.
         '''
-        self.os_path = os_path
-        self.root = root
+        self.os_path: str = os_path
+        self.root: str = root
 
     def get_os_path(self) -> str:
         '''
         Retrieve the absolute os path to the token structure.
         '''
         return os.path.join(self.root, self.os_path)
+    
+    def subpath(self, name):
+        '''
+        Create a PathToken that is a subpath of the provided token.
+        '''
+        return PathToken(os.path.join(self.os_path, name), self.root)
+    
+    @classmethod
+    def init_root(cls, base_dir: str) -> Self:
+        '''
+        Initialize the root PathToken.
+        
+        - base_dir (str): the base directory of the dataset.
+        '''
+        return cls('', base_dir)
