@@ -19,6 +19,8 @@ class Token:
     CLASS_IDX = hash('CLASS_IDX')
     GENERIC_ITEM = hash('GENERIC_ITEM')
     GENERIC_FOLDER = hash('GENERIC_FOLDER')
+    ANNOTATION_FILE_STYLE = hash('ANNOTATION_FILE_STYLE')
+    FILENAME_IDENTIFIER = hash('FILENAME_IDENTIFIER')
     
     # detection specific
     
@@ -33,3 +35,10 @@ class Token:
             if hash(token) == token_hash:
                 return token
         raise ValueError('Invalid token.')
+    
+    @staticmethod
+    def to_str(token_hash) -> str:
+        '''
+        Get the string version of the hash for searching.
+        '''
+        return str(token_hash)
