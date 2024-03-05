@@ -38,7 +38,7 @@ class Dataset:
         self.structures = instantiate_all(self.structures, self.path)
 
         print(self)
-        
+
     def __repr__(self) -> str:
         lines = [f'+ Dataset (root {self.path})',
                  f'| - Valid modes: {", ".join([str(mode) for mode in self.modes])}',

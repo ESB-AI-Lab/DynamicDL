@@ -22,7 +22,7 @@ class JSONToken(FormatToken):
 
     def __init__(self):
         pass
-    
+
 class TXTToken(FormatToken):
     '''
     Utility functions for parsing txt files.

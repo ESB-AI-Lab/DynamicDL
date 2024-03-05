@@ -56,7 +56,7 @@ class PathToken(Token):
 
     def __repr__(self) -> str:
         return self.get_os_path()
-    
+
     def get_files(self) -> list[str]:
         '''
         Find all files (not directories) in this path. This token must be a directory type.

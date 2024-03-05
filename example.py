@@ -11,13 +11,13 @@ if __name__ == '__main__':
                 GenericDirectoryToken(
                     StringFormatToken(
                         '{}',
-                        Token()
+                        DataTypes.IMAGE_SET
                     ),
                     DirectoryPurposeToken(),
                     GenericFileToken(
                         StringFormatToken(
                             '{}.txt',
-                            Token()
+                            DataTypes.IMAGE_SET
                         ),
                         FilePurposeToken()
                     )
@@ -29,13 +29,14 @@ if __name__ == '__main__':
                 GenericFileToken(
                     StringFormatToken(
                         '{}.jpg',
-                        Token()
+                        DataTypes.IMAGE_NAME
                     ),
                     FilePurposeToken()
                 )
             )
         ],
         TXTToken(
-
+            
         )
     )
+    print(my_dataset)
