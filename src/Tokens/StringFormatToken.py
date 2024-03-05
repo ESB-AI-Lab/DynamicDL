@@ -1,7 +1,7 @@
 import re
 
-from ..Token import Token
-from ..._utils import union
+from .Token import Token
+from .._utils import union
 
 class StringFormatToken(Token):
     '''
@@ -39,3 +39,6 @@ class StringFormatToken(Token):
         assert len(values) == len(self.tokens), \
             f'Number of values did not match (expected: {len(self.tokens)}, actual: {len(values)})'
         return self.pattern.format(*values)
+
+    def __repr__(self) -> str:
+        return self.pattern

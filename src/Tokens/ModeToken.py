@@ -4,7 +4,7 @@ ModeToken module.
 
 from typing import Self
 
-from ..Token import Token
+from .Token import Token
 
 class ModeToken(Token):
     '''

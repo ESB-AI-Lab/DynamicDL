@@ -2,11 +2,9 @@
 The fundamental dataset module for importing datasets.
 '''
 
-from .FileStructureTokens import PathToken, StructureToken
-from .OtherTokens import ModeToken
-from .FormatTokens import FormatToken
-
-from .FileStructureTokens import instantiate_all
+from .StructureTokens import PathToken, StructureToken, instantiate_all
+from .ModeToken import ModeToken
+from . import FormatTokens
 
 from .._utils import union
 
@@ -23,7 +21,7 @@ class Dataset:
 
     def __init__(self, modes: list[ModeToken] | ModeToken, path: PathToken,
                  structure: list[StructureToken] | StructureToken,
-                 annotation_structure: FormatToken):
+                 annotation_structure: FormatTokens):
         '''
         Create a dataset.
         
@@ -35,7 +33,7 @@ class Dataset:
         self.modes: list[ModeToken] = union(modes)
         self.path: PathToken = path
         self.structures: list[StructureToken] = union(structure)
-        self.annotation_structure: FormatToken = annotation_structure
+        self.annotation_structure: FormatTokens = annotation_structure
 
         self.structures = instantiate_all(self.structures, self.path)
 
