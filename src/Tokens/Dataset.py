@@ -6,7 +6,7 @@ from .FileStructureTokens import PathToken, StructureToken
 from .OtherTokens import ModeToken
 from .FormatTokens import FormatToken
 
-from .FileStructureTokens.utils import instantiate_all
+from .FileStructureTokens import instantiate_all
 
 from .._utils import union
 
@@ -37,4 +37,14 @@ class Dataset:
         self.structures: list[StructureToken] = union(structure)
         self.annotation_structure: FormatToken = annotation_structure
 
-        instantiate_all(self.structures)
+        self.structures = instantiate_all(self.structures, self.path)
+
+        print(self)
+        
+    def __repr__(self) -> str:
+        lines = [f'+ Dataset (root {self.path})',
+                 f'| - Valid modes: {", ".join([str(mode) for mode in self.modes])}',
+                 '| - Files:']
+        for structure in self.structures:
+            lines += ['|   ' + line for line in str(structure).split('\n')]
+        return '\n'.join(lines)

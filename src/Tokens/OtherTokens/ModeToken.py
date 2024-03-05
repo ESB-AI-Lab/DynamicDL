@@ -34,3 +34,6 @@ class ModeToken(Token):
         Initialize a classification mode token.
         '''
         return cls('Segmentation')
+
+    def __repr__(self) -> str:
+        return self.mode

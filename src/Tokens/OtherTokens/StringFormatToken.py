@@ -13,7 +13,7 @@ class StringFormatToken(Token):
     '''
     def __init__(self, pattern: str, tokens: list[Token] | Token):
         self.tokens: list[Token] = union(tokens)
-        assert pattern.count('{}') == len(tokens), \
+        assert pattern.count('{}') == len(self.tokens), \
             "Length of tokens must match corresponding wildcards {}"
         self.pattern: str = pattern
 
@@ -26,8 +26,6 @@ class StringFormatToken(Token):
         '''
         pattern: str = self.pattern.replace('{}', '(.*)')
         matches: list[str] = re.findall(pattern, entry)
-        if len(matches) == 0 and len(self.tokens) > 0:
-            raise ValueError('Matching returned no results.')
         return matches
 
     def substitute(self, values: list[str] | str) -> str:

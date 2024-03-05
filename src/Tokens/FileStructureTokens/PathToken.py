@@ -33,13 +33,13 @@ class PathToken(Token):
         Retrieve the absolute os path to the token structure.
         '''
         return os.path.join(self.root, self.os_path)
-    
+
     def subpath(self, name):
         '''
         Create a PathToken that is a subpath of the provided token.
         '''
         return PathToken(os.path.join(self.os_path, name), self.root)
-    
+
     @classmethod
     def init_root(cls, base_dir: str) -> Self:
         '''
@@ -48,3 +48,6 @@ class PathToken(Token):
         - base_dir (str): the base directory of the dataset.
         '''
         return cls('', base_dir)
+
+    def __repr__(self) -> str:
+        return self.get_os_path()
