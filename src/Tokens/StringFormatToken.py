@@ -21,16 +21,29 @@ class StringFormatToken(Token):
             "Length of tokens must match corresponding wildcards {}"
         self.pattern: str = pattern
 
-    def match(self, entry: str) -> list[str]:
+    def match(self, entry: str, insertion: bool = False) -> list[DataItem]:
         '''
         Return a list of the tokens' string values provided an entry string which follows the 
         pattern.
         
         - entry (str): the string to match to the pattern, assuming it does match
+        - insertion (bool): tolerate new storage tokens
         '''
         pattern: str = self.pattern.replace('{}', '(.*)')
         matches: list[str] = re.findall(pattern, entry)
-        return matches
+        result: list[DataItem] = []
+        try:
+            if not matches:
+                return []
+            # if multiple token matching, extract first matching; else do nothing
+            if isinstance(matches[0], tuple):
+                matches = matches[0]
+            for data_type, match in zip(self.tokens, matches):
+                result.append(DataItem(data_type, match, insertion=insertion))
+        except AssertionError:
+            print('StringFormatToken Warning: parsed string format did not match data requirements')
+            return []
+        return result
 
     def substitute(self, values: list[DataItem] | DataItem) -> str:
         '''

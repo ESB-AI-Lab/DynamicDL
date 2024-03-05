@@ -2,9 +2,9 @@
 The fundamental dataset module for importing datasets.
 '''
 
-from .StructureTokens import PathToken, StructureToken, instantiate_all
+from .StructureTokens import PathToken, FileToken, StructureToken, instantiate_all
 from .ModeToken import ModeToken
-from . import FormatTokens
+from . import FormatToken
 
 from .._utils import union
 
@@ -21,7 +21,7 @@ class Dataset:
 
     def __init__(self, modes: list[ModeToken] | ModeToken, path: PathToken,
                  structure: list[StructureToken] | StructureToken,
-                 annotation_structure: FormatTokens):
+                 annotation_structure: FormatToken):
         '''
         Create a dataset.
         
@@ -33,11 +33,9 @@ class Dataset:
         self.modes: list[ModeToken] = union(modes)
         self.path: PathToken = path
         self.structures: list[StructureToken] = union(structure)
-        self.annotation_structure: FormatTokens = annotation_structure
+        self.annotation_structure: FormatToken = annotation_structure
 
-        self.structures = instantiate_all(self.structures, self.path)
-
-        print(self)
+        self.structures = instantiate_all(self.structures, self.path, self)
 
     def __repr__(self) -> str:
         lines = [f'+ Dataset (root {self.path})',
@@ -46,3 +44,24 @@ class Dataset:
         for structure in self.structures:
             lines += ['|   ' + line for line in str(structure).split('\n')]
         return '\n'.join(lines)
+
+    def get(self, path: str) -> FileToken | list[StructureToken]:
+        '''
+        Get the structure token object at a given path.
+        '''
+        if path == self.path:
+            return self.structures
+        curr: list[StructureToken] = self.structures
+        index = 0
+        while index < len(curr):
+            structure = curr[index]
+            if structure.path.os_path in path:
+                if isinstance(structure, FileToken):
+                    return structure
+                if structure.path.os_path == path:
+                    return structure.subtokens
+                curr = structure.subtokens
+                index = 0
+                continue
+            index += 1
+        raise ValueError('Path does not exist')

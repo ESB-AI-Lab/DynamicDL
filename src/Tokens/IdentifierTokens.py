@@ -13,9 +13,11 @@ class IdentifierToken(Token):
     StringFormatTokens for data parsing functions. Subclasses of this class may have specific 
     requirements for content.
     '''
-    @staticmethod
+    def __init__(self):
+        pass
+
     @abstractmethod
-    def verify_token(token: str) -> bool:
+    def verify_token(self, token: str) -> bool:
         '''
         Checks whether the token is in valid format in accordance with the identifier.
         
@@ -26,28 +28,25 @@ class StorageToken(IdentifierToken):
     '''
     The StorageToken class possesses a set of elements which checks upon itself for membership.
     '''
-    items = set()
+    def __init__(self):
+        self.items: set[str] = set()
 
-    @staticmethod
-    def verify_token(token: str) -> bool:
-        '''
-        Checks whether the token exists in the item pool.
-        
-        - token (str): the token to check for.
-        '''
-        return token in StorageToken.items
+    def verify_token(self, token: str, insertion: bool = False) -> bool:
+        if insertion:
+            self.items.add(token)
+        return token in self.items
 
-    @staticmethod
-    def add_token(token: str) -> bool:
-        '''
-        Add the token to the pool of items. Returns false if it already exists.
-        
-        - token (str): the token to add.
-        '''
-        if token in StorageToken.items:
-            return False
-        StorageToken.items.add(token)
-        return True
+class UniqueToken(IdentifierToken):
+    '''
+    The UniqueToken class possesses a set of elements which checks upon itself for membership.
+    '''
+    def __init__(self):
+        self.items: set[str] = set()
+
+    def verify_token(self, token: str, insertion: bool = False) -> bool:
+        if insertion:
+            self.items.add(token)
+        return token in self.items
 
 class WildcardToken(IdentifierToken):
     '''
@@ -55,8 +54,7 @@ class WildcardToken(IdentifierToken):
     be used for any identifiers.
     '''
 
-    @staticmethod
-    def verify_token(token: str) -> bool:
+    def verify_token(self, token: str) -> bool:
         '''
         Any string passes the wildcard check. Dummy method for assertions.
         
@@ -64,26 +62,24 @@ class WildcardToken(IdentifierToken):
         '''
         return True
 
-class FilenameToken(IdentifierToken):
+class FilenameToken(UniqueToken):
     '''
     The FilenameToken class is an IdentifierToken which checks for valid filenames.
     '''
-    @staticmethod
-    def verify_token(token: str) -> bool:
+    def verify_token(self, token: str, insertion: bool = True) -> bool:
         '''
         Any proper filename passes the check assuming it exists.
         
         - root (str): the root to the main dataset directory.
         - token (str): the token parsed from StringFormatToken.match()
         '''
-        return os.path.exists(token)
+        return os.path.exists(token) and super().verify_token(token, insertion=insertion)
 
 class QuantityToken(IdentifierToken):
     '''
     Represents a numeric quantity.
     '''
-    @staticmethod
-    def verify_token(token: str) -> bool:
+    def verify_token(self, token: str) -> bool:
         '''
         Any proper filename passes the check assuming it exists.
         

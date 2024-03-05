@@ -15,7 +15,8 @@ from typing import Self
 from abc import abstractmethod
 
 from .._utils import union
-from . import Token, DirectoryPurposeToken, FilePurposeToken, PurposeToken, StringFormatToken
+from . import Token, DirectoryPurposeToken, FilePurposeToken, PurposeToken, StringFormatToken, \
+              File, DataItem
 
 class PathToken(Token):
     '''
@@ -30,6 +31,7 @@ class PathToken(Token):
         '''
         Initialize the PathToken.
         '''
+        assert os.path.exists(os.path.join(root, os_path)), 'Path must be valid'
         self.os_path: str = os_path
         self.root: str = root
 
@@ -56,6 +58,11 @@ class PathToken(Token):
 
     def __repr__(self) -> str:
         return self.get_os_path()
+    
+    def __eq__(self, other: Self) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        return self.os_path == other.os_path and self.root == other.root
 
     def get_files(self) -> list[str]:
         '''
@@ -73,7 +80,6 @@ class PathToken(Token):
         return [name for name in os.listdir(self.get_os_path())
                 if os.path.isdir(os.path.join(self.get_os_path(), name))]
 
-
 class StructureToken(Token):
     '''
     Abstract class representing either a file or a directory
@@ -89,13 +95,15 @@ class StructureToken(Token):
         self.name: str = name
         self.instantiated: bool = False
 
-    def instantiate(self, path: PathToken) -> None:
+    def instantiate(self, path: PathToken, dataset) -> None:
         '''
         Instantiates the path of this structure token, and mark as instantiated.
         
-        - path: the parent path token.
+        - path (PathToken): the parent path token.
+        - dataset (Dataset): the dataset this structure token belongs to.
         '''
         self.path: PathToken = path.subpath(self.name)
+        self.dataset = dataset
         self.instantiated = True
 
 class GenericStructureToken(StructureToken):
@@ -104,9 +112,9 @@ class GenericStructureToken(StructureToken):
     '''
     @abstractmethod
     def __init__(self, pattern: str,
-                 purpose: list[PurposeToken] | PurposeToken):
+                 purpose: PurposeToken):
         self.pattern: StringFormatToken = pattern
-        self.purpose: list[DirectoryPurposeToken] = union(purpose)
+        self.purpose: PurposeToken = purpose
         super().__init__(str(pattern))
 
     @abstractmethod
@@ -115,13 +123,15 @@ class GenericStructureToken(StructureToken):
         Expand the generic structure into a list of structure tokens.
         '''
 
-    def instantiate(self, path: PathToken) -> None:
+    def instantiate(self, path: PathToken, dataset) -> None:
         '''
         Instantiates the path of this structure token, and mark as instantiated.
         
         - path: the parent path token.
+        - dataset: the dataset this structure token belongs to.
         '''
         self.path: PathToken = PathToken(path.os_path, path.root)
+        self.dataset: dataset
         self.instantiated = True
 
 class DirectoryToken(StructureToken):
@@ -148,17 +158,18 @@ class DirectoryToken(StructureToken):
         self.subtokens: list[StructureToken] = union(subtokens)
         super().__init__(name)
 
-    def instantiate(self, path: PathToken) -> None:
+    def instantiate(self, path: PathToken, dataset) -> None:
         '''
         Instantiates the path of this directory token, and mark as instantiated.
         
         - path (PathToken): the parent path token.
         '''
-        super().instantiate(path)
-        self.subtokens = instantiate_all(self.subtokens, self.path)
+        super().instantiate(path, dataset)
+        self.subtokens = instantiate_all(self.subtokens, self.path, dataset)
 
     def __repr__(self) -> str:
         lines: list[str] = [f'+ Directory ({self.path})',
+                 f'| - Purpose: {self.purpose}',
                  '| - Contents:']
         cutoff: int = min(len(self.subtokens), 5)
         for subtoken in self.subtokens[:cutoff]:
@@ -183,11 +194,18 @@ class FileToken(StructureToken):
         - path (PathToken): the parent path token.
         - purpose (FilePurposeToken): the purpose token for the file.
         '''
-        self.purpose = purpose
+        self.purpose: FilePurposeToken = purpose
+        self.data: list[list[DataItem]] = None
         super().__init__(path)
 
+    def instantiate(self, path: PathToken, dataset) -> bool:
+        super().instantiate(path, dataset)
+        if self.purpose == File.ANNOTATION:
+            self.data: list[list[DataItem]] = dataset.annotation_structure.get_data(self.path)
+
     def __repr__(self) -> str:
-        lines = [f'+ File ({self.path})']
+        lines = [f'+ File ({self.path})',
+                 f'| - Purpose: {self.purpose}']
         return '\n'.join(lines)
 
 class GenericDirectoryToken(GenericStructureToken):
@@ -201,7 +219,7 @@ class GenericDirectoryToken(GenericStructureToken):
     - subtokens (list[StructureToken] | GenericStructureToken): the items contained in the dir.
     '''
     def __init__(self, pattern: StringFormatToken,
-                 purpose: list[DirectoryPurposeToken] | DirectoryPurposeToken,
+                 purpose: DirectoryPurposeToken,
                  subtokens: list[StructureToken] | StructureToken):
         self.subtokens: list[StructureToken] = union(subtokens)
         super().__init__(pattern, purpose)
@@ -212,7 +230,7 @@ class GenericDirectoryToken(GenericStructureToken):
         all_directories: list[DirectoryToken] = []
         available = self.path.get_directories()
         for directory in available:
-            tokens = self.pattern.match(directory)
+            tokens = self.pattern.match(directory, insertion=True)
             if len(tokens) == 0:
                 continue
             all_directories.append(DirectoryToken(directory, self.purpose, self.subtokens))
@@ -228,7 +246,7 @@ class GenericFileToken(GenericStructureToken):
     - purpose (list[FilePurposeToken] | FilePurposeToken): the purpose of the directory.
     '''
     def __init__(self, pattern: StringFormatToken,
-                 purpose: list[FilePurposeToken] | FilePurposeToken):
+                 purpose: FilePurposeToken):
         super().__init__(pattern, purpose)
 
     def expand(self) -> list[FileToken]:
@@ -237,13 +255,14 @@ class GenericFileToken(GenericStructureToken):
         all_files: list[FileToken] = []
         available = self.path.get_files()
         for file in available:
-            tokens = self.pattern.match(file)
+            tokens = self.pattern.match(file, insertion=True)
             if len(tokens) == 0:
                 continue
             all_files.append(FileToken(file, self.purpose))
         return all_files
 
-def instantiate_all(structures: list[StructureToken], path: PathToken) -> list[StructureToken]:
+def instantiate_all(structures: list[StructureToken], path: PathToken,
+                    dataset) -> list[StructureToken]:
     '''
     Instantiate a list of structures, including expanding the generic structures.
     Structures is modified in place.
@@ -254,7 +273,7 @@ def instantiate_all(structures: list[StructureToken], path: PathToken) -> list[S
     expanded_structures: list[StructureToken] = []
     for structure in structures:
         if isinstance(structure, GenericStructureToken):
-            structure.instantiate(path)
+            structure.instantiate(path, dataset)
             expanded_structures += structure.expand()
 
     structures = [structure for structure in structures \
@@ -263,6 +282,6 @@ def instantiate_all(structures: list[StructureToken], path: PathToken) -> list[S
     structures = structures + expanded_structures
 
     for structure in structures:
-        structure.instantiate(path)
+        structure.instantiate(path, dataset)
 
     return structures
