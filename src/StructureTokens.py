@@ -14,9 +14,10 @@ import os
 from typing import Self
 from abc import abstractmethod
 
-from .._utils import union
+from ._utils import union
+from .DataItems import DataEntry, DataItem, DataTypes
 from . import Token, DirectoryPurposeToken, FilePurposeToken, PurposeToken, StringFormatToken, \
-              File, DataItem
+              File
 
 class PathToken(Token):
     '''
@@ -58,7 +59,7 @@ class PathToken(Token):
 
     def __repr__(self) -> str:
         return self.get_os_path()
-    
+
     def __eq__(self, other: Self) -> bool:
         if self.__class__ != other.__class__:
             return False
@@ -146,7 +147,8 @@ class DirectoryToken(StructureToken):
     '''
     def __init__(self, name: str,
                  purpose: list[DirectoryPurposeToken] | DirectoryPurposeToken,
-                 subtokens: list[StructureToken] | GenericStructureToken):
+                 subtokens: list[StructureToken] | GenericStructureToken,
+                 data_tokens: list[DataItem] = []):
         '''
         Instantiate a DirectoryToken.
         
@@ -156,6 +158,7 @@ class DirectoryToken(StructureToken):
         '''
         self.purpose: list[DirectoryPurposeToken] = union(purpose)
         self.subtokens: list[StructureToken] = union(subtokens)
+        self.data_tokens: list[DataItem] = data_tokens
         super().__init__(name)
 
     def instantiate(self, path: PathToken, dataset) -> None:
@@ -187,7 +190,8 @@ class FileToken(StructureToken):
     - purpose (FilePurposeToken): the purpose token for the file.
     - format (FormatToken): the format of this file.
     '''
-    def __init__(self, path: PathToken, purpose: FilePurposeToken):
+    def __init__(self, path: PathToken, purpose: FilePurposeToken,
+                 data_tokens: list[DataItem] = []):
         '''
         Instantiate a FileToken.
         
@@ -195,13 +199,18 @@ class FileToken(StructureToken):
         - purpose (FilePurposeToken): the purpose token for the file.
         '''
         self.purpose: FilePurposeToken = purpose
-        self.data: list[list[DataItem]] = None
+        self.data: list[DataEntry] = None
+        self.data_tokens: list[DataItem] = data_tokens
         super().__init__(path)
 
     def instantiate(self, path: PathToken, dataset) -> bool:
         super().instantiate(path, dataset)
         if self.purpose == File.ANNOTATION:
-            self.data: list[list[DataItem]] = dataset.annotation_structure.get_data(self.path)
+            self.data: list[DataEntry] = dataset.annotation_structure.get_data(self.path)
+        if self.purpose == File.IMAGE:
+            self.data_tokens += [DataItem(DataTypes.ABSOLUTE_FILE,
+                                          self.path.get_os_path(), insertion=True)]
+            self.data: list[DataEntry] = [DataEntry(self.data_tokens)]
 
     def __repr__(self) -> str:
         lines = [f'+ File ({self.path})',
@@ -233,7 +242,8 @@ class GenericDirectoryToken(GenericStructureToken):
             tokens = self.pattern.match(directory, insertion=True)
             if len(tokens) == 0:
                 continue
-            all_directories.append(DirectoryToken(directory, self.purpose, self.subtokens))
+            all_directories.append(DirectoryToken(directory, self.purpose, self.subtokens,
+                                                  data_tokens=tokens))
         return all_directories
 
 class GenericFileToken(GenericStructureToken):
@@ -258,7 +268,7 @@ class GenericFileToken(GenericStructureToken):
             tokens = self.pattern.match(file, insertion=True)
             if len(tokens) == 0:
                 continue
-            all_files.append(FileToken(file, self.purpose))
+            all_files.append(FileToken(file, self.purpose, tokens))
         return all_files
 
 def instantiate_all(structures: list[StructureToken], path: PathToken,

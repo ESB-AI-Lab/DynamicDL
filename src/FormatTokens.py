@@ -6,8 +6,8 @@ from abc import abstractmethod
 from .Token import Token
 from .StringFormatToken import StringFormatToken
 from .StructureTokens import PathToken
-from .._utils import union
-from ..DataItems import DataTypes, DataItem
+from ._utils import union
+from .DataItems import DataTypes, DataItem, DataEntry
 
 class FormatToken(Token):
     '''
@@ -102,7 +102,7 @@ class TXTToken(FormatToken):
                 pattern: StringFormatToken = parser.next_format()
                 item += pattern.match(line, insertion=True)
                 if parser.is_end():
-                    data.append(item)
+                    data.append(DataEntry(item))
         return data
 
 class XLSXToken(FormatToken):

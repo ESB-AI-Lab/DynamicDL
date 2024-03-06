@@ -4,8 +4,45 @@ Generic Format Token module for wildcard strings.
 import re
 
 from .Token import Token
-from .._utils import union
-from ..DataItems import DataItem, DataType
+from ._utils import union
+from .DataItems import DataItem, DataType
+
+class PatternAlias:
+    '''
+    Class used when a DataType placeholder could be interpreted multiple ways. For example, if
+    IMAGE_NAME also contains CLASS_NAME and IMAGE_ID, we can extract all 3 tokens out using
+    PatternAlias. Counts for a single wildcard token.
+    '''
+    def __init__(self, patterns: list[str], aliases: list[list[DataType] | DataType]):
+        aliases = [union(alias) for alias in aliases]
+        assert len(patterns) == len(aliases), \
+            f'Pattern and alias list lengths ({len(patterns)}, {len(aliases)}) must match'
+        for pattern, alias in zip(patterns, aliases):
+            count = pattern.count('{}')
+            assert count == len(alias), \
+                f'Pattern must have as many wildcards ({count}) as aliases ({len(alias)})'
+        self.patterns: list[str] = patterns
+        self.aliases: list[list[DataType]] = aliases
+
+    def get_matches(self, entry: str, insertion: bool = False) -> list[DataItem]:
+        '''
+        Return a list of DataItems including all of the possible alias items.
+        '''
+        result: list[DataItem] = []
+        for pattern, alias in zip(self.patterns, self.aliases):
+            pattern: str = pattern.replace('{}', '(.+)')
+            matches: list[str] = re.findall(pattern, entry)
+            try:
+                if not matches:
+                    return []
+                # if multiple token matching, extract first matching; else do nothing
+                if isinstance(matches[0], tuple):
+                    matches = matches[0]
+                for data_type, match in zip(alias, matches):
+                    result.append(DataItem(data_type, match, insertion=insertion))
+            except AssertionError:
+                return []
+        return result
 
 class StringFormatToken(Token):
     '''
@@ -15,8 +52,9 @@ class StringFormatToken(Token):
     - tokens (list[DataItem] | DataItem): the list of tokens which correspond to each wildcard {}
     - pattern (str): the pattern for matching
     '''
-    def __init__(self, pattern: str, tokens: list[DataType] | DataType):
-        self.tokens: list[DataType] = union(tokens)
+    def __init__(self, pattern: str,
+                 tokens: list[DataType | PatternAlias] | DataType | PatternAlias):
+        self.tokens: list[DataType | PatternAlias] = union(tokens)
         assert pattern.count('{}') == len(self.tokens), \
             "Length of tokens must match corresponding wildcards {}"
         self.pattern: str = pattern
@@ -29,7 +67,7 @@ class StringFormatToken(Token):
         - entry (str): the string to match to the pattern, assuming it does match
         - insertion (bool): tolerate new storage tokens
         '''
-        pattern: str = self.pattern.replace('{}', '(.*)')
+        pattern: str = self.pattern.replace('{}', '(.+)')
         matches: list[str] = re.findall(pattern, entry)
         result: list[DataItem] = []
         try:
@@ -39,7 +77,10 @@ class StringFormatToken(Token):
             if isinstance(matches[0], tuple):
                 matches = matches[0]
             for data_type, match in zip(self.tokens, matches):
-                result.append(DataItem(data_type, match, insertion=insertion))
+                if isinstance(data_type, PatternAlias):
+                    result += data_type.get_matches(match, insertion=insertion)
+                else:
+                    result.append(DataItem(data_type, match, insertion=insertion))
         except AssertionError:
             print('StringFormatToken Warning: parsed string format did not match data requirements')
             return []
