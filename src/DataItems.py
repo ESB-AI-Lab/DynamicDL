@@ -5,7 +5,7 @@ Represents all possible (required) data items for parsing a dataset.
 from typing import Self
 
 from .IdentifierTokens import IdentifierToken, StorageToken, WildcardToken, FilenameToken, \
-                              QuantityToken, UniqueToken
+                              QuantityToken, UniqueToken, RedundantStorageToken
 from ._utils import union
 
 class DataType:
@@ -39,8 +39,8 @@ class DataTypes:
     '''
     Presets for DataType.
     '''
-    IMAGE_SET: DataType = DataType('IMAGE_SET', StorageToken())
-    IMAGE_SET_ID: DataType = DataType('IMAGE_SET_ID', StorageToken())
+    IMAGE_SET: DataType = DataType('IMAGE_SET', RedundantStorageToken())
+    IMAGE_SET_ID: DataType = DataType('IMAGE_SET_ID', RedundantStorageToken())
     ABSOLUTE_FILE: DataType = DataType('ABSOLUTE_FILE', FilenameToken())
     RELATIVE_FILE: DataType = DataType('RELATIVE_FILE', FilenameToken())
     IMAGE_NAME: DataType = DataType('IMAGE_NAME', UniqueToken())
@@ -102,6 +102,10 @@ class DataEntry:
         for desc, item in other.data.items():
             if desc not in self.data:
                 self.data[desc] = item
+                continue
+            if isinstance(item.delimiter.token_type, RedundantStorageToken):
+                self.data[desc] = union(self.data[desc])
+                self.data[desc].append(item)
 
     def apply_tokens(self, items: list[DataItem] | DataItem) -> None:
         '''
@@ -120,6 +124,10 @@ class DataEntry:
         for item in items:
             if item.delimiter.desc not in self.data:
                 self.data[item.delimiter.desc] = item
+                continue
+            if isinstance(item.delimiter.token_type, RedundantStorageToken):
+                self.data[item.delimiter.desc] = union(self.data[item.delimiter.desc])
+                self.data[item.delimiter.desc].append(item)
 
     def apply_pairing(self, entries: list[Self] | Self) -> None:
         '''

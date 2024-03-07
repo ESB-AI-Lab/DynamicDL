@@ -36,6 +36,12 @@ class StorageToken(IdentifierToken):
             self.items.add(token)
         return token in self.items
 
+class RedundantStorageToken(StorageToken):
+    '''
+    The RedundantStorageToken class possesses a set of elements which checks upon itself, but also
+    allows for a data item to store a list of items instead of just one value.
+    '''
+
 class UniqueToken(IdentifierToken):
     '''
     The UniqueToken class possesses a set of elements which checks upon itself for membership.
