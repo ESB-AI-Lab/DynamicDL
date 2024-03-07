@@ -103,3 +103,9 @@ class StringFormatToken(Token):
 
     def __repr__(self) -> str:
         return self.pattern.format(*self.tokens)
+
+class DictFormatToken(Token):
+    pass
+
+class ListFormatToken(Token):
+    pass

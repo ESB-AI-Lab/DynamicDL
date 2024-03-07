@@ -1,31 +1,10 @@
 '''
 FormatToken module
 '''
-from abc import abstractmethod
-
-from .Token import Token
 from .StringFormatToken import StringFormatToken
-from .StructureTokens import PathToken
+from .StructureTokens import PathToken, FormatToken
 from ._utils import union
 from .DataItems import DataTypes, DataItem, DataEntry
-
-class FormatToken(Token):
-    '''
-    The FormatToken abstract class is a framework for format classes to support utility functions
-    for parsing annotation data.
-    '''
-
-    @abstractmethod
-    def __init__(self):
-        pass
-
-    @abstractmethod
-    def get_data(self, file: str) -> dict:
-        '''
-        Retrieve data.
-        
-        - file (str): path to the annotation file.
-        '''
 
 class JSONToken(FormatToken):
     '''

@@ -19,6 +19,24 @@ from .DataItems import DataEntry, DataItem, DataTypes
 from . import Token, DirectoryPurposeToken, FilePurposeToken, PurposeToken, StringFormatToken, \
               File
 
+class FormatToken(Token):
+    '''
+    The FormatToken abstract class is a framework for format classes to support utility functions
+    for parsing annotation data.
+    '''
+
+    @abstractmethod
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def get_data(self, file: str) -> dict:
+        '''
+        Retrieve data.
+        
+        - file (str): path to the annotation file.
+        '''
+
 class PathToken(Token):
     '''
     The PathToken class represents an OS path, and also can be used to traverse the token structure.
@@ -96,7 +114,7 @@ class StructureToken(Token):
         self.name: str = name
         self.instantiated: bool = False
 
-    def instantiate(self, path: PathToken, dataset) -> None:
+    def instantiate(self, path: PathToken) -> None:
         '''
         Instantiates the path of this structure token, and mark as instantiated.
         
@@ -104,7 +122,6 @@ class StructureToken(Token):
         - dataset (Dataset): the dataset this structure token belongs to.
         '''
         self.path: PathToken = path.subpath(self.name)
-        self.dataset = dataset
         self.instantiated = True
 
 class GenericStructureToken(StructureToken):
@@ -124,7 +141,7 @@ class GenericStructureToken(StructureToken):
         Expand the generic structure into a list of structure tokens.
         '''
 
-    def instantiate(self, path: PathToken, dataset) -> None:
+    def instantiate(self, path: PathToken) -> None:
         '''
         Instantiates the path of this structure token, and mark as instantiated.
         
@@ -132,7 +149,6 @@ class GenericStructureToken(StructureToken):
         - dataset: the dataset this structure token belongs to.
         '''
         self.path: PathToken = PathToken(path.os_path, path.root)
-        self.dataset: dataset
         self.instantiated = True
 
 class DirectoryToken(StructureToken):
@@ -161,14 +177,14 @@ class DirectoryToken(StructureToken):
         self.data_tokens: list[DataItem] = data_tokens
         super().__init__(name)
 
-    def instantiate(self, path: PathToken, dataset) -> None:
+    def instantiate(self, path: PathToken) -> None:
         '''
         Instantiates the path of this directory token, and mark as instantiated.
         
         - path (PathToken): the parent path token.
         '''
-        super().instantiate(path, dataset)
-        self.subtokens = instantiate_all(self.subtokens, self.path, dataset)
+        super().instantiate(path)
+        self.subtokens = instantiate_all(self.subtokens, self.path)
 
     def __repr__(self) -> str:
         lines: list[str] = [f'+ Directory ({self.path})',
@@ -190,23 +206,26 @@ class FileToken(StructureToken):
     - purpose (FilePurposeToken): the purpose token for the file.
     - format (FormatToken): the format of this file.
     '''
-    def __init__(self, path: PathToken, purpose: FilePurposeToken,
-                 data_tokens: list[DataItem] = []):
+    def __init__(self, name: str, purpose: FilePurposeToken,
+                 data_tokens: list[DataItem] = [], format_token: FormatToken = None):
         '''
         Instantiate a FileToken.
         
-        - path (PathToken): the parent path token.
+        - name (str): the name of the file.
         - purpose (FilePurposeToken): the purpose token for the file.
         '''
         self.purpose: FilePurposeToken = purpose
         self.data: list[DataEntry] = None
         self.data_tokens: list[DataItem] = data_tokens
-        super().__init__(path)
-
-    def instantiate(self, path: PathToken, dataset) -> bool:
-        super().instantiate(path, dataset)
         if self.purpose == File.ANNOTATION:
-            self.data: list[DataEntry] = dataset.annotation_structure.get_data(self.path)
+            assert format_token is not None, 'Must have a format for annotation files.'
+        self.format_token: FormatToken = format_token
+        super().__init__(name)
+
+    def instantiate(self, path: PathToken) -> bool:
+        super().instantiate(path)
+        if self.purpose == File.ANNOTATION:
+            self.data: list[DataEntry] = self.format_token.get_data(self.path)
         if self.purpose == File.IMAGE:
             self.data_tokens += [DataItem(DataTypes.ABSOLUTE_FILE,
                                           self.path.get_os_path(), insertion=True)]
@@ -256,7 +275,10 @@ class GenericFileToken(GenericStructureToken):
     - purpose (list[FilePurposeToken] | FilePurposeToken): the purpose of the directory.
     '''
     def __init__(self, pattern: StringFormatToken,
-                 purpose: FilePurposeToken):
+                 purpose: FilePurposeToken, format_token: FormatToken = None):
+        if purpose == File.ANNOTATION:
+            assert format_token is not None, 'Must have a format for annotation files.'
+        self.format_token: FormatToken = format_token
         super().__init__(pattern, purpose)
 
     def expand(self) -> list[FileToken]:
@@ -268,11 +290,11 @@ class GenericFileToken(GenericStructureToken):
             tokens = self.pattern.match(file, insertion=True)
             if len(tokens) == 0:
                 continue
-            all_files.append(FileToken(file, self.purpose, tokens))
+            all_files.append(FileToken(file, self.purpose, data_tokens=tokens,
+                                       format_token=self.format_token))
         return all_files
 
-def instantiate_all(structures: list[StructureToken], path: PathToken,
-                    dataset) -> list[StructureToken]:
+def instantiate_all(structures: list[StructureToken], path: PathToken) -> list[StructureToken]:
     '''
     Instantiate a list of structures, including expanding the generic structures.
     Structures is modified in place.
@@ -283,7 +305,7 @@ def instantiate_all(structures: list[StructureToken], path: PathToken,
     expanded_structures: list[StructureToken] = []
     for structure in structures:
         if isinstance(structure, GenericStructureToken):
-            structure.instantiate(path, dataset)
+            structure.instantiate(path)
             expanded_structures += structure.expand()
 
     structures = [structure for structure in structures \
@@ -292,6 +314,6 @@ def instantiate_all(structures: list[StructureToken], path: PathToken,
     structures = structures + expanded_structures
 
     for structure in structures:
-        structure.instantiate(path, dataset)
+        structure.instantiate(path)
 
     return structures

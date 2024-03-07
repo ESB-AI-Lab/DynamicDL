@@ -2,7 +2,6 @@
 The fundamental dataset module for importing datasets.
 '''
 
-from .FormatTokens import FormatToken
 from .ModeToken import ModeToken
 from .StructureTokens import PathToken, FileToken, StructureToken, DirectoryToken, instantiate_all
 from .DataItems import DataEntry, DataTypes, DataType
@@ -21,8 +20,7 @@ class Dataset:
     '''
 
     def __init__(self, modes: list[ModeToken] | ModeToken, path: PathToken,
-                 structure: list[StructureToken] | StructureToken,
-                 annotation_structure: FormatToken):
+                 structure: list[StructureToken] | StructureToken):
         '''
         Create a dataset.
         
@@ -34,31 +32,44 @@ class Dataset:
         self.modes: list[ModeToken] = union(modes)
         self.path: PathToken = path
         self.structures: list[StructureToken] = union(structure)
-        self.annotation_structure: FormatToken = annotation_structure
 
-        self.structures = instantiate_all(self.structures, self.path, self)
+        self.structures = instantiate_all(self.structures, self.path)
+        self.data, self.pairing_data = self._populate_data(self.structures)
 
-        self.data: list[DataEntry] = self._populate_data(self.structures)
+        for pair in self.pairing_data:
+            pair.apply_pairing(self.data)
 
-    def _populate_data(self, root: list[StructureToken] | StructureToken) -> list[DataEntry]:
+    def _populate_data(self, root: list[StructureToken] | StructureToken) -> \
+            tuple[list[DataEntry], list[DataEntry]]:
         '''
         Recursively search through root to populate list of data entries in the entire dataset.
         '''
         data: list[DataEntry] = []
+        pairing_data: list[DataEntry] = []
         if isinstance(root, list):
             for structure in root:
-                data = Dataset._merge_lists(data, self._populate_data(structure))
+                child_data, child_pairing_data = self._populate_data(structure)
+                data = Dataset._merge_lists(data, child_data)
+                pairing_data += child_pairing_data
         elif isinstance(root, DirectoryToken):
             for structure in root.subtokens:
-                child_data: list[DataEntry] = self._populate_data(structure)
+                child_data, child_pairing_data = self._populate_data(structure)
+                pairing_data += child_pairing_data
                 for item in child_data:
-                    item.apply(structure.data_tokens)
+                    if item.unique:
+                        item.apply_tokens(structure.data_tokens)
+                    else:
+                        pairing_data.append(item)
                 data = Dataset._merge_lists(data, child_data)
         elif isinstance(root, FileToken):
-            data = root.data
+            for entry in root.data:
+                if entry.unique:
+                    data.append(entry)
+                else:
+                    pairing_data.append(entry)
         else:
             raise ValueError('Invalid structure! Found StructureToken not of type Dir/File.')
-        return data
+        return data, pairing_data
 
     @staticmethod
     def _merge_lists(first: list[DataEntry], second: list[DataEntry]) -> list[DataEntry]:
@@ -66,7 +77,6 @@ class Dataset:
         unique_identifiers: list[DataType] = [var for var in vars(DataTypes).values() if
                                               isinstance(var, DataType) and
                                               isinstance(var.token_type, UniqueToken)]
-        # print(unique_identifiers)
         hashmaps: dict[str, dict[str, DataEntry]] = {}
         for identifier in unique_identifiers:
             hashmaps[identifier.desc] = {}

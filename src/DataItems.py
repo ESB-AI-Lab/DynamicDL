@@ -67,7 +67,7 @@ class DataItem:
 
     def __repr__(self) -> str:
         return f'{self.delimiter}: {self.value}'
-    
+
     def __eq__(self, other: Self) -> bool:
         if self.__class__ != other.__class__:
             return False
@@ -77,12 +77,14 @@ class DataEntry:
     '''
     Contains all items required for an entry in the dataset.
     
-    - items (list[DataItem] | DataItem): list of data items to associate together.
+    Instance variables:
+    - unique (bool): true if this entry contains unique data, paired data otherwise.
+    - data (list[DataItem] | DataItem): list of data items to associate together.
     '''
     def __init__(self, items: list[DataItem] | DataItem):
         items: list[DataItem] = union(items)
-        assert any([isinstance(item.delimiter.token_type, UniqueToken) for item in items]), \
-               'There must be a unique identifier item in items.'
+        self.unique: bool = any([isinstance(item.delimiter.token_type, UniqueToken)
+                                 for item in items])
         self.data: dict[str, DataItem] = {item.delimiter.desc: item for item in items}
 
     def merge(self, other: Self) -> None:
@@ -101,7 +103,7 @@ class DataEntry:
             if desc not in self.data:
                 self.data[desc] = item
 
-    def apply(self, items: list[DataItem] | DataItem) -> None:
+    def apply_tokens(self, items: list[DataItem] | DataItem) -> None:
         '''
         Apply new tokens to the item.
         
@@ -118,7 +120,18 @@ class DataEntry:
         for item in items:
             if item.delimiter.desc not in self.data:
                 self.data[item.delimiter.desc] = item
-                
+
+    def apply_pairing(self, entries: list[Self] | Self) -> None:
+        '''
+        If entry is a non-unique entry, apply its pairing to all entries to populate data.
+        '''
+        if self.unique:
+            raise ValueError('Can only apply pairing for non-unique DataEntry instances.')
+        entries: list[Self] = union(entries)
+        for entry in entries:
+            if any([item in entry.data.values() for item in self.data.values()]):
+                entry.apply_tokens(list(self.data.values()))
+
     def get_unique_ids(self) -> list[DataItem]:
         '''
         Return identifier tokens.
@@ -130,4 +143,4 @@ class DataEntry:
         return id_items
 
     def __repr__(self) -> str:
-        return '\n'.join(['\nDataEntry:']+[str(item) for item in self.data.values()])
+        return '\n'.join(['DataEntry:']+[str(item) for item in self.data.values()])
