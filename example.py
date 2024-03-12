@@ -19,23 +19,25 @@ Dataset(
     ],
     JSONToken(
         {
-            'images': DictFormatToken(
+            'images': {
                 'id': DataTypes.IMAGE_ID,
                 'file_name': StringFormatToken(
                     '{}/{}', [DataTypes.GENERIC, DataTypes.RELATIVE_FILE]
                 )
-            ),
-            'categories': DictFormatToken(
+            },
+            'categories': {
                 'id': DataTypes.CLASS_ID,
                 'name': DataTypes.CLASS_NAME
-            ),
-            'annotations': DictFormatToken({
-                'image_id': DataTypes.IMAGE_ID,
-                'category_id': DataTypes.CLASS_ID,
-                'bbox': [
-                    DataTypes.XMIN, DataTypes.YMIN, DataTypes.XMAX, DataTypes.YMAX
-                ]
-            })
+            },
+            'annotations': [
+                GenericDict({
+                    'image_id': DataTypes.IMAGE_ID,
+                    'category_id': DataTypes.CLASS_ID,
+                    'bbox': [
+                        DataTypes.XMIN, DataTypes.YMIN, DataTypes.XMAX, DataTypes.YMAX
+                    ]
+                })
+            ]
         }
     )
 )

@@ -10,94 +10,15 @@ GenericDirectoryToken class: generic directory structure class
 GenericFileToken class: generic file structure class
 '''
 
-import os
-from typing import Self
 from abc import abstractmethod
 
 from ._utils import union
 from .DataItems import DataEntry, DataItem, DataTypes
-from . import Token, DirectoryPurposeToken, FilePurposeToken, PurposeToken, StringFormatToken, \
-              File
+from .Token import Token, PathToken, FormatToken
+from .PurposeTokens import DirectoryPurposeToken, FilePurposeToken, PurposeToken, File
+from .FormatTokens import StringFormatToken
 
-class FormatToken(Token):
-    '''
-    The FormatToken abstract class is a framework for format classes to support utility functions
-    for parsing annotation data.
-    '''
 
-    @abstractmethod
-    def __init__(self):
-        pass
-
-    @abstractmethod
-    def get_data(self, file: str) -> dict:
-        '''
-        Retrieve data.
-        
-        - file (str): path to the annotation file.
-        '''
-
-class PathToken(Token):
-    '''
-    The PathToken class represents an OS path, and also can be used to traverse the token structure.
-    
-    Instance Variables:
-    - os_path (str): The relative OS path, starting from the root
-    - root (str): The absolute OS path to the root of the dataset
-    '''
-
-    def __init__(self, os_path: str, root: str):
-        '''
-        Initialize the PathToken.
-        '''
-        assert os.path.exists(os.path.join(root, os_path)), 'Path must be valid'
-        self.os_path: str = os_path
-        self.root: str = root
-
-    def get_os_path(self) -> str:
-        '''
-        Retrieve the absolute os path to the token structure.
-        '''
-        return os.path.join(self.root, self.os_path)
-
-    def subpath(self, name):
-        '''
-        Create a PathToken that is a subpath of the provided token.
-        '''
-        return PathToken(os.path.join(self.os_path, name), self.root)
-
-    @classmethod
-    def init_root(cls, base_dir: str) -> Self:
-        '''
-        Initialize the root PathToken.
-        
-        - base_dir (str): the base directory of the dataset.
-        '''
-        return cls('', base_dir)
-
-    def __repr__(self) -> str:
-        return self.get_os_path()
-
-    def __eq__(self, other: Self) -> bool:
-        if self.__class__ != other.__class__:
-            return False
-        return self.os_path == other.os_path and self.root == other.root
-
-    def get_files(self) -> list[str]:
-        '''
-        Find all files (not directories) in this path. This token must be a directory type.
-        '''
-        assert os.path.isdir(self.get_os_path()), 'This PathToken does not represent a directory!'
-        return [name for name in os.listdir(self.get_os_path())
-                if not os.path.isdir(os.path.join(self.get_os_path(), name))]
-
-    def get_directories(self) -> list[str]:
-        '''
-        Find all directories (not files) in the given os path.
-        '''
-        assert os.path.isdir(self.get_os_path()), 'This PathToken does not represent a directory!'
-        return [name for name in os.listdir(self.get_os_path())
-                if os.path.isdir(os.path.join(self.get_os_path(), name))]
 
 class StructureToken(Token):
     '''
@@ -225,11 +146,11 @@ class FileToken(StructureToken):
     def instantiate(self, path: PathToken) -> bool:
         super().instantiate(path)
         if self.purpose == File.ANNOTATION:
-            self.data: list[DataEntry] = self.format_token.get_data(self.path)
+            self.data, self.pairing_data = self.format_token.get_data(self.path)
         if self.purpose == File.IMAGE:
-            self.data_tokens += [DataItem(DataTypes.ABSOLUTE_FILE,
-                                          self.path.get_os_path(), insertion=True)]
+            self.data_tokens += [DataItem(DataTypes.ABSOLUTE_FILE, self.path.get_os_path())]
             self.data: list[DataEntry] = [DataEntry(self.data_tokens)]
+            self.pairing_data: list[DataEntry] = []
 
     def __repr__(self) -> str:
         lines = [f'+ File ({self.path})',
@@ -258,7 +179,7 @@ class GenericDirectoryToken(GenericStructureToken):
         all_directories: list[DirectoryToken] = []
         available = self.path.get_directories()
         for directory in available:
-            tokens = self.pattern.match(directory, insertion=True)
+            tokens = self.pattern.match(directory)
             if len(tokens) == 0:
                 continue
             all_directories.append(DirectoryToken(directory, self.purpose, self.subtokens,
@@ -287,7 +208,7 @@ class GenericFileToken(GenericStructureToken):
         all_files: list[FileToken] = []
         available = self.path.get_files()
         for file in available:
-            tokens = self.pattern.match(file, insertion=True)
+            tokens = self.pattern.match(file)
             if len(tokens) == 0:
                 continue
             all_files.append(FileToken(file, self.purpose, data_tokens=tokens,

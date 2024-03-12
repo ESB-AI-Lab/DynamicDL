@@ -31,10 +31,9 @@ class StorageToken(IdentifierToken):
     def __init__(self):
         self.items: set[str] = set()
 
-    def verify_token(self, token: str, insertion: bool = False) -> bool:
-        if insertion:
-            self.items.add(token)
-        return token in self.items
+    def verify_token(self, token: str) -> bool:
+        self.items.add(token)
+        return True
 
 class RedundantStorageToken(StorageToken):
     '''
@@ -49,10 +48,9 @@ class UniqueToken(IdentifierToken):
     def __init__(self):
         self.items: set[str] = set()
 
-    def verify_token(self, token: str, insertion: bool = False) -> bool:
-        if insertion:
-            self.items.add(token)
-        return token in self.items
+    def verify_token(self, token: str) -> bool:
+        self.items.add(token)
+        return True
 
 class WildcardToken(IdentifierToken):
     '''
@@ -72,14 +70,14 @@ class FilenameToken(UniqueToken):
     '''
     The FilenameToken class is an IdentifierToken which checks for valid filenames.
     '''
-    def verify_token(self, token: str, insertion: bool = True) -> bool:
+    def verify_token(self, token: str) -> bool:
         '''
         Any proper filename passes the check assuming it exists.
         
         - root (str): the root to the main dataset directory.
         - token (str): the token parsed from StringFormatToken.match()
         '''
-        return os.path.exists(token) and super().verify_token(token, insertion=insertion)
+        return os.path.exists(token) and super().verify_token(token)
 
 class QuantityToken(IdentifierToken):
     '''

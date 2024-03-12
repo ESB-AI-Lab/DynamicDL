@@ -10,8 +10,14 @@ from ._utils import union
 
 class DataType:
     '''
-    All possible data types.
+    All possible data types. Container class for IdentifierToken objects with specific purposes.
+    
+    Instance variables:
+    - desc (str): the purpose of the DataType. This should be unique for every new object.
+    - storage (bool): whether the DataType stores items contained in it.
+    - token_type (type[IdentifierToken]): the token type of the DataType.
     '''
+
     def __init__(self, desc: str, token_type: IdentifierToken):
         self.desc: str = desc
         self.storage: bool = False
@@ -27,17 +33,19 @@ class DataType:
             return False
         return self.desc == other.desc
 
-    def verify_token(self, value: str, insertion: bool = False) -> bool:
+    def verify_token(self, value: str) -> bool:
         '''
-        Verify that a given value is valid for the datatype.
+        Verify that a given value is valid for the datatype. Calls on internal IdentifierToken
+        functions for validation.
+        
+        - value (str): the value to check if it is compatible with the DataType.
         '''
-        if self.storage:
-            return self.token_type.verify_token(value, insertion=insertion)
         return self.token_type.verify_token(value)
 
 class DataTypes:
     '''
-    Presets for DataType.
+    Presets for DataType. These represent valid tokens, and DataType should not be initialized
+    directly but rather through these presets.
     '''
     IMAGE_SET: DataType = DataType('IMAGE_SET', RedundantStorageToken())
     IMAGE_SET_ID: DataType = DataType('IMAGE_SET_ID', RedundantStorageToken())
@@ -57,10 +65,15 @@ class DataTypes:
 
 class DataItem:
     '''
-    Base, abstract class for representing a data item.
+    Base, abstract class for representing a data item. Contains a DataType and a value associated
+    with it.
+    
+    Instance variables:
+    - delimiter (DataType): the type of the DataItem.
+    - value (str): the value associated with the DataType, must be compatible.
     '''
-    def __init__(self, delimiter: DataType, value: str, insertion=False):
-        assert delimiter.verify_token(value, insertion = insertion), \
+    def __init__(self, delimiter: DataType, value: str):
+        assert delimiter.verify_token(value), \
                f'Value {value} is invalid for given delimiter type {delimiter}'
         self.delimiter: DataType = delimiter
         self.value: str = value
@@ -75,11 +88,11 @@ class DataItem:
 
 class DataEntry:
     '''
-    Contains all items required for an entry in the dataset.
+    Contains all items required for an entry in the dataset, which contains DataItem objects.
     
     Instance variables:
     - unique (bool): true if this entry contains unique data, paired data otherwise.
-    - data (list[DataItem] | DataItem): list of data items to associate together.
+    - data (list[DataItem]): list of data items to associate together.
     '''
     def __init__(self, items: list[DataItem] | DataItem):
         items: list[DataItem] = union(items)
@@ -93,12 +106,11 @@ class DataEntry:
         
         - other (DataEntry): another data entry to merge into this instance.
         '''
-        # execute checks first
         for desc, item in other.data.items():
             if isinstance(item.delimiter.token_type, UniqueToken):
                 assert desc not in self.data or self.data[desc] == other.data[desc], \
                        f'Unique identifiers {self.data[desc]} not equal to {other.data[desc]}'
-        # merge
+
         for desc, item in other.data.items():
             if desc not in self.data:
                 self.data[desc] = item
@@ -132,6 +144,8 @@ class DataEntry:
     def apply_pairing(self, entries: list[Self] | Self) -> None:
         '''
         If entry is a non-unique entry, apply its pairing to all entries to populate data.
+        
+        - entries (list[DataEntry] | DataEntry): entries to apply this general entry to.
         '''
         if self.unique:
             raise ValueError('Can only apply pairing for non-unique DataEntry instances.')
@@ -142,7 +156,7 @@ class DataEntry:
 
     def get_unique_ids(self) -> list[DataItem]:
         '''
-        Return identifier tokens.
+        Return all unique identifier tokens.
         '''
         id_items: list[DataItem] = []
         for item in self.data.values():
@@ -151,4 +165,4 @@ class DataEntry:
         return id_items
 
     def __repr__(self) -> str:
-        return '\n'.join(['DataEntry:']+[str(item) for item in self.data.values()])
+        return ' '.join(['DataEntry:']+[str(item) for item in self.data.values()])
