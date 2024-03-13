@@ -33,12 +33,9 @@ class GenericList:
         item_list: list[Static] = []
         item: list[Any] = []
         for index, entry in enumerate(dataset):
-            # print(entry)
-            # print(self.form[index % len(self.form)])
             item.append(_expand_generics(entry, self.form[index % len(self.form)]))
-            # print(item)
-            if (index + 1) % len(self.form) == 0: 
-                item_list.append(Static(index, item))
+            if (index + 1) % len(self.form) == 0:
+                item_list.append(Static((index + 1) % len(self.form), item))
                 item = []
         return {Static(str(i)): value for i, value in enumerate(item_list)}
 
