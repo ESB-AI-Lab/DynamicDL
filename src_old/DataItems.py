@@ -2,101 +2,11 @@
 Represents all possible (required) data items for parsing a dataset.
 '''
 
-import os
-from typing import Self, Any
-from abc import ABC, abstractmethod
+from typing import Self
 
+from .IdentifierTokens import IdentifierToken, StorageToken, WildcardToken, FilenameToken, \
+                              QuantityToken, UniqueToken, RedundantStorageToken
 from ._utils import union
-
-class _IdentifierToken(ABC):
-    '''
-    The IdentifierToken class is an abstract class which carries important information into 
-    StringFormatTokens for data parsing functions. Subclasses of this class may have specific 
-    requirements for content.
-    '''
-    def __init__(self):
-        pass
-
-    @abstractmethod
-    def verify_token(self, token: str) -> bool:
-        '''
-        Checks whether the token is in valid format in accordance with the identifier.
-        
-        - token: the token to check
-        '''
-
-class _StorageToken(_IdentifierToken):
-    '''
-    The StorageToken class possesses a set of elements which checks upon itself for membership.
-    '''
-    def __init__(self):
-        self.items: set[str] = set()
-
-    def verify_token(self, token: str) -> bool:
-        self.items.add(token)
-        return True
-
-class _RedundantStorageToken(_StorageToken):
-    '''
-    The RedundantStorageToken class possesses a set of elements which checks upon itself, but also
-    allows for a data item to store a list of items instead of just one value.
-    '''
-
-class _UniqueToken(_IdentifierToken):
-    '''
-    The UniqueToken class possesses a set of elements which checks upon itself for membership.
-    '''
-    def __init__(self):
-        self.items: set[str] = set()
-
-    def verify_token(self, token: str) -> bool:
-        self.items.add(token)
-        return True
-
-class _WildcardToken(_IdentifierToken):
-    '''
-    The WildcardToken class represents a generic wildcard which can stand for anything and will not 
-    be used for any identifiers.
-    '''
-
-    def verify_token(self, token: str) -> bool:
-        '''
-        Any string passes the wildcard check. Dummy method for assertions.
-        
-        - token (str): the token parsed from StringFormatToken.match()
-        '''
-        return True
-
-class _FilenameToken(_UniqueToken):
-    '''
-    The FilenameToken class is an IdentifierToken which checks for valid filenames.
-    '''
-    def verify_token(self, token: str) -> bool:
-        '''
-        Any proper filename passes the check assuming it exists.
-        
-        - root (str): the root to the main dataset directory.
-        - token (str): the token parsed from StringFormatToken.match()
-        '''
-        return os.path.exists(token) and super().verify_token(token)
-
-class _QuantityToken(_IdentifierToken):
-    '''
-    Represents a numeric quantity.
-    '''
-    def verify_token(self, token: Any) -> bool:
-        '''
-        Passes if token is numeric.
-        
-        - token (str): the token parsed from StringFormatToken.match()
-        '''
-        if isinstance(token, (int | float)):
-            return True
-        elif isinstance(token, str):
-            try: float(token)
-            except ValueError: return False
-            return True
-        return False
 
 class DataType:
     '''
@@ -108,9 +18,12 @@ class DataType:
     - token_type (type[IdentifierToken]): the token type of the DataType.
     '''
 
-    def __init__(self, desc: str, token_type: _IdentifierToken):
+    def __init__(self, desc: str, token_type: IdentifierToken):
         self.desc: str = desc
-        self.token_type: type[_IdentifierToken] = token_type
+        self.storage: bool = False
+        if isinstance(token_type, (StorageToken, UniqueToken)):
+            self.storage = True
+        self.token_type: type[IdentifierToken] = token_type
 
     def __repr__(self) -> str:
         return f'<{self.desc}>'
@@ -134,21 +47,21 @@ class DataTypes:
     Presets for DataType. These represent valid tokens, and DataType should not be initialized
     directly but rather through these presets.
     '''
-    IMAGE_SET: DataType = DataType('IMAGE_SET', _RedundantStorageToken())
-    IMAGE_SET_ID: DataType = DataType('IMAGE_SET_ID', _RedundantStorageToken())
-    ABSOLUTE_FILE: DataType = DataType('ABSOLUTE_FILE', _FilenameToken())
-    RELATIVE_FILE: DataType = DataType('RELATIVE_FILE', _FilenameToken())
-    IMAGE_NAME: DataType = DataType('IMAGE_NAME', _UniqueToken())
-    IMAGE_ID: DataType = DataType('IMAGE_ID', _UniqueToken())
-    CLASS_NAME: DataType = DataType('CLASS_NAME', _StorageToken())
-    CLASS_ID: DataType = DataType('CLASS_ID', _StorageToken())
-    XMIN: DataType = DataType('XMIN', _QuantityToken())
-    YMIN: DataType = DataType('YMIN', _QuantityToken())
-    XMAX: DataType = DataType('XMAX', _QuantityToken())
-    YMAX: DataType = DataType('YMAX', _QuantityToken())
-    WIDTH: DataType = DataType('WIDTH', _QuantityToken())
-    HEIGHT: DataType = DataType('HEIGHT', _QuantityToken())
-    GENERIC: DataType = DataType('GENERIC', _WildcardToken())
+    IMAGE_SET: DataType = DataType('IMAGE_SET', RedundantStorageToken())
+    IMAGE_SET_ID: DataType = DataType('IMAGE_SET_ID', RedundantStorageToken())
+    ABSOLUTE_FILE: DataType = DataType('ABSOLUTE_FILE', FilenameToken())
+    RELATIVE_FILE: DataType = DataType('RELATIVE_FILE', FilenameToken())
+    IMAGE_NAME: DataType = DataType('IMAGE_NAME', UniqueToken())
+    IMAGE_ID: DataType = DataType('IMAGE_ID', UniqueToken())
+    CLASS_NAME: DataType = DataType('CLASS_NAME', StorageToken())
+    CLASS_ID: DataType = DataType('CLASS_ID', StorageToken())
+    XMIN: DataType = DataType('XMIN', QuantityToken())
+    YMIN: DataType = DataType('YMIN', QuantityToken())
+    XMAX: DataType = DataType('XMAX', QuantityToken())
+    YMAX: DataType = DataType('YMAX', QuantityToken())
+    WIDTH: DataType = DataType('WIDTH', QuantityToken())
+    HEIGHT: DataType = DataType('HEIGHT', QuantityToken())
+    GENERIC: DataType = DataType('GENERIC', WildcardToken())
 
 class DataItem:
     '''
@@ -183,7 +96,7 @@ class DataEntry:
     '''
     def __init__(self, items: list[DataItem] | DataItem):
         items: list[DataItem] = union(items)
-        self.unique: bool = any([isinstance(item.delimiter.token_type, _UniqueToken)
+        self.unique: bool = any([isinstance(item.delimiter.token_type, UniqueToken)
                                  for item in items])
         self.data: dict[str, DataItem] = {item.delimiter.desc: item for item in items}
 
@@ -194,7 +107,7 @@ class DataEntry:
         - other (DataEntry): another data entry to merge into this instance.
         '''
         for desc, item in other.data.items():
-            if isinstance(item.delimiter.token_type, _UniqueToken):
+            if isinstance(item.delimiter.token_type, UniqueToken):
                 assert desc not in self.data or self.data[desc] == other.data[desc], \
                        f'Unique identifiers {self.data[desc]} not equal to {other.data[desc]}'
 
@@ -202,7 +115,7 @@ class DataEntry:
             if desc not in self.data:
                 self.data[desc] = item
                 continue
-            if isinstance(item.delimiter.token_type, _RedundantStorageToken):
+            if isinstance(item.delimiter.token_type, RedundantStorageToken):
                 self.data[desc] = union(self.data[desc])
                 self.data[desc].append(item)
 
@@ -216,7 +129,7 @@ class DataEntry:
         # execute checks first
         for item in items:
             delim = item.delimiter
-            if isinstance(delim.token_type, _UniqueToken):
+            if isinstance(delim.token_type, UniqueToken):
                 assert self.data[delim.desc] == item, \
                        f'Unique identifiers {self.data[delim.desc]} not equal to {item}'
         # merge
@@ -224,7 +137,7 @@ class DataEntry:
             if item.delimiter.desc not in self.data:
                 self.data[item.delimiter.desc] = item
                 continue
-            if isinstance(item.delimiter.token_type, _RedundantStorageToken):
+            if isinstance(item.delimiter.token_type, RedundantStorageToken):
                 self.data[item.delimiter.desc] = union(self.data[item.delimiter.desc])
                 self.data[item.delimiter.desc].append(item)
 
@@ -247,7 +160,7 @@ class DataEntry:
         '''
         id_items: list[DataItem] = []
         for item in self.data.values():
-            if isinstance(item.delimiter.token_type, _UniqueToken):
+            if isinstance(item.delimiter.token_type, UniqueToken):
                 id_items.append(item)
         return id_items
 
