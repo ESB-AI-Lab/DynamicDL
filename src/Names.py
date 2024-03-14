@@ -64,7 +64,7 @@ class Static:
         return matched, data
 
     def __repr__(self) -> str:
-        return f'{self.name} ({", ".join([str(item) for item in self.data])})'
+        return f'S|{self.name} ({", ".join([str(item) for item in self.data])})'
 
 class Generic:
     '''
@@ -82,7 +82,7 @@ class Generic:
         
         - entry (str): the string to match to the pattern, assuming it does match
         '''
-        pattern: str = self.name.replace('{}', '(.+)')
+        pattern: str = '^' + self.name.replace('{}', '(.+)') + '+$'
         matches: list[str] = re.findall(pattern, entry)
         result: list[DataItem] = []
 

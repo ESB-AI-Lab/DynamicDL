@@ -5,7 +5,7 @@ from typing import Any
 
 from ._utils import union
 from .Names import Generic, Static
-from .DataItems import DataType, DataTypes, DataItem
+from .DataItems import DataType, DataTypes, DataItem, DataEntry
 
 class Image:
     '''
@@ -30,14 +30,18 @@ class GenericList:
         '''
         assert len(dataset) % len(self.form) == 0, \
                 'List length must be a multiple of length of provided form'
-        item_list: list[Static] = []
-        item: list[Any] = []
+        item_list: list[Static | dict] = []
+        item: DataEntry = DataEntry([])
         for index, entry in enumerate(dataset):
-            item.append(_expand_generics(entry, self.form[index % len(self.form)]))
-            if (index + 1) % len(self.form) == 0:
-                item_list.append(Static((index + 1) % len(self.form), item))
-                item = []
-        return {Static(str(i)): value for i, value in enumerate(item_list)}
+            result = _expand_generics(entry, self.form[index % len(self.form)])
+            if isinstance(result, dict):
+                item_list.append(result)
+            else:
+                item.merge(result)
+                if (index + 1) % len(self.form) == 0:
+                    item_list.append(item)
+                    item = DataEntry([])
+        return item_list
 
 class JSONFile:
     '''
@@ -116,7 +120,7 @@ class TXTFile:
         '''
         with open(path, 'r', encoding='utf-8') as f:
             lines: list[str] = f.readlines()
-        data: list[Static] = []
+        data: list[list[DataItem]] = []
         parser: self.__FormatParser = self.__FormatParser(self.line_format)
         if self.by_line:
             for line in lines[self.offset:]:
@@ -125,8 +129,8 @@ class TXTFile:
                 parser.next_format(line)
                 # may need to change
                 if parser.is_end():
-                    data.append(Static(str(len(data)), parser.data))
-        return {Static(str(i)): val for i, val in enumerate(data)}
+                    data.append(DataEntry(parser.data))
+        return data
 
 def _expand_generics(dataset: dict[str, Any] | Any,
                      root: dict[str | Static | Generic, Any] | DataType | Generic) -> dict | Static:
@@ -138,7 +142,7 @@ def _expand_generics(dataset: dict[str, Any] | Any,
     if isinstance(root, Generic):
         success, tokens = root.match(str(dataset))
         if not success: raise ValueError(f'Failed to match: {dataset} to {root}')
-        return Static(root.substitute(tokens), tokens)
+        return DataEntry(tokens)
     expanded_root: dict[Static, Any] = {}
     generics: list[Generic] = []
     names: set[Static] = set()
@@ -148,11 +152,12 @@ def _expand_generics(dataset: dict[str, Any] | Any,
             heapq.heappush(generics, (-len(key.data), key))
             continue
         if isinstance(key, str):
-            if key.name in dataset:
+            if key in dataset:
                 names.add(key)
                 expanded_root[Static(key)] = root[key]
             else:
                 raise ValueError(f'Static value {key} not found in dataset')
+            continue
         if key.name in dataset:
             names.add(key.name)
             expanded_root[key] = root[key]
@@ -176,10 +181,12 @@ def _expand_generics(dataset: dict[str, Any] | Any,
                                                     expanded_root[key])
         elif isinstance(value, GenericList):
             expanded_root[key] = value.expand(dataset[key.name])
-        if isinstance(value, DataType):
-            expanded_root[key] = Static(dataset[key.name], [value])
-        if isinstance(value, Generic):
+        elif isinstance(value, DataType):
+            expanded_root[key] = DataEntry(DataItem(value, dataset[key.name]))
+        elif isinstance(value, Generic):
             success, tokens = value.match(dataset[key.name])
             if not success: raise ValueError(f'Failed to match: {dataset} to {root}')
-            expanded_root[key] = Static(dataset[key.name], tokens)
+            expanded_root[key] = DataEntry(tokens)
+        else:
+            raise ValueError(f'Inappropriate value {value}')
     return expanded_root

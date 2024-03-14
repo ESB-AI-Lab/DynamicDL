@@ -1,7 +1,9 @@
 import os
 import heapq
 from typing import Any
+import json
 
+from .DataItems import DataEntry
 from .Names import Static, Generic
 from .Processing import TXTFile, JSONFile, Image
 
@@ -28,11 +30,12 @@ def _expand_generics(path: str, dataset: dict[str, Any],
             heapq.heappush(generics, (-len(key.data), key))
             continue
         if isinstance(key, str):
-            if key.name in dataset:
+            if key in dataset:
                 names.add(key)
                 expanded_root[Static(key)] = root[key]
             else:
                 raise ValueError(f'Static value {key} not found in dataset')
+            continue
         if key.name in dataset:
             names.add(key.name)
             expanded_root[key] = root[key]
@@ -60,15 +63,26 @@ def _expand_generics(path: str, dataset: dict[str, Any],
             expanded_root[key] = Image()
     return expanded_root
 
+def _get_str(data):
+    if isinstance(data, dict):
+        return {str(key): _get_str(val) for key, val in data.items()}
+    if isinstance(data, list):
+        return [_get_str(val) for val in data]
+    return str(data)
+
+def get_str(data):
+    return json.dumps(_get_str(data), indent=4)
+
 class Dataset:
     def __init__(self, root: str, form: dict[Static | Generic, Any]):
         self.root = root
         self.form = form
-        self.dataset = self._expand()
+        self._expand()
 
-    def _expand(self) -> dict:
+    def _expand(self) -> list[DataEntry]:
         '''
         Expand dataset into dict format
         '''
         dataset = _get_files(self.root)
-        return _expand_generics(self.root, dataset, self.form)
+        data = _expand_generics(self.root, dataset, self.form)
+        print(get_str(data))

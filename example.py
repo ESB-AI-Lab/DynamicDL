@@ -15,36 +15,34 @@ form = {
     },
     Static("images"): {
         Generic("{}.jpg", alias): Image()
-    }
+    },
+    Static("class.txt"): TXTFile(
+        Generic("{} {}", DataTypes.CLASS_NAME, DataTypes.CLASS_ID)
+    )
 }
 dataset = Dataset(root, form)
 '''
 
-from pprint import pprint
 from src import *
 
 if __name__ == '__main__':
     form = {
-        Static('images'): {
-            Generic("{}.jpg", DataTypes.GENERIC): Image()
-        },
-        Static('result.json'): JSONFile({
-            Static('images'): GenericList([{
-                Static('id'): DataTypes.IMAGE_ID,
-                Static('file_name'): DataTypes.RELATIVE_FILE
+        'temp.json': JSONFile({
+            'images': GenericList([{
+                'id': DataTypes.IMAGE_ID,
+                'file_name': DataTypes.IMAGE_NAME
             }]),
-            Static('categories'): GenericList([{
-                Static('id'): DataTypes.CLASS_ID,
-                Static('name'): DataTypes.CLASS_NAME
+            'categories': GenericList([{
+                'id': DataTypes.CLASS_ID,
+                'name': DataTypes.CLASS_NAME
             }]),
-            Static('annotations'): GenericList([{
-                Static('image_id'): DataTypes.IMAGE_ID,
-                Static('category_id'): DataTypes.CLASS_ID,
-                Static('bbox'): GenericList([
+            'annotations': GenericList([{
+                'image_id': DataTypes.IMAGE_ID,
+                'category_id': DataTypes.CLASS_ID,
+                'bbox': GenericList([
                     DataTypes.XMIN, DataTypes.YMIN, DataTypes.XMAX, DataTypes.YMAX
                 ])
             }])
         })
     }
     dataset = Dataset('/Users/atong/Documents/Datasets/Avo', form)
-    pprint(dataset.dataset)

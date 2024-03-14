@@ -134,21 +134,21 @@ class DataTypes:
     Presets for DataType. These represent valid tokens, and DataType should not be initialized
     directly but rather through these presets.
     '''
-    IMAGE_SET: DataType = DataType('IMAGE_SET', _RedundantStorageToken())
-    IMAGE_SET_ID: DataType = DataType('IMAGE_SET_ID', _RedundantStorageToken())
-    ABSOLUTE_FILE: DataType = DataType('ABSOLUTE_FILE', _FilenameToken())
-    RELATIVE_FILE: DataType = DataType('RELATIVE_FILE', _FilenameToken())
-    IMAGE_NAME: DataType = DataType('IMAGE_NAME', _UniqueToken())
-    IMAGE_ID: DataType = DataType('IMAGE_ID', _UniqueToken())
-    CLASS_NAME: DataType = DataType('CLASS_NAME', _StorageToken())
-    CLASS_ID: DataType = DataType('CLASS_ID', _StorageToken())
-    XMIN: DataType = DataType('XMIN', _QuantityToken())
-    YMIN: DataType = DataType('YMIN', _QuantityToken())
-    XMAX: DataType = DataType('XMAX', _QuantityToken())
-    YMAX: DataType = DataType('YMAX', _QuantityToken())
-    WIDTH: DataType = DataType('WIDTH', _QuantityToken())
-    HEIGHT: DataType = DataType('HEIGHT', _QuantityToken())
-    GENERIC: DataType = DataType('GENERIC', _WildcardToken())
+    IMAGE_SET = DataType('IMAGE_SET', _RedundantStorageToken())
+    IMAGE_SET_ID = DataType('IMAGE_SET_ID', _RedundantStorageToken())
+    ABSOLUTE_FILE = DataType('ABSOLUTE_FILE', _FilenameToken())
+    RELATIVE_FILE = DataType('RELATIVE_FILE', _FilenameToken())
+    IMAGE_NAME = DataType('IMAGE_NAME', _UniqueToken())
+    IMAGE_ID = DataType('IMAGE_ID', _UniqueToken())
+    CLASS_NAME = DataType('CLASS_NAME', _StorageToken())
+    CLASS_ID = DataType('CLASS_ID', _StorageToken())
+    XMIN = DataType('XMIN', _QuantityToken())
+    YMIN = DataType('YMIN', _QuantityToken())
+    XMAX = DataType('XMAX', _QuantityToken())
+    YMAX = DataType('YMAX', _QuantityToken())
+    WIDTH = DataType('WIDTH', _QuantityToken())
+    HEIGHT = DataType('HEIGHT', _QuantityToken())
+    GENERIC = DataType('GENERIC', _WildcardToken())
 
 class DataItem:
     '''
@@ -253,3 +253,31 @@ class DataEntry:
 
     def __repr__(self) -> str:
         return ' '.join(['DataEntry:']+[str(item) for item in self.data.values()])
+
+def merge_lists(first: list[DataEntry], second: list[DataEntry]) -> list[DataEntry]:
+    '''
+    Merge two DataEntry lists.
+    '''
+    data: list[DataEntry] = first.copy()
+    unique_identifiers: list[DataType] = [var for var in vars(DataTypes).values() if
+                                            isinstance(var, DataType) and
+                                            isinstance(var.token_type, _UniqueToken)]
+    hashmaps: dict[str, dict[str, DataEntry]] = {}
+    for identifier in unique_identifiers:
+        hashmaps[identifier.desc] = {}
+        for entry in data:
+            value = entry.data.get(identifier.desc)
+            if value: hashmaps[identifier.desc][value.value] = entry
+
+    additional_data: list[DataEntry] = []
+    for entry in second:
+        merged: bool = False
+        for identifier in unique_identifiers:
+            value = entry.data.get(identifier.desc)
+            if value and value.value in hashmaps[identifier.desc]:
+                hashmaps[identifier.desc][value.value].merge(entry)
+                merged = True
+                break
+        if not merged: additional_data.append(entry)
+    data += additional_data
+    return data
