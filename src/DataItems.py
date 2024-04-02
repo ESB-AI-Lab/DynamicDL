@@ -2,13 +2,13 @@
 Represents all possible (required) data items for parsing a dataset.
 '''
 
+import re
 import os
 from typing import Self, Any
-from abc import ABC, abstractmethod
 
 from ._utils import union
 
-class _IdentifierToken(ABC):
+class IdentifierToken:
     '''
     The IdentifierToken class is an abstract class which carries important information into 
     StringFormatTokens for data parsing functions. Subclasses of this class may have specific 
@@ -17,32 +17,20 @@ class _IdentifierToken(ABC):
     def __init__(self):
         pass
 
-    @abstractmethod
     def verify_token(self, token: str) -> bool:
         '''
         Checks whether the token is in valid format in accordance with the identifier.
         
         - token: the token to check
         '''
+        return token != ''
 
-class _StorageToken(_IdentifierToken):
+class RedundantToken(IdentifierToken):
     '''
-    The StorageToken class possesses a set of elements which checks upon itself for membership.
-    '''
-    def __init__(self):
-        self.items: set[str] = set()
-
-    def verify_token(self, token: str) -> bool:
-        self.items.add(token)
-        return True
-
-class _RedundantStorageToken(_StorageToken):
-    '''
-    The RedundantStorageToken class possesses a set of elements which checks upon itself, but also
-    allows for a data item to store a list of items instead of just one value.
+    Allows for redundancy.
     '''
 
-class _UniqueToken(_IdentifierToken):
+class UniqueToken(IdentifierToken):
     '''
     The UniqueToken class possesses a set of elements which checks upon itself for membership.
     '''
@@ -53,7 +41,7 @@ class _UniqueToken(_IdentifierToken):
         self.items.add(token)
         return True
 
-class _WildcardToken(_IdentifierToken):
+class WildcardToken(IdentifierToken):
     '''
     The WildcardToken class represents a generic wildcard which can stand for anything and will not 
     be used for any identifiers.
@@ -67,7 +55,7 @@ class _WildcardToken(_IdentifierToken):
         '''
         return True
 
-class _FilenameToken(_UniqueToken):
+class FilenameToken(UniqueToken):
     '''
     The FilenameToken class is an IdentifierToken which checks for valid filenames.
     '''
@@ -80,7 +68,23 @@ class _FilenameToken(_UniqueToken):
         '''
         return os.path.exists(token) and super().verify_token(token)
 
-class _QuantityToken(_IdentifierToken):
+class IDToken(IdentifierToken):
+    '''
+    Represents an ID.
+    '''
+    def verify_token(self, token: Any) -> bool:
+        '''
+        Passes if token is numeric.
+        
+        - token (str): the token parsed from StringFormatToken.match()
+        '''
+        if isinstance(token, (int | float)):
+            return True
+        elif isinstance(token, str):
+            return token.isnumeric()
+        return False
+
+class QuantityToken(IdentifierToken):
     '''
     Represents a numeric quantity.
     '''
@@ -98,9 +102,14 @@ class _QuantityToken(_IdentifierToken):
             return True
         return False
 
-class _RedundantQuantityToken(_QuantityToken):
+class RedundantQuantityToken(QuantityToken, RedundantToken):
     '''
-    Represents a numeric quantity.
+    Represents a redundant numeric quantity.
+    '''
+
+class RedundantIDToken(IDToken, RedundantToken):
+    '''
+    Represents a redundant ID.
     '''
 
 class DataType:
@@ -113,9 +122,9 @@ class DataType:
     - token_type (type[IdentifierToken]): the token type of the DataType.
     '''
 
-    def __init__(self, desc: str, token_type: _IdentifierToken):
+    def __init__(self, desc: str, token_type: IdentifierToken):
         self.desc: str = desc
-        self.token_type: type[_IdentifierToken] = token_type
+        self.token_type: type[IdentifierToken] = token_type
 
     def __repr__(self) -> str:
         return f'<{self.desc}>'
@@ -139,24 +148,23 @@ class DataTypes:
     Presets for DataType. These represent valid tokens, and DataType should not be initialized
     directly but rather through these presets.
     '''
-    IMAGE_SET = DataType('IMAGE_SET', _RedundantStorageToken())
-    IMAGE_SET_ID = DataType('IMAGE_SET_ID', _RedundantStorageToken())
-    ABSOLUTE_FILE = DataType('ABSOLUTE_FILE', _FilenameToken())
-    RELATIVE_FILE = DataType('RELATIVE_FILE', _FilenameToken())
-    IMAGE_NAME = DataType('IMAGE_NAME', _UniqueToken())
-    IMAGE_ID = DataType('IMAGE_ID', _UniqueToken())
-    CLASS_NAME = DataType('CLASS_NAME', _StorageToken())
-    CLASS_ID = DataType('CLASS_ID', _StorageToken())
-    BBOX_CLASS_NAME = DataType('BBOX_CLASS_NAME', _RedundantStorageToken())
-    BBOX_CLASS_ID = DataType('BBOX_CLASS_ID', _RedundantQuantityToken())
-    XMIN = DataType('XMIN', _RedundantQuantityToken())
-    YMIN = DataType('YMIN', _RedundantQuantityToken())
-    XMAX = DataType('XMAX', _RedundantQuantityToken())
-    YMAX = DataType('YMAX', _RedundantQuantityToken())
-    WIDTH = DataType('WIDTH', _RedundantQuantityToken())
-    HEIGHT = DataType('HEIGHT', _RedundantQuantityToken())
-    NAME = DataType('NAME', _WildcardToken())
-    GENERIC = DataType('GENERIC', _WildcardToken())
+    IMAGE_SET = DataType('IMAGE_SET', RedundantToken())
+    IMAGE_SET_ID = DataType('IMAGE_SET_ID', RedundantIDToken())
+    ABSOLUTE_FILE = DataType('ABSOLUTE_FILE', FilenameToken())
+    IMAGE_NAME = DataType('IMAGE_NAME', UniqueToken())
+    IMAGE_ID = DataType('IMAGE_ID', UniqueToken())
+    CLASS_NAME = DataType('CLASS_NAME', IdentifierToken())
+    CLASS_ID = DataType('CLASS_ID', IDToken())
+    BBOX_CLASS_NAME = DataType('BBOX_CLASS_NAME', RedundantToken())
+    BBOX_CLASS_ID = DataType('BBOX_CLASS_ID', RedundantIDToken())
+    XMIN = DataType('XMIN', RedundantQuantityToken())
+    YMIN = DataType('YMIN', RedundantQuantityToken())
+    XMAX = DataType('XMAX', RedundantQuantityToken())
+    YMAX = DataType('YMAX', RedundantQuantityToken())
+    WIDTH = DataType('WIDTH', RedundantQuantityToken())
+    HEIGHT = DataType('HEIGHT', RedundantQuantityToken())
+    NAME = DataType('NAME', WildcardToken())
+    GENERIC = DataType('GENERIC', WildcardToken())
 
 class DataItem:
     '''
@@ -191,24 +199,28 @@ class DataEntry:
     '''
     def __init__(self, items: list[DataItem] | DataItem):
         items: list[DataItem] = union(items)
-        self.unique: bool = any([isinstance(item.delimiter.token_type, _UniqueToken)
+        self.unique: bool = any([isinstance(item.delimiter.token_type, UniqueToken)
                                  for item in items if not isinstance(item, list)])
-        self.data: dict[str, DataItem] = {(item.delimiter.desc if not isinstance(item, list) 
+        self.data: dict[str, DataItem] = {(item.delimiter.desc if not isinstance(item, list)
                                            else item[0].delimiter.desc): item for item in items}
 
     @classmethod
-    def merge(cls, first: Self, second: Self, overlap=True) -> Self:
+    def merge(cls, first: Self, second: Self, overlap: bool = True) -> Self:
         '''
-        Merge two data entries together, storing it in this instance.
+        Merge two data entries together, storing it in a new instance. 
         
-        - other (DataEntry): another data entry to merge into this instance.
+        - first (DataEntry): the first data entry to merge.
+        - second (DataEntry): the second data entry to merge.
+        - overlap (bool): whether to allow nonunique item overlapping. default true.
+        
+        Returns new DataEntry object.
         '''
         merged = cls(list(first.data.values()))
 
         for desc, item in second.data.items():
             if isinstance(item, list) or isinstance(item.delimiter.token_type,
-                    (_RedundantQuantityToken, _RedundantStorageToken, _WildcardToken)): continue
-            if overlap or isinstance(item.delimiter.token_type, _UniqueToken):
+                    (RedundantToken, WildcardToken)): continue
+            if overlap or isinstance(item.delimiter.token_type, UniqueToken):
                 if desc in merged.data and merged.data[desc] != second.data[desc]: return None
 
         for desc, item in second.data.items():
@@ -218,16 +230,23 @@ class DataEntry:
             if desc not in merged.data:
                 merged.data[desc] = item
                 continue
-            if isinstance(item.delimiter.token_type,
-                          (_RedundantStorageToken, _RedundantQuantityToken)):
+            if isinstance(item.delimiter.token_type, RedundantToken):
                 merged.data[desc] = union(merged.data.get(desc, [])) + [item]
         return merged
 
     def merge_inplace(self, other: Self, overlap=True) -> bool:
+        '''
+        Merge two data entries together, storing it in this instance. 
+        
+        - other (DataEntry): the other data entry to merge into this instance.
+        - overlap (bool): whether to allow nonunique item overlapping. default true.
+        
+        Returns true if merge operation succeeded, false otherwise.
+        '''
         for desc, item in other.data.items():
-            if isinstance(item, list) or isinstance(item.delimiter.token_type,
-                    (_RedundantQuantityToken, _RedundantStorageToken, _WildcardToken)): continue
-            if overlap or isinstance(item.delimiter.token_type, _UniqueToken):
+            if isinstance(item, list) or isinstance(item.delimiter.token_type, 
+                                                    (RedundantToken, WildcardToken)): continue
+            if overlap or isinstance(item.delimiter.token_type, UniqueToken):
                 if desc in self.data and self.data[desc] != other.data[desc]: return False
 
         for desc, item in other.data.items():
@@ -237,8 +256,7 @@ class DataEntry:
             if desc not in self.data:
                 self.data[desc] = item
                 continue
-            if isinstance(item.delimiter.token_type,
-                          (_RedundantStorageToken, _RedundantQuantityToken)):
+            if isinstance(item.delimiter.token_type, RedundantToken):
                 self.data[desc] = union(self.data.get(desc, [])) + [item]
         return True
 
@@ -252,7 +270,7 @@ class DataEntry:
         # execute checks first
         for item in items:
             delim = item.delimiter
-            if isinstance(delim.token_type, _UniqueToken):
+            if isinstance(delim.token_type, UniqueToken):
                 assert self.data[delim.desc] == item, \
                        f'Unique identifiers {self.data[delim.desc]} not equal to {item}'
         # merge
@@ -260,7 +278,7 @@ class DataEntry:
             if item.delimiter.desc not in self.data:
                 self.data[item.delimiter.desc] = item
                 continue
-            if isinstance(item.delimiter.token_type, _RedundantStorageToken):
+            if isinstance(item.delimiter.token_type, RedundantToken):
                 self.data[item.delimiter.desc] = union(self.data[item.delimiter.desc])
                 self.data[item.delimiter.desc].append(item)
 
@@ -270,41 +288,132 @@ class DataEntry:
         '''
         id_items: list[DataItem] = []
         for item in self.data.values():
-            if isinstance(item.delimiter.token_type, _UniqueToken):
+            if isinstance(item.delimiter.token_type, UniqueToken):
                 id_items.append(item)
         return id_items
 
     def __repr__(self) -> str:
         return ' '.join(['DataEntry:']+[str(item) for item in self.data.values()])
 
-def merge_lists(lists: list[list[DataEntry]]) -> list[DataEntry]:
+class Alias:
     '''
-    Merge two DataEntry lists.
+    Class used when a DataType placeholder could be interpreted multiple ways. For example, if
+    IMAGE_NAME also contains CLASS_NAME and IMAGE_ID, we can extract all 3 tokens out using
+    PatternAlias. Counts for a single wildcard token.
     '''
-    if len(lists) == 0: return []
-    if len(lists) == 1:
-        return lists[0]
-    unique_identifiers: list[DataType] = [var for var in vars(DataTypes).values() if
-                                            isinstance(var, DataType) and
-                                            isinstance(var.token_type, _UniqueToken)]
-    hashmaps: dict[str, dict[str, DataEntry]] = {id.desc:{} for id in unique_identifiers}
-    for next_list in lists:
-        for entry in next_list:
-            for identifier in unique_identifiers:
-                value = entry.data.get(identifier.desc)
-                if not value: continue
-                if value.value in hashmaps[identifier.desc]:
-                    result = hashmaps[identifier.desc][value.value].merge_inplace(entry)
-                    if not result: raise ValueError(f'Found conflicting information when merging \
-                        {hashmaps[identifier.desc][value.value]} and {entry}')
-                    for id_update in unique_identifiers:
-                        value_update = entry.data.get(id_update.desc)
-                        if id_update == identifier or not value_update: continue
-                        hashmaps[id_update.desc][value_update.value] = hashmaps[identifier.desc][value.value]
-                    break
-                hashmaps[identifier.desc][value.value] = entry
+    def __init__(self, generics: list['Generic']):
+        assert len(generics) > 0, 'Must have at least 1 generic in list.'
+        self.patterns: list[str] = [generic.name for generic in generics]
+        self.aliases: list[tuple[DataType, ...]] = [generic.data for generic in generics]
+        self.desc = ''.join([token.desc for alias in self.aliases for token in alias])
 
-    data = set()
-    for identifier in unique_identifiers:
-        data.update(hashmaps[identifier.desc].values())
-    return list(data)
+    def match(self, entry: str) -> tuple[bool, list[DataItem]]:
+        '''
+        Return a list of DataItems including all of the possible alias items.
+        '''
+        result: list[DataItem] = []
+        for pattern, alias in zip(self.patterns, self.aliases):
+            pattern: str = pattern.replace('{}', '(.+)')
+            matches: list[str] = re.findall(pattern, entry)
+            try:
+                if not matches:
+                    return False, []
+                # if multiple token matching, extract first matching; else do nothing
+                if isinstance(matches[0], tuple):
+                    matches = matches[0]
+                for data_type, match in zip(alias, matches):
+                    result.append(DataItem(data_type, match))
+            except AssertionError:
+                return False, []
+        return True, result
+
+    def substitute(self, values: list[DataItem]) -> str:
+        '''
+        Given the list (in order) of items, substitute the generic to retrieve original data string.
+        '''
+        return Generic(self.patterns[0], *self.aliases[0]).substitute(values[:len(self.aliases[0])])
+
+    def length(self) -> int:
+        '''
+        Get the length of the alias, i.e. how many tokens there are.
+        '''
+        return len(self.patterns)
+
+    def __repr__(self) -> str:
+        return str(dict(zip(self.patterns, self.aliases)))
+
+class Static:
+    '''
+    Represents an object with a static name. Can contain data.
+    '''
+    def __init__(self, name: str, data: list[DataItem] | DataItem = []):
+        self.name: str = name
+        self.data: list[DataItem] = union(data)
+
+    def match(self, entry: str) -> tuple[bool, list[DataItem]]:
+        '''
+        Checks if the entry string matches this static item.
+        '''
+        matched: bool = entry == self.name
+        data: list[DataItem] = self.data if matched else []
+        return matched, data
+
+    def __repr__(self) -> str:
+        return f'*-{self.name} ({", ".join([str(item) for item in self.data])})-*'
+
+class Generic:
+    '''
+    Represents an object with a generic name.
+    '''
+    def __init__(self, name: str, *data: DataType | Alias):
+        assert len(data) == name.count('{}'), 'Format must have same number of wildcards'
+        self.name: str = name
+        self.data: tuple[DataType | Alias, ...] = data
+
+    def match(self, entry: str) -> tuple[bool, list[DataItem]]:
+        '''
+        Return a list of the tokens' string values provided an entry string which follows the 
+        pattern.
+        
+        - entry (str): the string to match to the pattern, assuming it does match
+        '''
+        pattern: str = '^' + self.name.replace('{}', '(.+)') + '+$'
+        matches: list[str] = re.findall(pattern, entry)
+        result: list[DataItem] = []
+
+        if not matches:
+            return False, []
+        # if multiple token matching, extract first matching; else do nothing
+        try:
+            if isinstance(matches[0], tuple): matches = matches[0]
+            for data_type, match in zip(self.data, matches):
+                if not isinstance(data_type, Alias):
+                    result.append(DataItem(data_type, match))
+                    continue
+                success, matched = data_type.match(match)
+                if not success: return False, []
+                result += matched
+        except AssertionError: return False, []
+        return True, result
+
+    def substitute(self, values: list[DataItem] | DataItem) -> str:
+        '''
+        Return the string representation of the values provided string representations for each
+        token as a list
+        
+        - values (list[str] | str): the values of the tokens to replace, in order
+        '''
+        values: list[DataItem] = union(values)
+        substitutions: list[str] = []
+        index: int = 0
+        for token in self.data:
+            if isinstance(token, Alias):
+                substitutions.append(token.substitute(values[index:]))
+                index += token.length()
+            else:
+                substitutions.append(values[index].value)
+                index += 1
+        return self.name.format(*substitutions)
+
+    def __repr__(self) -> str:
+        return f'{self.name} | {self.data}'

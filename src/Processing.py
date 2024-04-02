@@ -1,11 +1,12 @@
-
+'''
+File processing module.
+'''
 import json
 import heapq
 from typing import Any
 
 from ._utils import union
-from .Names import Generic, Static
-from .DataItems import DataType, DataTypes, DataItem
+from .DataItems import DataType, DataTypes, DataItem, Generic, Static
 
 class Image:
     '''

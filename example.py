@@ -52,5 +52,4 @@ if __name__ == '__main__':
             Generic("{} {}", DataTypes.CLASS_NAME, DataTypes.CLASS_ID)
         )
     }
-    dataset = Dataset(root, form)
-    
+    dataset = CVData(root, form)

@@ -1,11 +1,18 @@
+'''
+Main module for processing datasets.
+'''
 import os
 import heapq
 from typing import Any
 import json
 from pandas import DataFrame
+from pandas.core.series import Series
+from torchvision.io import read_image
+from torch.utils.data import Dataset, DataLoader
+from torch import Tensor, IntTensor, FloatTensor
+import torch
 
-from .DataItems import DataEntry, DataItem, DataTypes, merge_lists
-from .Names import Static, Generic
+from .DataItems import DataEntry, DataItem, DataTypes, DataType, UniqueToken, Static, Generic
 from .Processing import TXTFile, JSONFile, Image
 
 def _get_files(path: str) -> dict:
@@ -60,7 +67,7 @@ def _expand_generics(path: str, dataset: dict[str, Any],
         elif isinstance(value, (TXTFile, JSONFile)):
             expanded_root[key] = value.parse(os.path.join(path, key.name))
         elif isinstance(value, Image):
-            expanded_root[key] = Static('Image', DataItem(DataTypes.ABSOLUTE_FILE, 
+            expanded_root[key] = Static('Image', DataItem(DataTypes.ABSOLUTE_FILE,
                                                            os.path.join(path, key.name)))
     return expanded_root
 
@@ -70,7 +77,8 @@ def _make_uniform(data: dict[Static, Any] | list[Any] | Static) -> dict:
         for key, val in data.items():
             items[key] = _make_uniform(val)
         return items
-    elif isinstance(data, list): return {i:_make_uniform(item) for i, item in enumerate(data)}
+    if isinstance(data, list):
+        return {i:_make_uniform(item) for i, item in enumerate(data)}
     return data
 
 def _split(data: dict[Static | int, Any] | Static) -> tuple[dict, dict]:
@@ -96,7 +104,8 @@ def _split(data: dict[Static | int, Any] | Static) -> tuple[dict, dict]:
     return pairings, uniques
 
 def _find_pairings(pairings: dict[Static | int, Any], curr_data: list[DataItem]) -> list[DataEntry]:
-    if all([isinstance(key, (Static, int)) and isinstance(val, Static) for key, val in pairings.items()]):
+    if all([isinstance(key, (Static, int)) and isinstance(val, Static)
+            for key, val in pairings.items()]):
         data_items = []
         for key, val in pairings.items():
             data_items += key.data + val.data if isinstance(key, Static) else val.data
@@ -112,6 +121,45 @@ def _find_pairings(pairings: dict[Static | int, Any], curr_data: list[DataItem])
     for struct in structs:
         pairs += _find_pairings(struct, curr_data)
     return pairs
+
+def _add_to_hashmap(hashmaps: dict[str, dict[str, DataEntry]], entry: DataEntry,
+                    unique_identifiers: list[DataType]) -> None:
+    '''
+    Helper method for _merge_lists()
+    '''
+    for id_try in unique_identifiers:
+        value = entry.data.get(id_try.desc)
+        if not value: continue
+        if value.value in hashmaps[id_try.desc]:
+            result = hashmaps[id_try.desc][value.value].merge_inplace(entry)
+            if not result: raise ValueError(f'Found conflicting information when merging \
+                {hashmaps[id_try.desc][value.value]} and {entry}')
+            for id_update in unique_identifiers:
+                value_update = entry.data.get(id_update.desc)
+                if id_update == id_try or not value_update: continue
+                hashmaps[id_update.desc][value_update.value] = hashmaps[id_try.desc][value.value]
+            break
+        hashmaps[id_try.desc][value.value] = entry
+
+def _merge_lists(lists: list[list[DataEntry]]) -> list[DataEntry]:
+    '''
+    Merge two DataEntry lists.
+    '''
+    if len(lists) == 0: return []
+    if len(lists) == 1: return lists[0]
+    # needs to be changed if allow custom definition of datatypes
+    unique_identifiers: list[DataType] = [var for var in vars(DataTypes).values() if
+                                            isinstance(var, DataType) and
+                                            isinstance(var.token_type, UniqueToken)]
+    hashmaps: dict[str, dict[str, DataEntry]] = {id.desc:{} for id in unique_identifiers}
+    for next_list in lists:
+        for entry in next_list:
+            _add_to_hashmap(hashmaps, entry, unique_identifiers)
+
+    data = set()
+    for identifier in unique_identifiers:
+        data.update(hashmaps[identifier.desc].values())
+    return list(data)
 
 def _merge(data: dict[Static | int, Any] | Static, pairings: list[DataEntry]) -> \
         DataEntry | list[DataEntry]:
@@ -135,7 +183,7 @@ def _merge(data: dict[Static | int, Any] | Static, pairings: list[DataEntry]) ->
     lists = [item for item in recursive if isinstance(item, list)]
     tokens = [item for item in recursive if not isinstance(item, list)]
     if lists:
-        result = merge_lists(lists)
+        result = _merge_lists(lists)
         if tokens:
             for token in tokens:
                 for item in result: item.apply_tokens(token)
@@ -163,22 +211,91 @@ def get_str(data):
     '''Return pretty print string.'''
     return json.dumps(_get_str(data), indent=4).replace('"', '')
 
-class Dataset:
-    def __init__(self, root: str, form: dict[Static | Generic, Any]):
+def _get_class_labels(item: Series) -> Tensor:
+    return int(item.get('CLASS_ID'))
+
+def _get_bbox_labels(item: Series) -> dict[str, Tensor]:
+    # execute checks
+    class_ids = item.get('BBOX_CLASS_ID')
+    xmins = item.get('XMIN')
+    ymins = item.get('YMIN')
+    xmaxs = item.get('XMAX')
+    ymaxs = item.get('YMAX')
+    bbox_tensors = [FloatTensor([float(xmin), float(ymin), float(xmax), float(ymax)])
+                    for xmin, ymin, xmax, ymax in zip(xmins, ymins, xmaxs, ymaxs)]
+    return {'boxes': torch.stack(bbox_tensors),
+            'labels': IntTensor(class_ids)}
+
+class CVData:
+    _classification_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'CLASS_ID'}
+    _detection_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'BBOX_CLASS_ID', 'XMIN', 'XMAX', 'YMIN', 'YMAX'}
+    '''
+    Main dataset class utils.
+    '''
+    def __init__(self, root: str, form: dict[Static | Generic, Any], transform=None,
+                 target_transform=None, remove_invalid=True):
         self.root = root
         self.form = form
-        self._expand()
-
-    def _expand(self) -> list[DataEntry]:
-        '''
-        Expand dataset into dict format
-        '''
+        self.transform = transform
+        self.target_transform = target_transform
         dataset = _get_files(self.root)
-        data = _expand_generics(self.root, dataset, self.form)
-        data = _make_uniform(data)
+        data = _make_uniform(_expand_generics(self.root, dataset, self.form))
         pairings, uniques = _split(data)
         pairings = _find_pairings(pairings, [])
         self.data: list[DataEntry] = _merge(uniques, pairings)
+        self.dataframe: DataFrame = DataFrame([{key: val.value if isinstance(val, DataItem)
+                                                else [x.value for x in val]
+                                                for key, val in data.data.items()}
+                                               for data in self.data])
+        self.remove_invalid = remove_invalid
+        self.available_modes = []
+        if CVData._classification_cols.issubset(self.dataframe.columns):
+            self.available_modes.append('classification')
+        if CVData._detection_cols.issubset(self.dataframe.columns):
+            self.available_modes.append('detection')
+        # add segmentation mode
 
-    def get_dataframe(self) -> DataFrame:
-        return DataFrame([data.data for data in self.data])
+    def get_dataset(self, image_set: str, mode: str) -> Dataset:
+        '''
+        Retrieve the dataset.
+        '''
+        assert mode.lower().strip() in self.available_modes, 'Desired mode not available.'
+        dataframe = self.dataframe
+        match mode:
+            case 'classification':
+                dataframe = dataframe.drop('BBOX_CLASS_ID', inplace=False, errors='ignore')
+        dataframe = self.dataframe # do something to alter df
+        if self.remove_invalid:
+            print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
+            dataframe = dataframe.dropna()
+        return CVDataset(dataframe, mode, image_set)
+
+    def get_dataloader(self, mode: str, image_set: str, batch_size: int = 4, shuffle: bool = True,
+                       num_workers: int = 1) -> DataLoader:
+        '''
+        Retrieve the dataloader for this dataset.
+        '''
+        return DataLoader(self.get_dataset(image_set, mode), batch_size=batch_size,
+                          shuffle=shuffle, num_workers=num_workers)
+
+class CVDataset(Dataset):
+    def __init__(self, df: DataFrame, mode: str, image_set: str):
+        self.dataframe = df[[image_set in item if isinstance(item, list)
+                             else image_set == item for item in df['IMAGE_SET']]]
+        self.mode = mode
+
+    def __len__(self):
+        return len(self.dataframe)
+
+    def __getitem__(self, idx):
+        item: Series = self.dataframe.iloc[idx]
+        image: Tensor = read_image(item.get('ABSOLUTE_FILE'))
+        label: dict[str, Tensor]
+        match self.mode:
+            case 'classification':
+                label = _get_class_labels(item)
+            case 'detection':
+                label = _get_bbox_labels(item)
+            case 'segmentation':
+                pass
+        return image, label
