@@ -51,9 +51,9 @@ class Static:
     '''
     Represents an object with a static name. Can contain data.
     '''
-    def __init__(self, name: str, data: list[DataItem] = []):
+    def __init__(self, name: str, data: list[DataItem] | DataItem = []):
         self.name: str = name
-        self.data: list[DataItem] = data
+        self.data: list[DataItem] = union(data)
 
     def match(self, entry: str) -> tuple[bool, list[DataItem]]:
         '''
@@ -64,7 +64,7 @@ class Static:
         return matched, data
 
     def __repr__(self) -> str:
-        return f'S|{self.name} ({", ".join([str(item) for item in self.data])})'
+        return f'*-{self.name} ({", ".join([str(item) for item in self.data])})-*'
 
 class Generic:
     '''

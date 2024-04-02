@@ -98,6 +98,11 @@ class _QuantityToken(_IdentifierToken):
             return True
         return False
 
+class _RedundantQuantityToken(_QuantityToken):
+    '''
+    Represents a numeric quantity.
+    '''
+
 class DataType:
     '''
     All possible data types. Container class for IdentifierToken objects with specific purposes.
@@ -142,12 +147,15 @@ class DataTypes:
     IMAGE_ID = DataType('IMAGE_ID', _UniqueToken())
     CLASS_NAME = DataType('CLASS_NAME', _StorageToken())
     CLASS_ID = DataType('CLASS_ID', _StorageToken())
-    XMIN = DataType('XMIN', _QuantityToken())
-    YMIN = DataType('YMIN', _QuantityToken())
-    XMAX = DataType('XMAX', _QuantityToken())
-    YMAX = DataType('YMAX', _QuantityToken())
-    WIDTH = DataType('WIDTH', _QuantityToken())
-    HEIGHT = DataType('HEIGHT', _QuantityToken())
+    BBOX_CLASS_NAME = DataType('BBOX_CLASS_NAME', _RedundantStorageToken())
+    BBOX_CLASS_ID = DataType('BBOX_CLASS_ID', _RedundantQuantityToken())
+    XMIN = DataType('XMIN', _RedundantQuantityToken())
+    YMIN = DataType('YMIN', _RedundantQuantityToken())
+    XMAX = DataType('XMAX', _RedundantQuantityToken())
+    YMAX = DataType('YMAX', _RedundantQuantityToken())
+    WIDTH = DataType('WIDTH', _RedundantQuantityToken())
+    HEIGHT = DataType('HEIGHT', _RedundantQuantityToken())
+    NAME = DataType('NAME', _WildcardToken())
     GENERIC = DataType('GENERIC', _WildcardToken())
 
 class DataItem:
@@ -184,27 +192,55 @@ class DataEntry:
     def __init__(self, items: list[DataItem] | DataItem):
         items: list[DataItem] = union(items)
         self.unique: bool = any([isinstance(item.delimiter.token_type, _UniqueToken)
-                                 for item in items])
-        self.data: dict[str, DataItem] = {item.delimiter.desc: item for item in items}
+                                 for item in items if not isinstance(item, list)])
+        self.data: dict[str, DataItem] = {(item.delimiter.desc if not isinstance(item, list) 
+                                           else item[0].delimiter.desc): item for item in items}
 
-    def merge(self, other: Self) -> None:
+    @classmethod
+    def merge(cls, first: Self, second: Self, overlap=True) -> Self:
         '''
         Merge two data entries together, storing it in this instance.
         
         - other (DataEntry): another data entry to merge into this instance.
         '''
+        merged = cls(list(first.data.values()))
+
+        for desc, item in second.data.items():
+            if isinstance(item, list) or isinstance(item.delimiter.token_type,
+                    (_RedundantQuantityToken, _RedundantStorageToken, _WildcardToken)): continue
+            if overlap or isinstance(item.delimiter.token_type, _UniqueToken):
+                if desc in merged.data and merged.data[desc] != second.data[desc]: return None
+
+        for desc, item in second.data.items():
+            if isinstance(item, list):
+                merged.data[desc] = union(merged.data.get(desc, [])) + item
+                continue
+            if desc not in merged.data:
+                merged.data[desc] = item
+                continue
+            if isinstance(item.delimiter.token_type,
+                          (_RedundantStorageToken, _RedundantQuantityToken)):
+                merged.data[desc] = union(merged.data.get(desc, [])) + [item]
+        return merged
+
+    def merge_inplace(self, other: Self, overlap=True) -> bool:
         for desc, item in other.data.items():
-            if isinstance(item.delimiter.token_type, _UniqueToken):
-                assert desc not in self.data or self.data[desc] == other.data[desc], \
-                       f'Unique identifiers {self.data[desc]} not equal to {other.data[desc]}'
+            if isinstance(item, list) or isinstance(item.delimiter.token_type,
+                    (_RedundantQuantityToken, _RedundantStorageToken, _WildcardToken)): continue
+            if overlap or isinstance(item.delimiter.token_type, _UniqueToken):
+                if desc in self.data and self.data[desc] != other.data[desc]: return False
 
         for desc, item in other.data.items():
+            if isinstance(item, list):
+                self.data[desc] = union(self.data.get(desc, [])) + item
+                continue
             if desc not in self.data:
                 self.data[desc] = item
                 continue
-            if isinstance(item.delimiter.token_type, _RedundantStorageToken):
-                self.data[desc] = union(self.data[desc])
-                self.data[desc].append(item)
+            if isinstance(item.delimiter.token_type,
+                          (_RedundantStorageToken, _RedundantQuantityToken)):
+                self.data[desc] = union(self.data.get(desc, [])) + [item]
+        return True
 
     def apply_tokens(self, items: list[DataItem] | DataItem) -> None:
         '''
@@ -228,19 +264,6 @@ class DataEntry:
                 self.data[item.delimiter.desc] = union(self.data[item.delimiter.desc])
                 self.data[item.delimiter.desc].append(item)
 
-    def apply_pairing(self, entries: list[Self] | Self) -> None:
-        '''
-        If entry is a non-unique entry, apply its pairing to all entries to populate data.
-        
-        - entries (list[DataEntry] | DataEntry): entries to apply this general entry to.
-        '''
-        if self.unique:
-            raise ValueError('Can only apply pairing for non-unique DataEntry instances.')
-        entries: list[Self] = union(entries)
-        for entry in entries:
-            if any([item in entry.data.values() for item in self.data.values()]):
-                entry.apply_tokens(list(self.data.values()))
-
     def get_unique_ids(self) -> list[DataItem]:
         '''
         Return all unique identifier tokens.
@@ -254,30 +277,34 @@ class DataEntry:
     def __repr__(self) -> str:
         return ' '.join(['DataEntry:']+[str(item) for item in self.data.values()])
 
-def merge_lists(first: list[DataEntry], second: list[DataEntry]) -> list[DataEntry]:
+def merge_lists(lists: list[list[DataEntry]]) -> list[DataEntry]:
     '''
     Merge two DataEntry lists.
     '''
-    data: list[DataEntry] = first.copy()
+    if len(lists) == 0: return []
+    if len(lists) == 1:
+        return lists[0]
     unique_identifiers: list[DataType] = [var for var in vars(DataTypes).values() if
                                             isinstance(var, DataType) and
                                             isinstance(var.token_type, _UniqueToken)]
-    hashmaps: dict[str, dict[str, DataEntry]] = {}
-    for identifier in unique_identifiers:
-        hashmaps[identifier.desc] = {}
-        for entry in data:
-            value = entry.data.get(identifier.desc)
-            if value: hashmaps[identifier.desc][value.value] = entry
+    hashmaps: dict[str, dict[str, DataEntry]] = {id.desc:{} for id in unique_identifiers}
+    for next_list in lists:
+        for entry in next_list:
+            for identifier in unique_identifiers:
+                value = entry.data.get(identifier.desc)
+                if not value: continue
+                if value.value in hashmaps[identifier.desc]:
+                    result = hashmaps[identifier.desc][value.value].merge_inplace(entry)
+                    if not result: raise ValueError(f'Found conflicting information when merging \
+                        {hashmaps[identifier.desc][value.value]} and {entry}')
+                    for id_update in unique_identifiers:
+                        value_update = entry.data.get(id_update.desc)
+                        if id_update == identifier or not value_update: continue
+                        hashmaps[id_update.desc][value_update.value] = hashmaps[identifier.desc][value.value]
+                    break
+                hashmaps[identifier.desc][value.value] = entry
 
-    additional_data: list[DataEntry] = []
-    for entry in second:
-        merged: bool = False
-        for identifier in unique_identifiers:
-            value = entry.data.get(identifier.desc)
-            if value and value.value in hashmaps[identifier.desc]:
-                hashmaps[identifier.desc][value.value].merge(entry)
-                merged = True
-                break
-        if not merged: additional_data.append(entry)
-    data += additional_data
-    return data
+    data = set()
+    for identifier in unique_identifiers:
+        data.update(hashmaps[identifier.desc].values())
+    return list(data)
