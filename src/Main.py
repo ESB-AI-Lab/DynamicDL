@@ -243,6 +243,7 @@ class CVData:
         self.target_transform = target_transform
         dataset = _get_files(self.root)
         data = _make_uniform(_expand_generics(self.root, dataset, self.form))
+        print(get_str(data))
         pairings, uniques = _split(data)
         pairings = _find_pairings(pairings, [])
         self.data: list[DataEntry] = _merge(uniques, pairings)

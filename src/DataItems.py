@@ -195,7 +195,7 @@ class DataItem:
         '''
         assert isinstance(self.delimiter.token_type, RedundantToken), \
             'Cannot add to item which is not redundant'
-        self.value = union(self.value) + union(item.value)
+        self.value = list(set(union(self.value) + union(item.value)))
 
 class DataEntry:
     '''
