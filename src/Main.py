@@ -212,19 +212,22 @@ def get_str(data):
     return json.dumps(_get_str(data), indent=4).replace('"', '')
 
 def _get_class_labels(item: Series) -> Tensor:
-    return int(item.get('CLASS_ID'))
+    return int(item['CLASS_ID'])
 
-def _get_bbox_labels(item: Series) -> dict[str, Tensor]:
+def _get_bbox_labels(item: dict) -> dict[str, Tensor]:
     # execute checks
-    class_ids = item.get('BBOX_CLASS_ID')
-    xmins = item.get('XMIN')
-    ymins = item.get('YMIN')
-    xmaxs = item.get('XMAX')
-    ymaxs = item.get('YMAX')
+    class_ids = item['BBOX_CLASS_ID']
+    xmins = item['XMIN']
+    ymins = item['YMIN']
+    xmaxs = item['XMAX']
+    ymaxs = item['YMAX']
     bbox_tensors = [FloatTensor([float(xmin), float(ymin), float(xmax), float(ymax)])
                     for xmin, ymin, xmax, ymax in zip(xmins, ymins, xmaxs, ymaxs)]
     return {'boxes': torch.stack(bbox_tensors),
             'labels': IntTensor(class_ids)}
+
+def _collate(batch):
+    return tuple(zip(*batch))
 
 class CVData:
     _classification_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'CLASS_ID'}
@@ -276,19 +279,20 @@ class CVData:
         Retrieve the dataloader for this dataset.
         '''
         return DataLoader(self.get_dataset(image_set, mode), batch_size=batch_size,
-                          shuffle=shuffle, num_workers=num_workers)
+                          shuffle=shuffle, num_workers=num_workers, collate_fn=_collate)
 
 class CVDataset(Dataset):
     def __init__(self, df: DataFrame, mode: str, image_set: str):
-        self.dataframe = df[[image_set in item if isinstance(item, list)
-                             else image_set == item for item in df['IMAGE_SET']]]
+        dataframe = df[[image_set in item if isinstance(item, list)
+                        else image_set == item for item in df['IMAGE_SET']]]
+        self.data = dataframe.to_dict('records')
         self.mode = mode
 
     def __len__(self):
-        return len(self.dataframe)
+        return len(self.data)
 
     def __getitem__(self, idx):
-        item: Series = self.dataframe.iloc[idx]
+        item: dict = self.data[idx]
         image: Tensor = read_image(item.get('ABSOLUTE_FILE'))
         label: dict[str, Tensor]
         match self.mode:

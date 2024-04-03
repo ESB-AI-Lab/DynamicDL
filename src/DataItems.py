@@ -179,7 +179,7 @@ class DataItem:
         assert delimiter.verify_token(value), \
                f'Value {value} is invalid for given delimiter type {delimiter}'
         self.delimiter: DataType = delimiter
-        self.value: str = value
+        self.value: str | list = value
 
     def __repr__(self) -> str:
         return f'{self.delimiter}: {self.value}'
@@ -188,6 +188,14 @@ class DataItem:
         if self.__class__ != other.__class__:
             return False
         return self.delimiter == other.delimiter and self.value == other.value
+
+    def add(self, item: Self) -> None:
+        '''
+        Add an item to current data if it is redundant.
+        '''
+        assert isinstance(self.delimiter.token_type, RedundantToken), \
+            'Cannot add to item which is not redundant'
+        self.value = union(self.value) + union(item.value)
 
 class DataEntry:
     '''
@@ -218,20 +226,16 @@ class DataEntry:
         merged = cls(list(first.data.values()))
 
         for desc, item in second.data.items():
-            if isinstance(item, list) or isinstance(item.delimiter.token_type,
-                    (RedundantToken, WildcardToken)): continue
+            if isinstance(item.delimiter.token_type, (RedundantToken, WildcardToken)): continue
             if overlap or isinstance(item.delimiter.token_type, UniqueToken):
                 if desc in merged.data and merged.data[desc] != second.data[desc]: return None
 
         for desc, item in second.data.items():
-            if isinstance(item, list):
-                merged.data[desc] = union(merged.data.get(desc, [])) + item
-                continue
             if desc not in merged.data:
                 merged.data[desc] = item
                 continue
             if isinstance(item.delimiter.token_type, RedundantToken):
-                merged.data[desc] = union(merged.data.get(desc, [])) + [item]
+                merged.data[desc].add(item)
         return merged
 
     def merge_inplace(self, other: Self, overlap=True) -> bool:
@@ -244,20 +248,16 @@ class DataEntry:
         Returns true if merge operation succeeded, false otherwise.
         '''
         for desc, item in other.data.items():
-            if isinstance(item, list) or isinstance(item.delimiter.token_type, 
-                                                    (RedundantToken, WildcardToken)): continue
+            if isinstance(item.delimiter.token_type, (RedundantToken, WildcardToken)): continue
             if overlap or isinstance(item.delimiter.token_type, UniqueToken):
                 if desc in self.data and self.data[desc] != other.data[desc]: return False
 
         for desc, item in other.data.items():
-            if isinstance(item, list):
-                self.data[desc] = union(self.data.get(desc, [])) + item
-                continue
             if desc not in self.data:
                 self.data[desc] = item
                 continue
             if isinstance(item.delimiter.token_type, RedundantToken):
-                self.data[desc] = union(self.data.get(desc, [])) + [item]
+                self.data[desc].add(item)
         return True
 
     def apply_tokens(self, items: list[DataItem] | DataItem) -> None:
@@ -269,18 +269,16 @@ class DataEntry:
         items: list[DataItem] = union(items)
         # execute checks first
         for item in items:
-            delim = item.delimiter
-            if isinstance(delim.token_type, UniqueToken):
-                assert self.data[delim.desc] == item, \
-                       f'Unique identifiers {self.data[delim.desc]} not equal to {item}'
+            if isinstance(item.delimiter.token_type, RedundantToken): continue
+            if isinstance(item.delimiter.token_type, UniqueToken):
+                assert self.data[item.delimiter.desc] == item, \
+                       f'Unique identifiers {self.data[item.delimiter.desc]} not equal to {item}'
         # merge
         for item in items:
             if item.delimiter.desc not in self.data:
                 self.data[item.delimiter.desc] = item
-                continue
-            if isinstance(item.delimiter.token_type, RedundantToken):
-                self.data[item.delimiter.desc] = union(self.data[item.delimiter.desc])
-                self.data[item.delimiter.desc].append(item)
+            elif isinstance(item.delimiter.token_type, RedundantToken):
+                self.data[item.delimiter.desc].add(item)
 
     def get_unique_ids(self) -> list[DataItem]:
         '''
