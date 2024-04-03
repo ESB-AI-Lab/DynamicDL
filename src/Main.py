@@ -3,6 +3,7 @@ Main module for processing datasets.
 '''
 import os
 import heapq
+import time
 from typing import Any
 import json
 from pandas import DataFrame
@@ -12,8 +13,8 @@ from torch.utils.data import Dataset, DataLoader
 from torch import Tensor, IntTensor, FloatTensor
 import torch
 
-from .DataItems import DataEntry, DataItem, DataTypes, DataType, UniqueToken, Static, Generic
-from .Processing import TXTFile, JSONFile, Image
+from .DataItems import DataEntry, DataItem, DataTypes, DataType, UniqueToken, Static, Generic, Image
+from .Processing import TXTFile, JSONFile
 
 def _get_files(path: str) -> dict:
     files = {}
@@ -114,7 +115,6 @@ def _find_pairings(pairings: dict[Static | int, Any], curr_data: list[DataItem])
     structs = []
     for key, val in pairings.items():
         if isinstance(key, Static): curr_data += key.data
-
         if isinstance(val, Static): curr_data += val.data
         else: structs.append(val)
 
@@ -175,10 +175,7 @@ def _merge(data: dict[Static | int, Any] | Static, pairings: list[DataEntry]) ->
                              if isinstance(key, Static) else result)
             continue
         if isinstance(key, Static):
-            for item in result:
-                if isinstance(item, list):
-                    for obj in item: obj.apply_tokens(key.data)
-                else: item.apply_tokens(key.data)
+            for item in result: item.apply_tokens(key.data)
         recursive.append(result)
     lists = [item for item in recursive if isinstance(item, list)]
     tokens = [item for item in recursive if not isinstance(item, list)]
@@ -221,8 +218,7 @@ def _get_bbox_labels(item: dict) -> dict[str, Tensor]:
     ymins = item['YMIN']
     xmaxs = item['XMAX']
     ymaxs = item['YMAX']
-    bbox_tensors = [FloatTensor([float(xmin), float(ymin), float(xmax), float(ymax)])
-                    for xmin, ymin, xmax, ymax in zip(xmins, ymins, xmaxs, ymaxs)]
+    bbox_tensors = [FloatTensor(list(zip(xmins, ymins, xmaxs, ymaxs)))]
     return {'boxes': torch.stack(bbox_tensors),
             'labels': IntTensor(class_ids)}
 
@@ -230,11 +226,13 @@ def _collate(batch):
     return tuple(zip(*batch))
 
 class CVData:
-    _classification_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'CLASS_ID'}
-    _detection_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'BBOX_CLASS_ID', 'XMIN', 'XMAX', 'YMIN', 'YMAX'}
     '''
     Main dataset class utils.
     '''
+
+    _classification_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'CLASS_ID'}
+    _detection_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'BBOX_CLASS_ID', 'XMIN', 'XMAX', 'YMIN', 'YMAX'}
+
     def __init__(self, root: str, form: dict[Static | Generic, Any], transform=None,
                  target_transform=None, remove_invalid=True):
         self.root = root
@@ -243,7 +241,6 @@ class CVData:
         self.target_transform = target_transform
         dataset = _get_files(self.root)
         data = _make_uniform(_expand_generics(self.root, dataset, self.form))
-        print(get_str(data))
         pairings, uniques = _split(data)
         pairings = _find_pairings(pairings, [])
         self.data: list[DataEntry] = _merge(uniques, pairings)
@@ -259,12 +256,14 @@ class CVData:
             self.available_modes.append('detection')
         # add segmentation mode
 
-    def get_dataset(self, image_set: str, mode: str) -> Dataset:
+    def get_dataset(self, mode: str, image_set: str) -> Dataset:
         '''
         Retrieve the dataset.
         '''
         assert mode.lower().strip() in self.available_modes, 'Desired mode not available.'
-        dataframe = self.dataframe
+        dataframe = self.dataframe[[image_set in item if isinstance(item, list)
+                                    else image_set == item for item in self.dataframe['IMAGE_SET']]]
+        if len(dataframe) == 0: raise ValueError(f'Image set {image_set} not available.')
         match mode:
             case 'classification':
                 dataframe = dataframe.drop('BBOX_CLASS_ID', inplace=False, errors='ignore')
@@ -272,27 +271,31 @@ class CVData:
         if self.remove_invalid:
             print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
             dataframe = dataframe.dropna()
-        return CVDataset(dataframe, mode, image_set)
+        return CVDataset(dataframe, mode)
 
     def get_dataloader(self, mode: str, image_set: str, batch_size: int = 4, shuffle: bool = True,
                        num_workers: int = 1) -> DataLoader:
         '''
         Retrieve the dataloader for this dataset.
         '''
-        return DataLoader(self.get_dataset(image_set, mode), batch_size=batch_size,
+        return DataLoader(self.get_dataset(mode, image_set), batch_size=batch_size,
                           shuffle=shuffle, num_workers=num_workers, collate_fn=_collate)
 
 class CVDataset(Dataset):
-    def __init__(self, df: DataFrame, mode: str, image_set: str):
-        dataframe = df[[image_set in item if isinstance(item, list)
-                        else image_set == item for item in df['IMAGE_SET']]]
+    '''
+    Dataset implementation for CVData environment.
+    '''
+    def __init__(self, df: DataFrame, mode: str):
+        dataframe = df
+        self.len = len(dataframe)
         self.data = dataframe.to_dict('records')
         self.mode = mode
 
     def __len__(self):
-        return len(self.data)
+        return self.len
 
     def __getitem__(self, idx):
+        start = time.time()
         item: dict = self.data[idx]
         image: Tensor = read_image(item.get('ABSOLUTE_FILE'))
         label: dict[str, Tensor]
@@ -303,4 +306,6 @@ class CVDataset(Dataset):
                 label = _get_bbox_labels(item)
             case 'segmentation':
                 pass
+        end = time.time()
+        print(f'Seconds: {end - start}')
         return image, label

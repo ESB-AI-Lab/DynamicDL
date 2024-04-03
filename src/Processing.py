@@ -2,49 +2,11 @@
 File processing module.
 '''
 import json
-import heapq
+
 from typing import Any
 
 from ._utils import union
-from .DataItems import DataType, DataTypes, DataItem, Generic, Static
-
-class Image:
-    '''
-    Generic image.
-    '''
-    def __init__(self):
-        pass
-
-    def __repr__(self) -> str:
-        return "Image"
-
-class GenericList:
-    '''
-    Generic list.
-    '''
-    def __init__(self, form: list[Any] | Any):
-        self.form = union(form)
-
-    def expand(self, dataset: list[Any]) -> dict[Static, Any]:
-        '''
-        Expand list into dict of statics.
-        '''
-        assert len(dataset) % len(self.form) == 0, \
-                'List length must be a multiple of length of provided form'
-        item_list: list[dict[str, Static | dict]] = []
-        item: list[Static | dict] = []
-        if len(self.form) == 1:
-            for index, entry in enumerate(dataset):
-                result = _expand_generics(entry, self.form[index % len(self.form)])
-                item_list.append(result)
-            return item_list
-        for index, entry in enumerate(dataset):
-            result = _expand_generics(entry, self.form[index % len(self.form)])
-            item.append(result)
-            if (index + 1) % len(self.form) == 0:
-                item_list.append(item)
-                item = []
-        return item_list
+from .DataItems import DataTypes, DataItem, Generic, Static, expand_generics
 
 class JSONFile:
     '''
@@ -59,7 +21,7 @@ class JSONFile:
         '''
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-        return _expand_generics(data, self.form)
+        return expand_generics(data, self.form)
 
 class TXTFile:
     '''
@@ -134,59 +96,3 @@ class TXTFile:
                 if parser.is_end():
                     data.append(Static(str(index), parser.data))
         return data
-
-def _expand_generics(dataset: dict[str, Any] | Any,
-                     root: dict[str | Static | Generic, Any] | DataType | Generic) -> dict | Static:
-    '''
-    Expand all generics and set to statics.
-    '''
-    if isinstance(root, DataType):
-        root = Generic('{}', root)
-    if isinstance(root, Generic):
-        success, tokens = root.match(str(dataset))
-        if not success: raise ValueError(f'Failed to match: {dataset} to {root}')
-        return Static(str(dataset), tokens)
-    expanded_root: dict[Static, Any] = {}
-    generics: list[Generic] = []
-    names: set[Static] = set()
-    for key in root:
-        if isinstance(key, Generic):
-            # push to prioritize generics with the most wildcards for disambiguation
-            heapq.heappush(generics, (-len(key.data), key))
-            continue
-        if isinstance(key, str):
-            if key in dataset:
-                names.add(key)
-                expanded_root[Static(key)] = root[key]
-            else:
-                raise ValueError(f'Static value {key} not found in dataset')
-            continue
-        if key.name in dataset:
-            names.add(key.name)
-            expanded_root[key] = root[key]
-        else:
-            raise ValueError(f'Static value {key} not found in dataset')
-
-    while len(generics) != 0:
-        _, generic = heapq.heappop(generics)
-        generic: Generic
-        for name in dataset:
-            if name in names: continue
-            status, items = generic.match(name)
-            if not status: continue
-            new_name: str = generic.substitute(items)
-            names.add(new_name)
-            expanded_root[Static(new_name, items)] = root[generic]
-
-    for key, value in expanded_root.items():
-        if isinstance(value, dict):
-            expanded_root[key] = _expand_generics(dataset[key.name], expanded_root[key])
-        elif isinstance(value, GenericList):
-            expanded_root[key] = value.expand(dataset[key.name])
-        elif isinstance(value, DataType):
-            expanded_root[key] = Static(dataset[key.name], [DataItem(value, dataset[key.name])])
-        elif isinstance(value, Generic):
-            expanded_root[key] = _expand_generics(dataset[key.name], expanded_root[key])
-        else:
-            raise ValueError(f'Inappropriate value {value}')
-    return expanded_root

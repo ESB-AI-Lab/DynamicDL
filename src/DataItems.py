@@ -4,6 +4,8 @@ Represents all possible (required) data items for parsing a dataset.
 
 import re
 import os
+import heapq
+from copy import copy
 from typing import Self, Any
 
 from ._utils import union
@@ -25,10 +27,18 @@ class IdentifierToken:
         '''
         return token != ''
 
+    def transform(self, token: str) -> Any:
+        '''
+        Transform the token from a string value to token type.
+        '''
+        return token
+
 class RedundantToken(IdentifierToken):
     '''
     Allows for redundancy.
     '''
+    def transform(self, token: str) -> Any:
+        return union(token)
 
 class UniqueToken(IdentifierToken):
     '''
@@ -84,6 +94,9 @@ class IDToken(IdentifierToken):
             return token.isnumeric()
         return False
 
+    def transform(self, token: str) -> Any:
+        return int(token)
+
 class QuantityToken(IdentifierToken):
     '''
     Represents a numeric quantity.
@@ -102,14 +115,28 @@ class QuantityToken(IdentifierToken):
             return True
         return False
 
+    def transform(self, token: str) -> Any:
+        return float(token)
+
 class RedundantQuantityToken(QuantityToken, RedundantToken):
     '''
     Represents a redundant numeric quantity.
     '''
 
+    def transform(self, token: str) -> Any:
+        return union(float(token))
+
 class RedundantIDToken(IDToken, RedundantToken):
     '''
     Represents a redundant ID.
+    '''
+
+    def transform(self, token: str) -> Any:
+        return union(int(token))
+
+class UniqueIDToken(IDToken, UniqueToken):
+    '''
+    Represents a unique ID.
     '''
 
 class DataType:
@@ -152,7 +179,7 @@ class DataTypes:
     IMAGE_SET_ID = DataType('IMAGE_SET_ID', RedundantIDToken())
     ABSOLUTE_FILE = DataType('ABSOLUTE_FILE', FilenameToken())
     IMAGE_NAME = DataType('IMAGE_NAME', UniqueToken())
-    IMAGE_ID = DataType('IMAGE_ID', UniqueToken())
+    IMAGE_ID = DataType('IMAGE_ID', UniqueIDToken())
     CLASS_NAME = DataType('CLASS_NAME', IdentifierToken())
     CLASS_ID = DataType('CLASS_ID', IDToken())
     BBOX_CLASS_NAME = DataType('BBOX_CLASS_NAME', RedundantToken())
@@ -179,7 +206,7 @@ class DataItem:
         assert delimiter.verify_token(value), \
                f'Value {value} is invalid for given delimiter type {delimiter}'
         self.delimiter: DataType = delimiter
-        self.value: str | list = value
+        self.value = delimiter.token_type.transform(value)
 
     def __repr__(self) -> str:
         return f'{self.delimiter}: {self.value}'
@@ -195,7 +222,14 @@ class DataItem:
         '''
         assert isinstance(self.delimiter.token_type, RedundantToken), \
             'Cannot add to item which is not redundant'
-        self.value = list(set(union(self.value) + union(item.value)))
+        self.value = self.value + union(item.value)
+
+    @classmethod
+    def copy(cls, first: Self) -> Self:
+        '''
+        Copy self's data.
+        '''
+        return cls(first.delimiter, copy(first.value))
 
 class DataEntry:
     '''
@@ -257,6 +291,9 @@ class DataEntry:
                 self.data[desc] = item
                 continue
             if isinstance(item.delimiter.token_type, RedundantToken):
+                # merge_inplace is called only in merge_lists, and we want to preserve when existing
+                # redundant values are the same and should not be overwritten/added onto
+                if self.data[desc].value == item.value: continue
                 self.data[desc].add(item)
         return True
 
@@ -266,7 +303,7 @@ class DataEntry:
         
         - items (list[DataItem] | DataItem): additional items to associate with this data entry.
         '''
-        items: list[DataItem] = union(items)
+        items: list[DataItem] = [DataItem.copy(item) for item in union(items)]
         # execute checks first
         for item in items:
             if isinstance(item.delimiter.token_type, RedundantToken): continue
@@ -409,9 +446,106 @@ class Generic:
                 substitutions.append(token.substitute(values[index:]))
                 index += token.length()
             else:
-                substitutions.append(values[index].value)
+                if isinstance(values[index].delimiter.token_type, RedundantToken):
+                    assert len(values[index].value) == 1, \
+                        'Redundant token cannot have multiple values in a generic'
+                    substitutions.append(values[index].value[0])
+                else:
+                    substitutions.append(values[index].value)
                 index += 1
         return self.name.format(*substitutions)
 
     def __repr__(self) -> str:
         return f'{self.name} | {self.data}'
+
+class Image:
+    '''
+    Generic image.
+    '''
+    def __init__(self):
+        pass
+
+    def __repr__(self) -> str:
+        return "Image"
+
+class GenericList:
+    '''
+    Generic list.
+    '''
+    def __init__(self, form: list[Any] | Any):
+        self.form = union(form)
+
+    def expand(self, dataset: list[Any]) -> dict[Static, Any]:
+        '''
+        Expand list into dict of statics.
+        '''
+        assert len(dataset) % len(self.form) == 0, \
+                'List length must be a multiple of length of provided form'
+        item_list: list[dict[str, Static | dict]] = []
+        item: list[Static | dict] = []
+        if len(self.form) == 1:
+            for index, entry in enumerate(dataset):
+                result = expand_generics(entry, self.form[index % len(self.form)])
+                item_list.append(result)
+            return item_list
+        for index, entry in enumerate(dataset):
+            result = expand_generics(entry, self.form[index % len(self.form)])
+            item.append(result)
+            if (index + 1) % len(self.form) == 0:
+                item_list.append(item)
+                item = []
+        return item_list
+
+def expand_generics(dataset: dict[str, Any] | Any,
+                     root: dict[str | Static | Generic, Any] | DataType | Generic) -> dict | Static:
+    '''
+    Expand all generics and set to statics.
+    '''
+    if isinstance(root, DataType):
+        root = Generic('{}', root)
+    if isinstance(root, Generic):
+        success, tokens = root.match(str(dataset))
+        if not success: raise ValueError(f'Failed to match: {dataset} to {root}')
+        return Static(str(dataset), tokens)
+    expanded_root: dict[Static, Any] = {}
+    generics: list[Generic] = []
+    names: set[Static] = set()
+    for key in root:
+        if isinstance(key, Generic):
+            # push to prioritize generics with the most wildcards for disambiguation
+            heapq.heappush(generics, (-len(key.data), key))
+            continue
+        if isinstance(key, str):
+            if key in dataset:
+                names.add(key)
+                expanded_root[Static(key)] = root[key]
+            else:
+                raise ValueError(f'Static value {key} not found in dataset')
+            continue
+        if key.name in dataset:
+            names.add(key.name)
+            expanded_root[key] = root[key]
+        else:
+            raise ValueError(f'Static value {key} not found in dataset')
+
+    while len(generics) != 0:
+        _, generic = heapq.heappop(generics)
+        generic: Generic
+        for name in dataset:
+            if name in names: continue
+            status, items = generic.match(name)
+            if not status: continue
+            new_name: str = generic.substitute(items)
+            names.add(new_name)
+            expanded_root[Static(new_name, items)] = root[generic]
+
+    for key, value in expanded_root.items():
+        if isinstance(value, (dict, Generic)):
+            expanded_root[key] = expand_generics(dataset[key.name], expanded_root[key])
+        elif isinstance(value, GenericList):
+            expanded_root[key] = value.expand(dataset[key.name])
+        elif isinstance(value, DataType):
+            expanded_root[key] = Static(dataset[key.name], [DataItem(value, dataset[key.name])])
+        else:
+            raise ValueError(f'Inappropriate value {value}')
+    return expanded_root
