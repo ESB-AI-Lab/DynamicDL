@@ -2,6 +2,8 @@
 File processing module.
 '''
 import json
+import csv
+import xml.etree.ElementTree as ET
 
 from typing import Any
 
@@ -27,12 +29,23 @@ class XMLFile:
     '''
     Utility functions for parsing xml files.
     '''
+    def __init__(self, form: dict[Static | Generic, Any]):
+        self.form = form
+
     def test(self, path: str) -> dict:
         '''
-        Test pulling/pushing.
+        Parses XML file.
+        Assumptions: XML file has root structure which is 'data', and tag of children of data are all the same and represent data points
         '''
-        print("hello world!\n")
-        return None
+        with open(path, 'r', encoding='utf-8') as f:
+            tree = ET.parse('country_data.xml')
+        root = tree.getroot()
+        
+        dataList = []
+        for child in root:
+            dataList.append(Static(child.attrib['name'], list(child.iter())))
+
+        return dataList
 
 class TXTFile:
     '''
