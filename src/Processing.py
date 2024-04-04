@@ -22,6 +22,17 @@ class JSONFile:
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         return expand_generics(data, self.form)
+    
+class XMLFile:
+    '''
+    Utility functions for parsing xml files.
+    '''
+    def test(self, path: str) -> dict:
+        '''
+        Test pulling/pushing.
+        '''
+        print("hello world!\n")
+        return None
 
 class TXTFile:
     '''
