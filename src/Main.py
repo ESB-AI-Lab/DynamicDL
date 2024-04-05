@@ -225,6 +225,15 @@ def _get_bbox_labels(item: dict) -> dict[str, Tensor]:
 def _collate(batch):
     return tuple(zip(*batch))
 
+def _purge_invalid_bbox(df: DataFrame) -> DataFrame:
+    '''Purge all entries without valid bbox entries'''
+    valid = [True] * len(df)
+    for i, row in df[['BBOX_CLASS_ID', 'XMIN', 'XMAX', 'YMIN', 'YMAX']].iterrows():
+        if not len(row['BBOX_CLASS_ID']) == len(row['XMIN']) == len(row['XMAX']) == \
+            len(row['YMIN']) == len(row['YMAX']):
+            valid[i] = False
+    return df[valid]
+
 class CVData:
     '''
     Main dataset class utils.
@@ -248,6 +257,8 @@ class CVData:
                                                 else [x.value for x in val]
                                                 for key, val in data.data.items()}
                                                for data in self.data])
+        self.image_set_to_idx = {}
+        self.image_sets = set()
         self.remove_invalid = remove_invalid
         self.available_modes = []
         if CVData._classification_cols.issubset(self.dataframe.columns):
@@ -255,22 +266,71 @@ class CVData:
         if CVData._detection_cols.issubset(self.dataframe.columns):
             self.available_modes.append('detection')
         # add segmentation mode
+        self.cleaned = False
+
+    def cleanup(self) -> None:
+        '''
+        Run cleanup and sanity checks on all data.
+        '''
+        print('[CVData] Cleaning up data...')
+        self._cleanup_image_sets()
+        self.cleaned = True
+        print('[CVData] Done!')
+
+    def _cleanup_image_sets(self) -> None:
+        if 'IMAGE_SET_ID' not in self.dataframe:
+            if 'IMAGE_SET' not in self.dataframe:
+                print('[CVData] No image set found. Assigning to default image set')
+                self.dataframe['IMAGE_SET'] = [['default']] * len(self.dataframe)
+                self.dataframe['IMAGE_SET_ID'] = [[0]] * len(self.dataframe)
+                self.image_set_to_idx = {'default': 0}
+                self.image_sets = {'default'}
+            else:
+                print('[CVData] Converting IMAGE_SET names to IMAGE_SET_ID')
+                self.dataframe.loc[self.dataframe['IMAGE_SET'].isna(), 'IMAGE_SET'] = \
+                    self.dataframe.loc[self.dataframe['IMAGE_SET'].isna(), 'IMAGE_SET'].apply(
+                        lambda x: ['default'])
+                for v in self.dataframe['IMAGE_SET']:
+                    self.image_sets.update(v)
+                self.image_set_to_idx = {v: i for i, v in enumerate(self.image_sets)}
+                self.dataframe['IMAGE_SET_ID'] = self.dataframe['IMAGE_SET'].apply(
+                    lambda x: list(map(lambda y: self.image_set_to_idx[y], x)))
+        elif 'IMAGE_SET' in self.dataframe:
+            for ids, vals in self.dataframe[['IMAGE_SET_ID', 'IMAGE_SET']]:
+                if len(ids) != len(vals): raise ValueError('Invalid image sets lengths in row')
+                for i, v in zip(ids, vals):
+                    if v in self.image_set_to_idx and self.image_set_to_idx[v] != i:
+                        raise ValueError(f'Invalid image_set id {i} assigned to name {v}')
+                    else: self.image_set_to_idx[v] = i
+                self.image_sets = set(self.image_set_to_idx.keys())
+        else:
+            for ids in self.dataframe['IMAGE_SET_ID']:
+                self.image_sets.update(ids)
 
     def get_dataset(self, mode: str, image_set: str) -> Dataset:
         '''
         Retrieve the dataset.
         '''
+        if not self.cleaned: self.cleanup()
         assert mode.lower().strip() in self.available_modes, 'Desired mode not available.'
-        dataframe = self.dataframe[[image_set in item if isinstance(item, list)
-                                    else image_set == item for item in self.dataframe['IMAGE_SET']]]
+        dataframe = self.dataframe[[image_set in item for item in self.dataframe['IMAGE_SET']]]
         if len(dataframe) == 0: raise ValueError(f'Image set {image_set} not available.')
         match mode:
             case 'classification':
-                dataframe = dataframe.drop('BBOX_CLASS_ID', inplace=False, errors='ignore')
-        dataframe = self.dataframe # do something to alter df
-        if self.remove_invalid:
-            print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
-            dataframe = dataframe.dropna()
+                dataframe = dataframe.drop(['BBOX_CLASS_ID', 'BBOX_CLASS_NAME', 'XMIN', 'XMAX',
+                                            'YMIN', 'YMAX', 'WIDTH', 'HEIGHT'], 
+                                           inplace=False, errors='ignore')
+                if self.remove_invalid:
+                    print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
+                    dataframe = dataframe.dropna()
+            case 'detection':
+                dataframe = dataframe.drop(['CLASS_ID', 'CLASS_NAME'],
+                                           inplace=False, errors='ignore')
+                if self.remove_invalid:
+                    print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
+                    dataframe = dataframe.dropna()
+                dataframe = _purge_invalid_bbox(dataframe)
+        if len(dataframe) == 0: raise ValueError('[CVData] After cleanup, this dataset is empty.')
         return CVDataset(dataframe, mode)
 
     def get_dataloader(self, mode: str, image_set: str, batch_size: int = 4, shuffle: bool = True,
@@ -286,13 +346,12 @@ class CVDataset(Dataset):
     Dataset implementation for CVData environment.
     '''
     def __init__(self, df: DataFrame, mode: str):
-        dataframe = df
-        self.len = len(dataframe)
-        self.data = dataframe.to_dict('records')
+        self.dataframe = df
+        self.data = self.dataframe.to_dict('records')
         self.mode = mode
 
     def __len__(self):
-        return self.len
+        return len(self.dataframe)
 
     def __getitem__(self, idx):
         start = time.time()

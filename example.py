@@ -37,7 +37,7 @@ if __name__ == '__main__':
     ])
     root = '/Users/atong/Documents/Datasets/OxfordPets'
     form = {
-        Static("annotations"): {
+        "annotations": {
             Generic("{}.txt", DataTypes.IMAGE_SET): TXTFile(
                 Generic(
                     "{} {} {} {}", alias, DataTypes.GENERIC, DataTypes.GENERIC, DataTypes.CLASS_ID
@@ -45,10 +45,10 @@ if __name__ == '__main__':
                 ignore_type = '#'
             )
         },
-        Static("images"): {
+        "images": {
             Generic("{}.jpg", alias): Image()
         },
-        Static("class.txt"): TXTFile(
+        "class.txt": TXTFile(
             Generic("{} {}", DataTypes.CLASS_NAME, DataTypes.CLASS_ID)
         )
     }
