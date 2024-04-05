@@ -175,7 +175,7 @@ class DataTypes:
     Presets for DataType. These represent valid tokens, and DataType should not be initialized
     directly but rather through these presets.
     '''
-    IMAGE_SET = DataType('IMAGE_SET', RedundantToken())
+    IMAGE_SET_NAME = DataType('IMAGE_SET_NAME', RedundantToken())
     IMAGE_SET_ID = DataType('IMAGE_SET_ID', RedundantIDToken())
     ABSOLUTE_FILE = DataType('ABSOLUTE_FILE', FilenameToken())
     IMAGE_NAME = DataType('IMAGE_NAME', UniqueToken())

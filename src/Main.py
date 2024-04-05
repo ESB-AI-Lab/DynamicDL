@@ -5,6 +5,7 @@ import os
 import heapq
 import time
 from typing import Any
+from math import isnan
 import json
 from pandas import DataFrame
 from pandas.core.series import Series
@@ -258,51 +259,107 @@ class CVData:
                                                 for key, val in data.data.items()}
                                                for data in self.data])
         self.image_set_to_idx = {}
-        self.image_sets = set()
+        self.image_sets = []
         self.remove_invalid = remove_invalid
         self.available_modes = []
-        if CVData._classification_cols.issubset(self.dataframe.columns):
-            self.available_modes.append('classification')
-        if CVData._detection_cols.issubset(self.dataframe.columns):
-            self.available_modes.append('detection')
-        # add segmentation mode
         self.cleaned = False
+
+    def _assign_ids(self, name: str, default=False, redundant=False, assign=False) -> \
+            tuple[dict, set]:
+        if not assign:
+            set_to_idx = {}
+            for _, (ids, vals) in self.dataframe[[f'{name}_ID', f'{name}_NAME']].iterrows():
+                if redundant:
+                    if len(ids) != len(vals):
+                        raise ValueError('Row id/name length mismatch')
+                    for i, v in zip(ids, vals):
+                        if isnan(i) or (isinstance(v, float) and isnan(v)): continue
+                        i = int(i)
+                        if v in set_to_idx and set_to_idx[v] != i:
+                            raise ValueError(f'Invalid {name} id {i} assigned to name {v}')
+                        else: set_to_idx[v] = i
+                else:
+                    if isnan(ids) or (isinstance(vals, float) and isnan(vals)): continue
+                    ids = int(ids)
+                    if vals in set_to_idx and set_to_idx[vals] != ids:
+                        raise ValueError(f'Invalid {name} id {ids} assigned to name {vals}')
+                    else: set_to_idx[vals] = ids
+            return set_to_idx, sorted(set_to_idx, key=set_to_idx.get)
+        sets = set()
+        default_value = ['default'] if redundant else 'default'
+        if default:
+            self.dataframe.loc[self.dataframe[f'{name}_NAME'].isna(), f'{name}_NAME'] = \
+                self.dataframe.loc[self.dataframe[f'{name}_NAME'].isna(), f'{name}_NAME'].apply(
+                    lambda x: default_value)
+        for v in self.dataframe[f'{name}_NAME']:
+            if redundant: sets.update(v)
+            else: sets.add(v)
+        set_to_idx = {v: i for i, v in enumerate(sets)}
+        if redundant:
+            self.dataframe[f'{name}_ID'] = self.dataframe[f'{name}_NAME'].apply(
+                lambda x: list(map(lambda y: set_to_idx[y], x)))
+        else:
+            self.dataframe[f'{name}_ID'] = self.dataframe[f'{name}_NAME'].apply(
+                lambda x: set_to_idx[x])
+        return set_to_idx, sorted(set_to_idx, key=set_to_idx.get)
+
+    def _patch_ids(self, name: str, set_to_idx: dict, idx_to_set: list, redundant=False) -> None:
+        for i, (ids, vals) in self.dataframe[[f'{name}_ID', f'{name}_NAME']].iterrows():
+            if redundant:
+                for index, (k, v) in enumerate(zip(ids, vals)):
+                    if isnan(i):
+                        self.dataframe.at[k, f'{name}_ID'][index] = set_to_idx[v]
+                    if isinstance(v, float) and isnan(v):
+                        self.dataframe.at[k, f'{name}_NAME'][index] = idx_to_set[v]
+            else:
+                if isnan(ids):
+                    self.dataframe.at[i, f'{name}_ID'] = set_to_idx[vals]
+                if isinstance(vals, float) and isnan(vals):
+                    self.dataframe.at[i, f'{name}_NAME'] = idx_to_set[ids]
 
     def cleanup(self) -> None:
         '''
         Run cleanup and sanity checks on all data.
         '''
         print('[CVData] Cleaning up data...')
+        if 'IMAGE_ID' not in self.dataframe: self.dataframe['IMAGE_ID'] = self.dataframe.index
+        if 'CLASS_NAME' in self.dataframe:
+            if 'CLASS_ID' not in self.dataframe:
+                print('[CVData] Assigning CLASS_ID')
+                self.class_to_idx, self.classes = self._assign_ids('CLASS', assign=True)
+            else:
+                self.class_to_idx, self.classes = self._assign_ids('CLASS', assign=False)
+                self._patch_ids('CLASS', set_to_idx=self.class_to_idx, idx_to_set=self.classes)
+        if CVData._classification_cols.issubset(self.dataframe.columns):
+            self.available_modes.append('classification')
+        if CVData._detection_cols.issubset(self.dataframe.columns):
+            self.available_modes.append('detection')
+        # add segmentation mode
+        self.dataframe.drop(columns='GENERIC', inplace=True, errors='ignore')
         self._cleanup_image_sets()
+        self._cleanup_id()
         self.cleaned = True
         print('[CVData] Done!')
 
+    def _cleanup_id(self) -> None:
+        cols = ['CLASS_ID', 'IMAGE_ID']
+        for col in cols:
+            if col not in self.dataframe: continue
+            self.dataframe[col] = self.dataframe[col].astype('Int64')
+
     def _cleanup_image_sets(self) -> None:
         if 'IMAGE_SET_ID' not in self.dataframe:
-            if 'IMAGE_SET' not in self.dataframe:
+            if 'IMAGE_SET_NAME' not in self.dataframe:
                 print('[CVData] No image set found. Assigning to default image set')
-                self.dataframe['IMAGE_SET'] = [['default']] * len(self.dataframe)
+                self.dataframe['IMAGE_SET_NAME'] = [['default']] * len(self.dataframe)
                 self.dataframe['IMAGE_SET_ID'] = [[0]] * len(self.dataframe)
                 self.image_set_to_idx = {'default': 0}
                 self.image_sets = {'default'}
             else:
                 print('[CVData] Converting IMAGE_SET names to IMAGE_SET_ID')
-                self.dataframe.loc[self.dataframe['IMAGE_SET'].isna(), 'IMAGE_SET'] = \
-                    self.dataframe.loc[self.dataframe['IMAGE_SET'].isna(), 'IMAGE_SET'].apply(
-                        lambda x: ['default'])
-                for v in self.dataframe['IMAGE_SET']:
-                    self.image_sets.update(v)
-                self.image_set_to_idx = {v: i for i, v in enumerate(self.image_sets)}
-                self.dataframe['IMAGE_SET_ID'] = self.dataframe['IMAGE_SET'].apply(
-                    lambda x: list(map(lambda y: self.image_set_to_idx[y], x)))
-        elif 'IMAGE_SET' in self.dataframe:
-            for ids, vals in self.dataframe[['IMAGE_SET_ID', 'IMAGE_SET']]:
-                if len(ids) != len(vals): raise ValueError('Invalid image sets lengths in row')
-                for i, v in zip(ids, vals):
-                    if v in self.image_set_to_idx and self.image_set_to_idx[v] != i:
-                        raise ValueError(f'Invalid image_set id {i} assigned to name {v}')
-                    else: self.image_set_to_idx[v] = i
-                self.image_sets = set(self.image_set_to_idx.keys())
+                self.image_set_to_idx, self.image_sets = self._assign_ids('IMAGE_SET', default=True, redundant=True, assign=True)
+        elif 'IMAGE_SET_NAME' in self.dataframe:
+            self.image_set_to_idx, self.image_sets = self._assign_ids('IMAGE_SET', default=True, redundant=True)
         else:
             for ids in self.dataframe['IMAGE_SET_ID']:
                 self.image_sets.update(ids)
@@ -313,7 +370,7 @@ class CVData:
         '''
         if not self.cleaned: self.cleanup()
         assert mode.lower().strip() in self.available_modes, 'Desired mode not available.'
-        dataframe = self.dataframe[[image_set in item for item in self.dataframe['IMAGE_SET']]]
+        dataframe = self.dataframe[[image_set in item for item in self.dataframe['IMAGE_SET_NAME']]]
         if len(dataframe) == 0: raise ValueError(f'Image set {image_set} not available.')
         match mode:
             case 'classification':
