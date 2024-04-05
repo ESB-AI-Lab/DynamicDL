@@ -37,15 +37,24 @@ class XMLFile:
         Parses XML file.
         Assumptions: XML file has root structure which is 'data', and tag of children of data are all the same and represent data points
         '''
-        with open(path, 'r', encoding='utf-8') as f:
-            tree = ET.parse('country_data.xml')
+        tree = ET.parse(path)
         root = tree.getroot()
-        
-        dataList = []
-        for child in root:
-            dataList.append(Static(child.attrib['name'], list(child.iter())))
 
-        return dataList
+        myDict = {}
+
+        for child in root:
+            myDict.append(child.tag, self.process(child))
+
+        return expand_generics(root, self.form)
+
+    def process(self, root) -> dict:
+        '''
+            Returns the dicitonary corresponding to the XML ET tree rooted at element
+        '''
+        myDict = {}
+        for child in root:
+            myDict.append(child.tag, self.process(child)).append(root.attrib)
+        
 
 class TXTFile:
     '''
