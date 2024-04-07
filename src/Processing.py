@@ -3,7 +3,7 @@ File processing module.
 '''
 import json
 
-from typing import Any
+from typing import Any, Union
 
 from ._utils import union
 from .DataItems import DataTypes, DataItem, Generic, Static, expand_generics
@@ -12,7 +12,7 @@ class JSONFile:
     '''
     Utility functions for parsing json files.
     '''
-    def __init__(self, form: dict[Static | Generic, Any]):
+    def __init__(self, form: dict[Union[Static, Generic], Any]):
         self.form = form
 
     def parse(self, path: str) -> dict:
@@ -53,8 +53,8 @@ class TXTFile:
             '''True if parser is at end of an object iteration'''
             return self.index == self.length - 1
 
-    def __init__(self, line_format: list[Generic] | Generic, offset: int = 0,
-                 ignore_type: list[Generic | str] | Generic | str = None,
+    def __init__(self, line_format: Union[list[Generic], Generic], offset: int = 0,
+                 ignore_type: Union[list[Union[Generic, str]], Generic, str] = None,
                  by_line: bool = True):
         '''
         Initialize the constructor.
