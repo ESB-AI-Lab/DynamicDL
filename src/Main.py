@@ -3,7 +3,6 @@ Main module for processing datasets.
 '''
 import os
 import heapq
-import time
 from typing import Any, Union
 from math import isnan
 import json
@@ -444,7 +443,6 @@ class CVDataset(Dataset):
         return len(self.dataframe)
 
     def __getitem__(self, idx):
-        start = time.time()
         item: dict = self.data[idx]
         image: Tensor = read_image(item.get('ABSOLUTE_FILE'))
         label: dict[str, Tensor]
@@ -452,6 +450,4 @@ class CVDataset(Dataset):
             label = _get_class_labels(item)
         elif self.mode == 'detection':
             label = _get_bbox_labels(item)
-        end = time.time()
-        print(f'Seconds: {end - start}')
         return image, label

@@ -405,10 +405,11 @@ class Generic:
     '''
     Represents an object with a generic name.
     '''
-    def __init__(self, name: str, *data: Union[DataType, Alias]):
+    def __init__(self, name: str, *data: Union[DataType, Alias], ignore: Union[list[str], str] = []):
         assert len(data) == name.count('{}'), 'Format must have same number of wildcards'
         self.name: str = name
         self.data: tuple[Union[DataType, Alias], ...] = data
+        self.ignore: list[str] = union(ignore)
 
     def match(self, entry: str) -> tuple[bool, list[DataItem]]:
         '''
@@ -417,6 +418,8 @@ class Generic:
         
         - entry (str): the string to match to the pattern, assuming it does match
         '''
+        for ignore_pattern in self.ignore:
+            if re.findall(ignore_pattern, entry): return False, []
         pattern: str = '^' + self.name.replace('{}', '(.+)') + '+$'
         matches: list[str] = re.findall(pattern, entry)
         result: list[DataItem] = []
