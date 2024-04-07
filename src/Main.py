@@ -34,10 +34,10 @@ def _expand_generics(path: str, dataset: dict[str, Any],
     expanded_root: dict[Static, Any] = {}
     generics: list[Generic] = []
     names: set[Static] = set()
-    for key in root:
+    for i, key in enumerate(root):
         if isinstance(key, Generic):
             # priority queue push to prioritize generics with the most wildcards for disambiguation
-            heapq.heappush(generics, (-len(key.data), key))
+            heapq.heappush(generics, (-len(key.data), i, key))
             continue
         if isinstance(key, str):
             if key in dataset:
@@ -52,7 +52,7 @@ def _expand_generics(path: str, dataset: dict[str, Any],
             raise ValueError(f'Static value {key} not found in dataset')
 
     while len(generics) != 0:
-        _, generic = heapq.heappop(generics)
+        _, _, generic = heapq.heappop(generics)
         generic: Generic
         for name in dataset:
             if name in names: continue
