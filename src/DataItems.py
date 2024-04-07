@@ -6,7 +6,8 @@ import re
 import os
 import heapq
 from copy import copy
-from typing import Self, Any
+from typing import Any, Union
+from typing_extensions import Self
 
 from ._utils import union
 
@@ -88,7 +89,7 @@ class IDToken(IdentifierToken):
         
         - token (str): the token parsed from StringFormatToken.match()
         '''
-        if isinstance(token, (int | float)):
+        if isinstance(token, (int, float)):
             return True
         elif isinstance(token, str):
             return token.isnumeric()
@@ -107,7 +108,7 @@ class QuantityToken(IdentifierToken):
         
         - token (str): the token parsed from StringFormatToken.match()
         '''
-        if isinstance(token, (int | float)):
+        if isinstance(token, (int, float)):
             return True
         elif isinstance(token, str):
             try: float(token)
@@ -243,7 +244,7 @@ class DataEntry:
     - unique (bool): true if this entry contains unique data, paired data otherwise.
     - data (list[DataItem]): list of data items to associate together.
     '''
-    def __init__(self, items: list[DataItem] | DataItem):
+    def __init__(self, items: Union[list[DataItem], DataItem]):
         items: list[DataItem] = union(items)
         self.unique: bool = any([isinstance(item.delimiter.token_type, UniqueToken)
                                  for item in items if not isinstance(item, list)])
@@ -301,7 +302,7 @@ class DataEntry:
                 self.data[desc].add(item)
         return True
 
-    def apply_tokens(self, items: list[DataItem] | DataItem) -> None:
+    def apply_tokens(self, items: Union[list[DataItem], DataItem]) -> None:
         '''
         Apply new tokens to the item.
         
@@ -385,7 +386,7 @@ class Static:
     '''
     Represents an object with a static name. Can contain data.
     '''
-    def __init__(self, name: str, data: list[DataItem] | DataItem = []):
+    def __init__(self, name: str, data: Union[list[DataItem], DataItem] = []):
         self.name: str = name
         self.data: list[DataItem] = union(data)
 
@@ -404,10 +405,10 @@ class Generic:
     '''
     Represents an object with a generic name.
     '''
-    def __init__(self, name: str, *data: DataType | Alias):
+    def __init__(self, name: str, *data: Union[DataType, Alias]):
         assert len(data) == name.count('{}'), 'Format must have same number of wildcards'
         self.name: str = name
-        self.data: tuple[DataType | Alias, ...] = data
+        self.data: tuple[Union[DataType, Alias], ...] = data
 
     def match(self, entry: str) -> tuple[bool, list[DataItem]]:
         '''
@@ -435,7 +436,7 @@ class Generic:
         except AssertionError: return False, []
         return True, result
 
-    def substitute(self, values: list[DataItem] | DataItem) -> str:
+    def substitute(self, values: Union[list[DataItem], DataItem]) -> str:
         '''
         Return the string representation of the values provided string representations for each
         token as a list
@@ -476,7 +477,7 @@ class GenericList:
     '''
     Generic list.
     '''
-    def __init__(self, form: list[Any] | Any):
+    def __init__(self, form: Union[list[Any], Any]):
         self.form = union(form)
 
     def expand(self, dataset: list[Any]) -> dict[Static, Any]:
@@ -485,7 +486,7 @@ class GenericList:
         '''
         assert len(dataset) % len(self.form) == 0, \
                 'List length must be a multiple of length of provided form'
-        item_list: list[dict[str, Static | dict]] = []
+        item_list: list[dict[str, Union[Static, dict]]] = []
         item: list[Static | dict] = []
         if len(self.form) == 1:
             for index, entry in enumerate(dataset):
@@ -500,8 +501,8 @@ class GenericList:
                 item = []
         return item_list
 
-def expand_generics(dataset: dict[str, Any] | Any,
-                     root: dict[str | Static | Generic, Any] | DataType | Generic) -> dict | Static:
+def expand_generics(dataset: Union[dict[str, Any], Any],
+                     root: Union[dict[Any], DataType, Generic]) -> Union[dict, Static]:
     '''
     Expand all generics and set to statics.
     '''

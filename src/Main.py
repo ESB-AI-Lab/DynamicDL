@@ -4,7 +4,7 @@ Main module for processing datasets.
 import os
 import heapq
 import time
-from typing import Any
+from typing import Any, Union
 from math import isnan
 import json
 from pandas import DataFrame
@@ -27,7 +27,7 @@ def _get_files(path: str) -> dict:
     return files
 
 def _expand_generics(path: str, dataset: dict[str, Any],
-                     root: dict[str | Static | Generic, Any]) -> dict:
+                     root: dict[Union[str, Static, Generic], Any]) -> dict:
     '''
     Expand all generics and set to statics.
     '''
@@ -73,7 +73,7 @@ def _expand_generics(path: str, dataset: dict[str, Any],
                                                            os.path.join(path, key.name)))
     return expanded_root
 
-def _make_uniform(data: dict[Static, Any] | list[Any] | Static) -> dict:
+def _make_uniform(data: Union[dict[Static, Any], list[Any], Static]) -> dict:
     if isinstance(data, dict):
         items = {}
         for key, val in data.items():
@@ -83,7 +83,7 @@ def _make_uniform(data: dict[Static, Any] | list[Any] | Static) -> dict:
         return {i:_make_uniform(item) for i, item in enumerate(data)}
     return data
 
-def _split(data: dict[Static | int, Any] | Static) -> tuple[dict, dict]:
+def _split(data: Union[dict[Union[Static, int], Any], Static]) -> tuple[dict, dict]:
     if isinstance(data, Static):
         return (None, data) if DataEntry(data.data).unique else (data, None)
     count = 0
@@ -105,7 +105,7 @@ def _split(data: dict[Static | int, Any] | Static) -> tuple[dict, dict]:
         return (None, data)
     return pairings, uniques
 
-def _find_pairings(pairings: dict[Static | int, Any], curr_data: list[DataItem]) -> list[DataEntry]:
+def _find_pairings(pairings: dict[Union[Static, int], Any], curr_data: list[DataItem]) -> list[DataEntry]:
     if all([isinstance(key, (Static, int)) and isinstance(val, Static)
             for key, val in pairings.items()]):
         data_items = []
@@ -162,8 +162,8 @@ def _merge_lists(lists: list[list[DataEntry]]) -> list[DataEntry]:
         data.update(hashmaps[identifier.desc].values())
     return list(data)
 
-def _merge(data: dict[Static | int, Any] | Static, pairings: list[DataEntry]) -> \
-        DataEntry | list[DataEntry]:
+def _merge(data: Union[dict[Union[Static, int], Any], Static], pairings: list[DataEntry]) -> \
+        Union[DataEntry, list[DataEntry]]:
     if isinstance(data, Static):
         entry = DataEntry(data.data) # apply pairings here if possible
         return entry
@@ -243,7 +243,7 @@ class CVData:
     _classification_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'CLASS_ID'}
     _detection_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'BBOX_CLASS_ID', 'XMIN', 'XMAX', 'YMIN', 'YMAX'}
 
-    def __init__(self, root: str, form: dict[Static | Generic, Any], transform=None,
+    def __init__(self, root: str, form: dict[Union[Static, Generic], Any], transform=None,
                  target_transform=None, remove_invalid=True):
         self.root = root
         self.form = form
@@ -406,21 +406,20 @@ class CVData:
         assert mode.lower().strip() in self.available_modes, 'Desired mode not available.'
         dataframe = self.dataframe[[image_set in item for item in self.dataframe['IMAGE_SET_NAME']]]
         if len(dataframe) == 0: raise ValueError(f'Image set {image_set} not available.')
-        match mode:
-            case 'classification':
-                dataframe = dataframe.drop(['BBOX_CLASS_ID', 'BBOX_CLASS_NAME', 'XMIN', 'XMAX',
-                                            'YMIN', 'YMAX', 'WIDTH', 'HEIGHT'], 
-                                           inplace=False, errors='ignore')
-                if self.remove_invalid:
-                    print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
-                    dataframe = dataframe.dropna()
-            case 'detection':
-                dataframe = dataframe.drop(['CLASS_ID', 'CLASS_NAME'],
-                                           inplace=False, errors='ignore')
-                if self.remove_invalid:
-                    print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
-                    dataframe = dataframe.dropna()
-                dataframe = _purge_invalid_bbox(dataframe)
+        if mode == 'classification':
+            dataframe = dataframe.drop(['BBOX_CLASS_ID', 'BBOX_CLASS_NAME', 'XMIN', 'XMAX',
+                                        'YMIN', 'YMAX', 'WIDTH', 'HEIGHT'], 
+                                        inplace=False, errors='ignore')
+            if self.remove_invalid:
+                print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
+                dataframe = dataframe.dropna()
+        elif mode == 'detection':
+            dataframe = dataframe.drop(['CLASS_ID', 'CLASS_NAME'],
+                                        inplace=False, errors='ignore')
+            if self.remove_invalid:
+                print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
+                dataframe = dataframe.dropna()
+            dataframe = _purge_invalid_bbox(dataframe)
         if len(dataframe) == 0: raise ValueError('[CVData] After cleanup, this dataset is empty.')
         return CVDataset(dataframe, mode)
 
@@ -449,13 +448,10 @@ class CVDataset(Dataset):
         item: dict = self.data[idx]
         image: Tensor = read_image(item.get('ABSOLUTE_FILE'))
         label: dict[str, Tensor]
-        match self.mode:
-            case 'classification':
-                label = _get_class_labels(item)
-            case 'detection':
-                label = _get_bbox_labels(item)
-            case 'segmentation':
-                pass
+        if self.mode == 'classification':
+            label = _get_class_labels(item)
+        elif self.mode == 'detection':
+            label = _get_bbox_labels(item)
         end = time.time()
         print(f'Seconds: {end - start}')
         return image, label
