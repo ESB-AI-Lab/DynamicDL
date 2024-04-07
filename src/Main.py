@@ -322,6 +322,8 @@ class CVData:
         Run cleanup and sanity checks on all data.
         '''
         print('[CVData] Cleaning up data...')
+        if {'X1', 'X2', 'Y1', 'Y2'}.issubset(self.dataframe.columns):
+            self._convert_bbox(0)
         if 'IMAGE_ID' not in self.dataframe: self.dataframe['IMAGE_ID'] = self.dataframe.index
         if 'CLASS_NAME' in self.dataframe:
             if 'CLASS_ID' not in self.dataframe:
@@ -341,6 +343,34 @@ class CVData:
         self.cleaned = True
         print('[CVData] Done!')
 
+    def _convert_bbox(self, mode: int) -> None:
+        if mode == 0:
+            xmins = []
+            ymins = []
+            xmaxs = []
+            ymaxs = []
+            for _, row in self.dataframe.iterrows():
+                if any([isinstance(row['X1'], float), isinstance(row['X2'], float),
+                        isinstance(row['Y1'], float), isinstance(row['Y2'], float)]):
+                    xmins.append([])
+                    ymins.append([])
+                    xmaxs.append([])
+                    ymaxs.append([])
+                    continue
+                assert len(row['X1']) == len(row['X2']) == len(row['Y1']) == len(row['Y2']), \
+                    'Length of bbox lists does not match'
+                boxes = [(min(x1, x2), min(y1, y2), max(x1, x2), max(y1,y2)) for x1, x2, y1, y2
+                         in zip(row['X1'], row['X2'], row['Y1'], row['Y2'])]
+                boxes = list(zip(*boxes))
+                xmins.append(list(boxes[0]))
+                ymins.append(list(boxes[1]))
+                xmaxs.append(list(boxes[2]))
+                ymaxs.append(list(boxes[3]))
+            self.dataframe['XMIN'] = xmins
+            self.dataframe['YMIN'] = ymins
+            self.dataframe['XMAX'] = xmaxs
+            self.dataframe['YMAX'] = ymaxs
+
     def _cleanup_id(self) -> None:
         cols = ['CLASS_ID', 'IMAGE_ID']
         for col in cols:
@@ -357,9 +387,13 @@ class CVData:
                 self.image_sets = {'default'}
             else:
                 print('[CVData] Converting IMAGE_SET names to IMAGE_SET_ID')
-                self.image_set_to_idx, self.image_sets = self._assign_ids('IMAGE_SET', default=True, redundant=True, assign=True)
+                self.image_set_to_idx, self.image_sets = self._assign_ids('IMAGE_SET',
+                                                                          default=True,
+                                                                          redundant=True,
+                                                                          assign=True)
         elif 'IMAGE_SET_NAME' in self.dataframe:
-            self.image_set_to_idx, self.image_sets = self._assign_ids('IMAGE_SET', default=True, redundant=True)
+            self.image_set_to_idx, self.image_sets = self._assign_ids('IMAGE_SET', default=True,
+                                                                      redundant=True)
         else:
             for ids in self.dataframe['IMAGE_SET_ID']:
                 self.image_sets.update(ids)
