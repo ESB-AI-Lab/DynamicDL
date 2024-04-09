@@ -6,14 +6,18 @@ import heapq
 from typing import Any, Union
 from math import isnan
 import json
+from numpy import asarray, int32, full_like
 from pandas import DataFrame
 from pandas.core.series import Series
+from cv2 import imread, fillPoly, IMREAD_GRAYSCALE
 from torchvision.io import read_image
 from torch.utils.data import Dataset, DataLoader
 from torch import Tensor, IntTensor, FloatTensor
 import torch
 
-from .DataItems import DataEntry, DataItem, DataTypes, DataType, UniqueToken, Static, Generic, Image
+
+from .DataItems import DataEntry, DataItem, DataTypes, DataType, UniqueToken, Static, Generic, \
+                       Image, SegmentationImage, Folder, File
 from .Processing import TXTFile, JSONFile
 
 def _get_files(path: str) -> dict:
@@ -34,6 +38,8 @@ def _expand_generics(path: str, dataset: dict[str, Any],
     generics: list[Generic] = []
     names: set[Static] = set()
     for i, key in enumerate(root):
+        if isinstance(key, DataType):
+            heapq.heappush(generics, (0, i, Generic('{}', key)))
         if isinstance(key, Generic):
             # priority queue push to prioritize generics with the most wildcards for disambiguation
             heapq.heappush(generics, (-len(key.data), i, key))
@@ -55,6 +61,8 @@ def _expand_generics(path: str, dataset: dict[str, Any],
         generic: Generic
         for name in dataset:
             if name in names: continue
+            if isinstance(generic, Folder) and dataset[name] == "File": continue
+            if isinstance(generic, File) and dataset[name] != "File": continue
             status, items = generic.match(name)
             if not status: continue
             new_name: str = generic.substitute(items)
@@ -69,6 +77,9 @@ def _expand_generics(path: str, dataset: dict[str, Any],
             expanded_root[key] = value.parse(os.path.join(path, key.name))
         elif isinstance(value, Image):
             expanded_root[key] = Static('Image', DataItem(DataTypes.ABSOLUTE_FILE,
+                                                           os.path.join(path, key.name)))
+        elif isinstance(value, SegmentationImage):
+            expanded_root[key] = Static('Segmentation Image', DataItem(DataTypes.ABSOLUTE_FILE_SEG,
                                                            os.path.join(path, key.name)))
     return expanded_root
 
@@ -211,28 +222,28 @@ def get_str(data):
 def _get_class_labels(item: Series) -> Tensor:
     return int(item['CLASS_ID'])
 
-def _get_bbox_labels(item: dict) -> dict[str, Tensor]:
+def _get_bbox_labels(item: Series) -> dict[str, Tensor]:
     # execute checks
+    assert len(item['BOX']) == len(item['BBOX_CLASS_ID']), \
+        'SEG_CLASS_ID and POLYGON len mismatch'
     class_ids = item['BBOX_CLASS_ID']
-    xmins = item['XMIN']
-    ymins = item['YMIN']
-    xmaxs = item['XMAX']
-    ymaxs = item['YMAX']
-    bbox_tensors = [FloatTensor(list(zip(xmins, ymins, xmaxs, ymaxs)))]
-    return {'boxes': torch.stack(bbox_tensors),
-            'labels': IntTensor(class_ids)}
+    boxes = item['BOX']
+    bbox_tensors = [FloatTensor(box) for box in boxes]
+    return {'boxes': torch.stack(bbox_tensors), 'labels': IntTensor(class_ids)}
 
+def _get_seg_labels(item: Series, default=0) -> Tensor:
+    if 'ABSOLUTE_FILE_SEG' in item:
+        return read_image(item['ABSOLUTE_FILE_SEG'])
+    assert len(item['POLYGON']) == len(item['SEG_CLASS_ID']), \
+        'SEG_CLASS_ID and POLYGON len mismatch'
+    mask = asarray(imread(item['ABSOLUTE_FILE'], IMREAD_GRAYSCALE), dtype=int32)
+    mask = full_like(mask, default)
+    for class_id, polygon in zip(item['SEG_CLASS_ID'], item['POLYGON']):
+        mask = fillPoly(mask, pts=[asarray(polygon, dtype=int32)], color=class_id)
+    mask = torch.from_numpy(asarray(mask))
+    return mask
 def _collate(batch):
     return tuple(zip(*batch))
-
-def _purge_invalid_bbox(df: DataFrame) -> DataFrame:
-    '''Purge all entries without valid bbox entries'''
-    valid = [True] * len(df)
-    for i, row in df[['BBOX_CLASS_ID', 'XMIN', 'XMAX', 'YMIN', 'YMAX']].iterrows():
-        if not len(row['BBOX_CLASS_ID']) == len(row['XMIN']) == len(row['XMAX']) == \
-            len(row['YMIN']) == len(row['YMAX']):
-            valid[i] = False
-    return df[valid]
 
 class CVData:
     '''
@@ -240,7 +251,8 @@ class CVData:
     '''
 
     _classification_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'CLASS_ID'}
-    _detection_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'BBOX_CLASS_ID', 'XMIN', 'XMAX', 'YMIN', 'YMAX'}
+    _detection_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'BBOX_CLASS_ID', 'BOX'}
+    _segmentation_cols = {'ABSOLUTE_FILE', 'IMAGE_ID'}
 
     def __init__(self, root: str, form: dict[Union[Static, Generic], Any], transform=None,
                  target_transform=None, remove_invalid=True):
@@ -249,7 +261,7 @@ class CVData:
         self.transform = transform
         self.target_transform = target_transform
         dataset = _get_files(self.root)
-        data = _make_uniform(_expand_generics(self.root, dataset, self.form))
+        data = _expand_generics(self.root, dataset, self.form)
         pairings, uniques = _split(data)
         pairings = _find_pairings(pairings, [])
         self.data: list[DataEntry] = _merge(uniques, pairings)
@@ -321,9 +333,19 @@ class CVData:
         Run cleanup and sanity checks on all data.
         '''
         print('[CVData] Cleaning up data...')
+
+        # convert bounding boxes into proper format and store under 'BOX'
         if {'X1', 'X2', 'Y1', 'Y2'}.issubset(self.dataframe.columns):
             self._convert_bbox(0)
+        elif {'XMIN', 'YMIN', 'XMAX', 'YMAX'}.issubset(self.dataframe.columns):
+            self._convert_bbox(1)
+        elif {'XMIN', 'YMIN', 'WIDTH', 'HEIGHT'}.issubset(self.dataframe.columns):
+            self._convert_bbox(2)
+
+        # assign image ids
         if 'IMAGE_ID' not in self.dataframe: self.dataframe['IMAGE_ID'] = self.dataframe.index
+
+        # assign class ids
         if 'CLASS_NAME' in self.dataframe:
             if 'CLASS_ID' not in self.dataframe:
                 print('[CVData] Assigning CLASS_ID')
@@ -331,10 +353,26 @@ class CVData:
             else:
                 self.class_to_idx, self.classes = self._assign_ids('CLASS', assign=False)
                 self._patch_ids('CLASS', set_to_idx=self.class_to_idx, idx_to_set=self.classes)
+
+        if 'SEG_CLASS_NAME' in self.dataframe:
+            if 'SEG_CLASS_ID' not in self.dataframe:
+                print('[CVData] Assigning SEG_CLASS_ID')
+                self.seg_class_to_idx, self.seg_classes = self._assign_ids('SEG_CLASS', assign=True, 
+                                                                   redundant=True)
+            else:
+                self.seg_class_to_idx, self.seg_classes = self._assign_ids('SEG_CLASS', redundant=True)
+        elif 'SEG_CLASS_ID' in self.dataframe:
+            self.seg_classes = set()
+            for item in self.dataframe['SEG_CLASS_ID']: self.seg_classes.update(item)
+
         if CVData._classification_cols.issubset(self.dataframe.columns):
             self.available_modes.append('classification')
         if CVData._detection_cols.issubset(self.dataframe.columns):
             self.available_modes.append('detection')
+        if CVData._segmentation_cols.issubset(self.dataframe.columns) and \
+            ({'POLYGON', 'SEG_CLASS_ID'}.issubset(self.dataframe.columns) \
+                or 'ABSOLUTE_FILE_SEG' in self.dataframe):
+            self.available_modes.append('segmentation')
         # add segmentation mode
         self.dataframe.drop(columns='GENERIC', inplace=True, errors='ignore')
         self._cleanup_image_sets()
@@ -343,32 +381,36 @@ class CVData:
         print('[CVData] Done!')
 
     def _convert_bbox(self, mode: int) -> None:
+        boxes = []
+        def __execute_checks(boxes: list, cols: tuple):
+            if any([isinstance(row[cols[0]], float), isinstance(row[cols[1]], float),
+                    isinstance(row[cols[2]], float), isinstance(row[cols[3]], float)]):
+                boxes.append([])
+                return False
+            assert all(len(row[x]) == len(row[cols[0]]) for x in cols), \
+                'Length of bbox lists does not match'
+            return True
         if mode == 0:
-            xmins = []
-            ymins = []
-            xmaxs = []
-            ymaxs = []
             for _, row in self.dataframe.iterrows():
-                if any([isinstance(row['X1'], float), isinstance(row['X2'], float),
-                        isinstance(row['Y1'], float), isinstance(row['Y2'], float)]):
-                    xmins.append([])
-                    ymins.append([])
-                    xmaxs.append([])
-                    ymaxs.append([])
-                    continue
-                assert len(row['X1']) == len(row['X2']) == len(row['Y1']) == len(row['Y2']), \
-                    'Length of bbox lists does not match'
-                boxes = [(min(x1, x2), min(y1, y2), max(x1, x2), max(y1,y2)) for x1, x2, y1, y2
-                         in zip(row['X1'], row['X2'], row['Y1'], row['Y2'])]
-                boxes = list(zip(*boxes))
-                xmins.append(list(boxes[0]))
-                ymins.append(list(boxes[1]))
-                xmaxs.append(list(boxes[2]))
-                ymaxs.append(list(boxes[3]))
-            self.dataframe['XMIN'] = xmins
-            self.dataframe['YMIN'] = ymins
-            self.dataframe['XMAX'] = xmaxs
-            self.dataframe['YMAX'] = ymaxs
+                if not __execute_checks(boxes, ('X1', 'Y1', 'X2', 'Y2')): continue
+                boxes.append([(min(x1, x2), min(y1, y2), max(x1, x2), max(y1,y2)) for x1, y1, x2, y2
+                              in zip(row['X1'], row['Y1'], row['X2'], row['Y2'])])
+            self.dataframe['BOX'] = boxes
+            return
+        if mode == 1:
+            for _, row in self.dataframe.iterrows():
+                if not __execute_checks(boxes, ('XMIN', 'YMIN', 'XMAX', 'YMAX')): continue
+                boxes.append([(xmin, ymin, xmax, ymax) for xmin, ymin, xmax, ymax
+                              in zip(row['XMIN'], row['YMIN'], row['XMAX'], row['YMAX'])])
+            self.dataframe['BOX'] = boxes
+            return
+        if mode == 2:
+            for _, row in self.dataframe.iterrows():
+                if not __execute_checks(boxes, ('XMIN', 'YMIN', 'WIDTH', 'HEIGHT')): continue
+                boxes.append([(xmin, ymin, xmin+width, ymin+height) for xmin, ymin, width, height
+                              in zip(row['XMAX'], row['YMAX'], row['WIDTH'], row['HEIGHT'])])
+            self.dataframe['BOX'] = boxes
+            return
 
     def _cleanup_id(self) -> None:
         cols = ['CLASS_ID', 'IMAGE_ID']
@@ -404,23 +446,27 @@ class CVData:
         if not self.cleaned: self.cleanup()
         assert mode.lower().strip() in self.available_modes, 'Desired mode not available.'
         dataframe = self.dataframe[[image_set in item for item in self.dataframe['IMAGE_SET_NAME']]]
+        seg_default = 0
         if len(dataframe) == 0: raise ValueError(f'Image set {image_set} not available.')
         if mode == 'classification':
-            dataframe = dataframe.drop(['BBOX_CLASS_ID', 'BBOX_CLASS_NAME', 'XMIN', 'XMAX',
-                                        'YMIN', 'YMAX', 'WIDTH', 'HEIGHT'], 
-                                        inplace=False, errors='ignore')
+            dataframe = dataframe[list(CVData._classification_cols)]
             if self.remove_invalid:
                 print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
                 dataframe = dataframe.dropna()
         elif mode == 'detection':
-            dataframe = dataframe.drop(['CLASS_ID', 'CLASS_NAME'],
-                                        inplace=False, errors='ignore')
+            dataframe = dataframe[list(CVData._detection_cols)]
             if self.remove_invalid:
                 print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
                 dataframe = dataframe.dropna()
-            dataframe = _purge_invalid_bbox(dataframe)
+        elif mode == 'segmentation':
+            dataframe = dataframe[list(CVData._segmentation_cols) + (['POLYGON', 'SEG_CLASS_ID'] \
+                if 'POLYGON' in dataframe else ['ABSOLUTE_FILE_SEG'])]
+            if self.remove_invalid:
+                print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
+                dataframe = dataframe.dropna()
+            seg_default = max(self.seg_classes) + 1
         if len(dataframe) == 0: raise ValueError('[CVData] After cleanup, this dataset is empty.')
-        return CVDataset(dataframe, mode)
+        return CVDataset(dataframe, mode, seg_default=seg_default)
 
     def get_dataloader(self, mode: str, image_set: str, batch_size: int = 4, shuffle: bool = True,
                        num_workers: int = 1) -> DataLoader:
@@ -434,10 +480,11 @@ class CVDataset(Dataset):
     '''
     Dataset implementation for CVData environment.
     '''
-    def __init__(self, df: DataFrame, mode: str):
+    def __init__(self, df: DataFrame, mode: str, seg_default: int = 0):
         self.dataframe = df
         self.data = self.dataframe.to_dict('records')
         self.mode = mode
+        self.seg_default = seg_default
 
     def __len__(self):
         return len(self.dataframe)
@@ -450,4 +497,6 @@ class CVDataset(Dataset):
             label = _get_class_labels(item)
         elif self.mode == 'detection':
             label = _get_bbox_labels(item)
+        elif self.mode == 'segmentation':
+            label = _get_seg_labels(item, default=self.seg_default)
         return image, label

@@ -11,16 +11,16 @@ from typing_extensions import Self
 
 from ._utils import union
 
-class IdentifierToken:
+class Token:
     '''
-    The IdentifierToken class is an abstract class which carries important information into 
-    StringFormatTokens for data parsing functions. Subclasses of this class may have specific 
+    The Token class is an abstract class which carries important information into 
+    Data objects for data parsing functions. Subclasses of this class may have specific 
     requirements for content.
     '''
     def __init__(self):
         pass
 
-    def verify_token(self, token: str) -> bool:
+    def verify_token(self, token: Any) -> bool:
         '''
         Checks whether the token is in valid format in accordance with the identifier.
         
@@ -28,31 +28,25 @@ class IdentifierToken:
         '''
         return token != ''
 
-    def transform(self, token: str) -> Any:
+    def transform(self, token: Any) -> Any:
         '''
         Transform the token from a string value to token type.
         '''
         return token
 
-class RedundantToken(IdentifierToken):
+class RedundantToken(Token):
     '''
     Allows for redundancy.
     '''
     def transform(self, token: str) -> Any:
         return union(token)
 
-class UniqueToken(IdentifierToken):
+class UniqueToken(Token):
     '''
     The UniqueToken class possesses a set of elements which checks upon itself for membership.
     '''
-    def __init__(self):
-        self.items: set[str] = set()
 
-    def verify_token(self, token: str) -> bool:
-        self.items.add(token)
-        return True
-
-class WildcardToken(IdentifierToken):
+class WildcardToken(Token):
     '''
     The WildcardToken class represents a generic wildcard which can stand for anything and will not 
     be used for any identifiers.
@@ -68,7 +62,7 @@ class WildcardToken(IdentifierToken):
 
 class FilenameToken(UniqueToken):
     '''
-    The FilenameToken class is an IdentifierToken which checks for valid filenames.
+    The FilenameToken class is a Token which checks for valid filenames.
     '''
     def verify_token(self, token: str) -> bool:
         '''
@@ -79,7 +73,7 @@ class FilenameToken(UniqueToken):
         '''
         return os.path.exists(token) and super().verify_token(token)
 
-class IDToken(IdentifierToken):
+class IDToken(Token):
     '''
     Represents an ID.
     '''
@@ -98,7 +92,7 @@ class IDToken(IdentifierToken):
     def transform(self, token: str) -> Any:
         return int(token)
 
-class QuantityToken(IdentifierToken):
+class QuantityToken(Token):
     '''
     Represents a numeric quantity.
     '''
@@ -139,20 +133,27 @@ class UniqueIDToken(IDToken, UniqueToken):
     '''
     Represents a unique ID.
     '''
+    
+class RedundantObjectToken(RedundantToken):
+    '''
+    Represents a segmentation object.
+    '''
+    def transform(self, token: list) -> list:
+        return [token]
 
 class DataType:
     '''
-    All possible data types. Container class for IdentifierToken objects with specific purposes.
+    All possible data types. Container class for Token objects with specific purposes.
     
     Instance variables:
     - desc (str): the purpose of the DataType. This should be unique for every new object.
     - storage (bool): whether the DataType stores items contained in it.
-    - token_type (type[IdentifierToken]): the token type of the DataType.
+    - token_type (type[Token]): the token type of the DataType.
     '''
 
-    def __init__(self, desc: str, token_type: IdentifierToken):
+    def __init__(self, desc: str, token_type: Token):
         self.desc: str = desc
-        self.token_type: type[IdentifierToken] = token_type
+        self.token_type: type[Token] = token_type
 
     def __repr__(self) -> str:
         return f'<{self.desc}>'
@@ -164,7 +165,7 @@ class DataType:
 
     def verify_token(self, value: str) -> bool:
         '''
-        Verify that a given value is valid for the datatype. Calls on internal IdentifierToken
+        Verify that a given value is valid for the datatype. Calls on internal Token
         functions for validation.
         
         - value (str): the value to check if it is compatible with the DataType.
@@ -179,9 +180,10 @@ class DataTypes:
     IMAGE_SET_NAME = DataType('IMAGE_SET_NAME', RedundantToken())
     IMAGE_SET_ID = DataType('IMAGE_SET_ID', RedundantIDToken())
     ABSOLUTE_FILE = DataType('ABSOLUTE_FILE', FilenameToken())
+    ABSOLUTE_FILE_SEG = DataType('ABSOLUTE_FILE_SEG', FilenameToken())
     IMAGE_NAME = DataType('IMAGE_NAME', UniqueToken())
     IMAGE_ID = DataType('IMAGE_ID', UniqueIDToken())
-    CLASS_NAME = DataType('CLASS_NAME', IdentifierToken())
+    CLASS_NAME = DataType('CLASS_NAME', Token())
     CLASS_ID = DataType('CLASS_ID', IDToken())
     BBOX_CLASS_NAME = DataType('BBOX_CLASS_NAME', RedundantToken())
     BBOX_CLASS_ID = DataType('BBOX_CLASS_ID', RedundantIDToken())
@@ -195,8 +197,13 @@ class DataTypes:
     Y2 = DataType('Y2', RedundantQuantityToken())
     WIDTH = DataType('WIDTH', RedundantQuantityToken())
     HEIGHT = DataType('HEIGHT', RedundantQuantityToken())
+    SEG_CLASS_NAME = DataType('SEG_CLASS_NAME', RedundantToken())
+    SEG_CLASS_ID = DataType('SEG_CLASS_ID', RedundantIDToken())
+    X = DataType('X', QuantityToken())
+    Y = DataType('Y', QuantityToken())
     NAME = DataType('NAME', WildcardToken())
     GENERIC = DataType('GENERIC', WildcardToken())
+    POLYGON = DataType('POLYGON', RedundantObjectToken())
 
 class DataItem:
     '''
@@ -227,6 +234,9 @@ class DataItem:
         '''
         assert isinstance(self.delimiter.token_type, RedundantToken), \
             'Cannot add to item which is not redundant'
+        if isinstance(self.delimiter.token_type, RedundantObjectToken):
+            self.value.append(item.value)
+            return
         self.value = self.value + union(item.value)
 
     @classmethod
@@ -466,6 +476,16 @@ class Generic:
     def __repr__(self) -> str:
         return f'{self.name} | {self.data}'
 
+class Folder(Generic):
+    '''
+    Generic for directories only.
+    '''
+
+class File(Generic):
+    '''
+    Generic for files only.
+    '''
+
 class Image:
     '''
     Generic image.
@@ -475,6 +495,16 @@ class Image:
 
     def __repr__(self) -> str:
         return "Image"
+
+class SegmentationImage:
+    '''
+    Segmentation mapped image.
+    '''
+    def __init__(self):
+        pass
+    
+    def __repr__(self) -> str:
+        return "Segmentation Image"
 
 class GenericList:
     '''
@@ -488,27 +518,49 @@ class GenericList:
         Expand list into dict of statics.
         '''
         assert len(dataset) % len(self.form) == 0, \
-                'List length must be a multiple of length of provided form'
-        item_list: list[dict[str, Union[Static, dict]]] = []
+                f'List length ({len(dataset)})must be a multiple of length of provided form ({len(self.form)})'
+        item_list: list[Any] = []
         item: list[Static | dict] = []
-        if len(self.form) == 1:
-            for index, entry in enumerate(dataset):
-                result = expand_generics(entry, self.form[index % len(self.form)])
-                item_list.append(result)
-            return item_list
         for index, entry in enumerate(dataset):
             result = expand_generics(entry, self.form[index % len(self.form)])
             item.append(result)
             if (index + 1) % len(self.form) == 0:
-                item_list.append(item)
+                item_list.append({i: v for i, v in enumerate(item)})
                 item = []
-        return item_list
+        return {i: item for i, item in enumerate(item_list)}
+
+class SegmentationObject:
+    '''
+    Object to represent a collection of polygonal coordinates for segmentation.
+    '''
+    def __init__(self, form: Union[GenericList, list]):
+        if isinstance(form, list): form = GenericList(form)
+        self.form = form
+
+    def expand(self, dataset: list[Any]) -> dict[Static, Any]:
+        '''
+        Expand object into dict of statics.
+        '''
+        item_dict = self.form.expand(dataset)
+        x = []
+        y = []
+        for item in item_dict.values(): # need to future-proof for ordered dict implementations
+            for i in item.values():
+                assert isinstance(i, Static), f'Unknown item {item} found in segmentation object'
+                for data in i.data:
+                    if data.delimiter == DataTypes.X: x.append(data.value)
+                    elif data.delimiter == DataTypes.Y: y.append(data.value)
+                    else: raise ValueError('Unknown item found in segmentation object')
+        assert len(x) == len(y), 'Mismatch X and Y coordinates'
+        return Static('SegObject', DataItem(DataTypes.POLYGON, list(zip(x, y))))
 
 def expand_generics(dataset: Union[dict[str, Any], Any],
                      root: Union[dict[Any], DataType, Generic]) -> Union[dict, Static]:
     '''
     Expand all generics and set to statics.
     '''
+    if isinstance(root, (GenericList, SegmentationObject)):
+        return root.expand(dataset)
     if isinstance(root, DataType):
         root = Generic('{}', root)
     if isinstance(root, Generic):
@@ -553,7 +605,9 @@ def expand_generics(dataset: Union[dict[str, Any], Any],
         elif isinstance(value, GenericList):
             expanded_root[key] = value.expand(dataset[key.name])
         elif isinstance(value, DataType):
-            expanded_root[key] = Static(dataset[key.name], [DataItem(value, dataset[key.name])])
+            expanded_root[key] = Static(dataset[key.name], DataItem(value, dataset[key.name]))
+        elif isinstance(value, SegmentationObject):
+            expanded_root[key] = value.expand(dataset[key.name])
         else:
             raise ValueError(f'Inappropriate value {value}')
     return expanded_root

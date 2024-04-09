@@ -95,4 +95,4 @@ class TXTFile:
                 # may need to change
                 if parser.is_end():
                     data.append(Static(str(index), parser.data))
-        return data
+        return {i: v for i, v in enumerate(data)}
