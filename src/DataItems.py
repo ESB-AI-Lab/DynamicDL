@@ -5,6 +5,7 @@ Represents all possible (required) data items for parsing a dataset.
 import re
 import os
 import heapq
+import numpy as np
 from copy import copy
 from typing import Any, Union
 from typing_extensions import Self
@@ -119,7 +120,7 @@ class RedundantQuantityToken(QuantityToken, RedundantToken):
     '''
 
     def transform(self, token: str) -> Any:
-        return union(float(token))
+        return list(map(lambda x: float(x), union(token)))
 
 class RedundantIDToken(IDToken, RedundantToken):
     '''
@@ -127,19 +128,20 @@ class RedundantIDToken(IDToken, RedundantToken):
     '''
 
     def transform(self, token: str) -> Any:
-        return union(int(token))
-
-class UniqueIDToken(IDToken, UniqueToken):
-    '''
-    Represents a unique ID.
-    '''
+        return list(map(lambda x: int(x), union(token)))
     
 class RedundantObjectToken(RedundantToken):
     '''
     Represents a segmentation object.
     '''
     def transform(self, token: list) -> list:
+        if len(token) > 0 and isinstance(token[0], list): return token
         return [token]
+
+class UniqueIDToken(IDToken, UniqueToken):
+    '''
+    Represents a unique ID.
+    '''
 
 class DataType:
     '''
@@ -153,7 +155,7 @@ class DataType:
 
     def __init__(self, desc: str, token_type: Token):
         self.desc: str = desc
-        self.token_type: type[Token] = token_type
+        self.token_type: Token = token_type
 
     def __repr__(self) -> str:
         return f'<{self.desc}>'
@@ -162,6 +164,9 @@ class DataType:
         if self.__class__ != other.__class__:
             return False
         return self.desc == other.desc
+    
+    def __hash__(self) -> int:
+        return hash(self.desc)
 
     def verify_token(self, value: str) -> bool:
         '''
@@ -505,109 +510,3 @@ class SegmentationImage:
     
     def __repr__(self) -> str:
         return "Segmentation Image"
-
-class GenericList:
-    '''
-    Generic list.
-    '''
-    def __init__(self, form: Union[list[Any], Any]):
-        self.form = union(form)
-
-    def expand(self, dataset: list[Any]) -> dict[Static, Any]:
-        '''
-        Expand list into dict of statics.
-        '''
-        assert len(dataset) % len(self.form) == 0, \
-                f'List length ({len(dataset)})must be a multiple of length of provided form ({len(self.form)})'
-        item_list: list[Any] = []
-        item: list[Static | dict] = []
-        for index, entry in enumerate(dataset):
-            result = expand_generics(entry, self.form[index % len(self.form)])
-            item.append(result)
-            if (index + 1) % len(self.form) == 0:
-                item_list.append({i: v for i, v in enumerate(item)})
-                item = []
-        return {i: item for i, item in enumerate(item_list)}
-
-class SegmentationObject:
-    '''
-    Object to represent a collection of polygonal coordinates for segmentation.
-    '''
-    def __init__(self, form: Union[GenericList, list]):
-        if isinstance(form, list): form = GenericList(form)
-        self.form = form
-
-    def expand(self, dataset: list[Any]) -> dict[Static, Any]:
-        '''
-        Expand object into dict of statics.
-        '''
-        item_dict = self.form.expand(dataset)
-        x = []
-        y = []
-        for item in item_dict.values(): # need to future-proof for ordered dict implementations
-            for i in item.values():
-                assert isinstance(i, Static), f'Unknown item {item} found in segmentation object'
-                for data in i.data:
-                    if data.delimiter == DataTypes.X: x.append(data.value)
-                    elif data.delimiter == DataTypes.Y: y.append(data.value)
-                    else: raise ValueError('Unknown item found in segmentation object')
-        assert len(x) == len(y), 'Mismatch X and Y coordinates'
-        return Static('SegObject', DataItem(DataTypes.POLYGON, list(zip(x, y))))
-
-def expand_generics(dataset: Union[dict[str, Any], Any],
-                     root: Union[dict[Any], DataType, Generic]) -> Union[dict, Static]:
-    '''
-    Expand all generics and set to statics.
-    '''
-    if isinstance(root, (GenericList, SegmentationObject)):
-        return root.expand(dataset)
-    if isinstance(root, DataType):
-        root = Generic('{}', root)
-    if isinstance(root, Generic):
-        success, tokens = root.match(str(dataset))
-        if not success: raise ValueError(f'Failed to match: {dataset} to {root}')
-        return Static(str(dataset), tokens)
-    expanded_root: dict[Static, Any] = {}
-    generics: list[Generic] = []
-    names: set[Static] = set()
-    for key in root:
-        if isinstance(key, Generic):
-            # push to prioritize generics with the most wildcards for disambiguation
-            heapq.heappush(generics, (-len(key.data), key))
-            continue
-        if isinstance(key, str):
-            if key in dataset:
-                names.add(key)
-                expanded_root[Static(key)] = root[key]
-            else:
-                raise ValueError(f'Static value {key} not found in dataset')
-            continue
-        if key.name in dataset:
-            names.add(key.name)
-            expanded_root[key] = root[key]
-        else:
-            raise ValueError(f'Static value {key} not found in dataset')
-
-    while len(generics) != 0:
-        _, generic = heapq.heappop(generics)
-        generic: Generic
-        for name in dataset:
-            if name in names: continue
-            status, items = generic.match(name)
-            if not status: continue
-            new_name: str = generic.substitute(items)
-            names.add(new_name)
-            expanded_root[Static(new_name, items)] = root[generic]
-
-    for key, value in expanded_root.items():
-        if isinstance(value, (dict, Generic)):
-            expanded_root[key] = expand_generics(dataset[key.name], expanded_root[key])
-        elif isinstance(value, GenericList):
-            expanded_root[key] = value.expand(dataset[key.name])
-        elif isinstance(value, DataType):
-            expanded_root[key] = Static(dataset[key.name], DataItem(value, dataset[key.name]))
-        elif isinstance(value, SegmentationObject):
-            expanded_root[key] = value.expand(dataset[key.name])
-        else:
-            raise ValueError(f'Inappropriate value {value}')
-    return expanded_root

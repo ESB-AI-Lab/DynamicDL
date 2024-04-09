@@ -18,7 +18,7 @@ import torch
 
 from .DataItems import DataEntry, DataItem, DataTypes, DataType, UniqueToken, Static, Generic, \
                        Image, SegmentationImage, Folder, File
-from .Processing import TXTFile, JSONFile
+from .Processing import TXTFile, JSONFile, Pairing
 
 def _get_files(path: str) -> dict:
     files = {}
@@ -37,6 +37,7 @@ def _expand_generics(path: str, dataset: dict[str, Any],
     expanded_root: dict[Static, Any] = {}
     generics: list[Generic] = []
     names: set[Static] = set()
+    pairings: list[Pairing] = []
     for i, key in enumerate(root):
         if isinstance(key, DataType):
             heapq.heappush(generics, (0, i, Generic('{}', key)))
@@ -69,29 +70,29 @@ def _expand_generics(path: str, dataset: dict[str, Any],
             names.add(new_name)
             expanded_root[Static(new_name, items)] = root[generic]
 
+    to_pop = []
+
     for key, value in expanded_root.items():
         if isinstance(value, dict):
-            expanded_root[key] = _expand_generics(os.path.join(path, key.name),
-                                                  dataset[key.name], expanded_root[key])
+            uniques, pairing = _expand_generics(os.path.join(path, key.name),
+                                                           dataset[key.name], expanded_root[key])
+            expanded_root[key] = uniques
+            pairings += pairing
         elif isinstance(value, (TXTFile, JSONFile)):
-            expanded_root[key] = value.parse(os.path.join(path, key.name))
+            uniques, pairing = value.parse(os.path.join(path, key.name))
+            expanded_root[key] = uniques
+            pairings += pairing
         elif isinstance(value, Image):
             expanded_root[key] = Static('Image', DataItem(DataTypes.ABSOLUTE_FILE,
                                                            os.path.join(path, key.name)))
         elif isinstance(value, SegmentationImage):
             expanded_root[key] = Static('Segmentation Image', DataItem(DataTypes.ABSOLUTE_FILE_SEG,
                                                            os.path.join(path, key.name)))
-    return expanded_root
-
-def _make_uniform(data: Union[dict[Static, Any], list[Any], Static]) -> dict:
-    if isinstance(data, dict):
-        items = {}
-        for key, val in data.items():
-            items[key] = _make_uniform(val)
-        return items
-    if isinstance(data, list):
-        return {i:_make_uniform(item) for i, item in enumerate(data)}
-    return data
+        elif isinstance(value, Pairing):
+            to_pop.append(key)
+            value.find_pairings(dataset[key.name])
+            
+    return expanded_root, pairings
 
 def _split(data: Union[dict[Union[Static, int], Any], Static]) -> tuple[dict, dict]:
     if isinstance(data, Static):
@@ -114,24 +115,6 @@ def _split(data: Union[dict[Union[Static, int], Any], Static]) -> tuple[dict, di
     if count == 1:
         return (None, data)
     return pairings, uniques
-
-def _find_pairings(pairings: dict[Union[Static, int], Any], curr_data: list[DataItem]) -> list[DataEntry]:
-    if all([isinstance(key, (Static, int)) and isinstance(val, Static)
-            for key, val in pairings.items()]):
-        data_items = []
-        for key, val in pairings.items():
-            data_items += key.data + val.data if isinstance(key, Static) else val.data
-        return [DataEntry(data_items + curr_data)]
-    pairs = []
-    structs = []
-    for key, val in pairings.items():
-        if isinstance(key, Static): curr_data += key.data
-        if isinstance(val, Static): curr_data += val.data
-        else: structs.append(val)
-
-    for struct in structs:
-        pairs += _find_pairings(struct, curr_data)
-    return pairs
 
 def _add_to_hashmap(hashmaps: dict[str, dict[str, DataEntry]], entry: DataEntry,
                     unique_identifiers: list[DataType]) -> None:
@@ -157,7 +140,6 @@ def _merge_lists(lists: list[list[DataEntry]]) -> list[DataEntry]:
     Merge two DataEntry lists.
     '''
     if len(lists) == 0: return []
-    if len(lists) == 1: return lists[0]
     # needs to be changed if allow custom definition of datatypes
     unique_identifiers: list[DataType] = [var for var in vars(DataTypes).values() if
                                             isinstance(var, DataType) and
@@ -172,7 +154,7 @@ def _merge_lists(lists: list[list[DataEntry]]) -> list[DataEntry]:
         data.update(hashmaps[identifier.desc].values())
     return list(data)
 
-def _merge(data: Union[dict[Union[Static, int], Any], Static], pairings: list[DataEntry]) -> \
+def _merge(data: Union[dict[Union[Static, int], Any], Static]) -> \
         Union[DataEntry, list[DataEntry]]:
     if isinstance(data, Static):
         entry = DataEntry(data.data) # apply pairings here if possible
@@ -180,7 +162,7 @@ def _merge(data: Union[dict[Union[Static, int], Any], Static], pairings: list[Da
     if len(data) == 0: return []
     recursive = []
     for key, val in data.items():
-        result = _merge(val, pairings)
+        result = _merge(val)
         if isinstance(result, DataEntry):
             recursive.append(DataEntry.merge(DataEntry(key.data), result)
                              if isinstance(key, Static) else result)
@@ -261,10 +243,12 @@ class CVData:
         self.transform = transform
         self.target_transform = target_transform
         dataset = _get_files(self.root)
-        data = _expand_generics(self.root, dataset, self.form)
-        pairings, uniques = _split(data)
-        pairings = _find_pairings(pairings, [])
-        self.data: list[DataEntry] = _merge(uniques, pairings)
+        data, pairings = _expand_generics(self.root, dataset, self.form)
+        self.data: list[DataEntry] = _merge(data)
+        for pairing in pairings:
+            for entry in self.data:
+                pairing.update_pairing(entry)
+        # self.data = _apply_pairings(uniques, pairings)
         self.dataframe: DataFrame = DataFrame([{key: val.value if isinstance(val, DataItem)
                                                 else [x.value for x in val]
                                                 for key, val in data.data.items()}
