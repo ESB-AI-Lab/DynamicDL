@@ -6,7 +6,8 @@ import heapq
 from typing import Any, Union, Optional, Callable
 from math import isnan
 import json
-from numpy import asarray, int32, full_like, random, nan
+from numpy import asarray, int32, full_like, nan
+import random
 from pandas import DataFrame
 from pandas.core.series import Series
 from cv2 import imread, fillPoly, IMREAD_GRAYSCALE
@@ -15,6 +16,7 @@ from torch.utils.data import Dataset, DataLoader
 from torch import Tensor, IntTensor, FloatTensor
 import torch
 
+from ._utils import next_avail_id
 from .DataItems import DataEntry, DataItem, DataTypes, DataType, UniqueToken, Static, Generic, \
                        Image, SegmentationImage, Folder, File
 from .Processing import DataFile, Pairing
@@ -262,7 +264,7 @@ class CVData:
                    for key, val in data.data.items()} for data in self.data]
         self.dataframe = DataFrame(entries)
         self.image_set_to_idx = {}
-        self.idx_to_image_sets = {}
+        self.idx_to_image_set = {}
         self.seg_class_to_idx = {}
         self.idx_to_seg_class = {}
         self.remove_invalid = remove_invalid
@@ -275,6 +277,12 @@ class CVData:
         '''
         print('[CVData] Cleaning up data...')
 
+        # sort by image id first to prevent randomness
+        if 'IMAGE_ID' in self.dataframe:
+            self.dataframe.sort_values('IMAGE_ID', ignore_index=True, inplace=True)
+        else:
+            self.dataframe.sort_values('IMAGE_NAME', ignore_Index=True, inplace=True)
+
         # convert bounding boxes into proper format and store under 'BOX'
         if {'X1', 'X2', 'Y1', 'Y2'}.issubset(self.dataframe.columns):
             self._convert_bbox(0)
@@ -282,6 +290,7 @@ class CVData:
             self._convert_bbox(1)
         elif {'XMIN', 'YMIN', 'WIDTH', 'HEIGHT'}.issubset(self.dataframe.columns):
             self._convert_bbox(2)
+        
 
         # assign image ids
         if 'IMAGE_ID' not in self.dataframe: self.dataframe['IMAGE_ID'] = self.dataframe.index
@@ -419,15 +428,15 @@ class CVData:
     def _cleanup_image_sets(self) -> None:
         if 'IMAGE_SET_NAME' in self.dataframe:
             result = self._assign_ids('IMAGE_SET', default=True, redundant=True)
-            self.image_set_to_idx, self.idx_to_image_sets = result
+            self.image_set_to_idx, self.idx_to_image_set = result
         elif 'IMAGE_SET_ID' not in self.dataframe:
             self.dataframe['IMAGE_SET_NAME'] = [['default']] * len(self.dataframe)
             self.dataframe['IMAGE_SET_ID'] = [[0]] * len(self.dataframe)
             self.image_set_to_idx = {'default': 0}
-            self.idx_to_image_sets = {0: 'default'}
+            self.idx_to_image_set = {0: 'default'}
         else:
             for ids in self.dataframe['IMAGE_SET_ID']:
-                self.idx_to_image_sets.update({k: str(k) for k in ids})
+                self.idx_to_image_set.update({k: str(k) for k in ids})
                 self.image_set_to_idx.update({str(k): k for k in ids})
 
     def get_dataset(self, mode: str, image_set: str) -> Dataset:
@@ -445,7 +454,7 @@ class CVData:
             dataframe = dataframe[list(CVData._segmentation_poly_cols if 'POLYGON' in dataframe 
                                        else CVData._segmentation_img_cols)]
             
-            seg_default = max(self.idx_to_seg_class) + 1 if self.idx_to_seg_class else 0
+            seg_default = next_avail_id(self.idx_to_seg_class)
         if self.remove_invalid:
             print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
             dataframe = dataframe.dropna()
@@ -460,7 +469,8 @@ class CVData:
         return DataLoader(self.get_dataset(mode, image_set), batch_size=batch_size,
                           shuffle=shuffle, num_workers=num_workers, collate_fn=_collate)
     
-    def split_image_set(self, image_set: str, *new_sets: tuple[str, float], inplace=False, seed=0):
+    def split_image_set(self, image_set: str, *new_sets: tuple[str, float], inplace: bool = False,
+                        seed: int = None):
         '''
         Split the existing image set into new image sets.
         '''
@@ -478,29 +488,45 @@ class CVData:
         # assemble new sets
         new_sets: list = list(new_sets)
         if inplace: new_sets.append((image_set, 1 - tot_frac))
-        gen = random.RandomState(seed=seed)
-        id_buf = max(self.idx_to_image_sets.keys()) + 1
+        if seed: random.seed(seed)
 
-        # add to existing image set tracker
-        self.idx_to_image_sets.update({id_buf + i: k[0] for i, k in enumerate(new_sets)})
-        self.image_set_to_idx.update({k[0]: i + id_buf for i, k in enumerate(new_sets)})
+        # add to existing image set tracker 
+        for k in new_sets:
+            next_id = next_avail_id(self.idx_to_image_set)
+            self.idx_to_image_set[next_id] = k[0]
+            self.image_set_to_idx[k[0]] = next_id
 
         # assign image sets
         for _, row in self.dataframe.iterrows():
             if image_set not in row['IMAGE_SET_NAME']: continue
-            next_selection = gen.rand()
+            next_selection = random.random()
             running_sum = 0
             for i, next_set in enumerate(new_sets):
                 if running_sum <= next_selection <= running_sum + next_set[1]:
-                    if inplace: 
-                        row['IMAGE_SET_NAME'][row['IMAGE_SET_NAME'].index(image_set)] = next_set[0]
-                        row['IMAGE_SET_ID'][row['IMAGE_SET_NAME'].index(image_set)] = i + id_buf
+                    if inplace:
+                        index = row['IMAGE_SET_NAME'].index(image_set)
+                        row['IMAGE_SET_NAME'][index] = next_set[0]
+                        row['IMAGE_SET_ID'][index] = self.image_set_to_idx[next_set[0]]
                     else: 
                         row['IMAGE_SET_NAME'].append(next_set[0])
-                        row['IMAGE_SET_ID'].append(i + id_buf)
-                    print(f'Allocating to {next_set[0]}')
+                        row['IMAGE_SET_ID'].append(self.image_set_to_idx[next_set[0]])
                     break
                 running_sum += next_set[1]
+        if inplace: self.clear_image_sets()
+    
+    def get_image_set(self, image_set: Union[str, int]) -> DataFrame:
+        if isinstance(image_set, str):
+            return self.dataframe[self.dataframe['IMAGE_SET_NAME'].apply(lambda x: image_set in x)]
+        return self.dataframe[self.dataframe['IMAGE_SET_ID'].apply(lambda x: image_set in x)]
+    
+    def clear_image_sets(self) -> None:
+        to_pop = []
+        for image_set in self.image_set_to_idx:
+            if len(self.get_image_set(image_set)) == 0:
+                to_pop.append(image_set)
+        for image_set in to_pop:
+            index = self.image_set_to_idx.pop(image_set)
+            self.idx_to_image_set.pop(index)
         
 class CVDataset(Dataset):
     '''
