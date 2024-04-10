@@ -3,6 +3,7 @@ File processing module.
 '''
 import json
 import heapq
+import xmltodict
 from typing import Any, Union
 from abc import ABC, abstractmethod
 
@@ -56,6 +57,18 @@ class SegmentationObject:
                     else: raise ValueError('Unknown item found in segmentation object')
         assert len(x) == len(y), 'Mismatch X and Y coordinates'
         return Static('SegObject', DataItem(DataTypes.POLYGON, list(zip(x, y)))), []
+
+class AmbiguousList:
+    '''
+    Ambiguous List. Used to represent when an item could either be in a list, or a solo item.
+    This is primarily used for XML files.
+    '''
+    def __init__(self, form: Any):
+        self.form = GenericList(form)
+        
+    def expand(self, dataset: Any) -> dict[Static, Any]:
+        dataset = union(dataset)
+        return self.form.expand(dataset)
 
 class DataFile(ABC):
     @abstractmethod
@@ -127,6 +140,21 @@ class TXTFile(DataFile):
         elif isinstance(self.line_format, Pairing):
             self.line_format.find_pairings(filtered_lines)
             return {}, [self.line_format]
+
+class XMLFile(DataFile):
+    '''
+    Utility functions for parsing json files.
+    '''
+    def __init__(self, form: dict[Union[Static, Generic], Any]):
+        self.form = form
+
+    def parse(self, path: str) -> dict:
+        '''
+        Parses JSON file.
+        '''
+        with open(path, 'r', encoding='utf-8') as f:
+            data = xmltodict.parse(f.read())
+        return expand_generics(data, self.form)
 
 class Pairing:
     '''
@@ -244,7 +272,7 @@ def expand_generics(dataset: Union[dict[str, Any], Any],
             uniques, pairing = expand_generics(dataset[key.name], expanded_root[key])
             expanded_root[key] = uniques
             pairings += pairing
-        elif isinstance(value, GenericList):
+        elif isinstance(value, (GenericList, AmbiguousList)):
             uniques, pairing = value.expand(dataset[key.name])
             expanded_root[key] = uniques
             pairings += pairing

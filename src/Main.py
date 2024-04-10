@@ -6,7 +6,7 @@ import heapq
 from typing import Any, Union, Optional, Callable
 from math import isnan
 import json
-from numpy import asarray, int32, full_like, random
+from numpy import asarray, int32, full_like, random, nan
 from pandas import DataFrame
 from pandas.core.series import Series
 from cv2 import imread, fillPoly, IMREAD_GRAYSCALE
@@ -303,6 +303,16 @@ class CVData:
         elif 'SEG_CLASS_ID' in self.dataframe:
             self.idx_to_seg_class = {i: str(i) for item in self.dataframe['SEG_CLASS_ID'] for i in item}
             self.seg_class_to_idx = {str(i): i for item in self.dataframe['SEG_CLASS_ID'] for i in item}
+        
+        # assign bbox ids
+        if 'BBOX_CLASS_NAME' in self.dataframe:
+            if 'BBOX_CLASS_ID' not in self.dataframe: call = self._assign_ids
+            else: call = self._validate_ids
+            result = call('BBOX_CLASS', redundant=True)
+            self.bbox_class_to_idx, self.idx_to_bbox_class = result
+        elif 'BBOX_CLASS_ID' in self.dataframe:
+            self.idx_to_bbox_class = {i: str(i) for item in self.dataframe['BBOX_CLASS_ID'] for i in item}
+            self.bbox_class_to_idx = {str(i): i for item in self.dataframe['BBOX_CLASS_ID'] for i in item}
 
         # check available columns to determine mode availability
         if CVData._classification_cols.issubset(self.dataframe.columns):
@@ -346,16 +356,17 @@ class CVData:
                 self.dataframe.loc[self.dataframe[f'{name}_NAME'].isna(), f'{name}_NAME'].apply(
                     lambda x: default_value)
         for v in self.dataframe[f'{name}_NAME']:
+            if isinstance(v, float): continue
             if redundant: sets.update(v)
             else: sets.add(v)
         name_to_idx = {v: i for i, v in enumerate(sets)}
         idx_to_name = {v: k for k, v in name_to_idx.items()}
         if redundant:
             self.dataframe[f'{name}_ID'] = self.dataframe[f'{name}_NAME'].apply(
-                lambda x: list(map(lambda y: name_to_idx[y], x)))
+                lambda x: nan if isinstance(x, float) else list(map(lambda y: name_to_idx[y], x)))
         else:
             self.dataframe[f'{name}_ID'] = self.dataframe[f'{name}_NAME'].apply(
-                lambda x: name_to_idx[x])
+                lambda x: nan if isinstance(x, float) else name_to_idx[x])
         return name_to_idx, idx_to_name
 
     def _patch_ids(self, name: str, name_to_idx: dict, idx_to_name: dict, redundant=False) -> None:

@@ -4,3 +4,4 @@ pandas>=1.5.2
 torch>=2.1.2
 torchvision>=0.16.2
 typing_extensions>=4.11.0
+xmltodict==0.13.0
