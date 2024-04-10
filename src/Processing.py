@@ -4,6 +4,7 @@ File processing module.
 import json
 import heapq
 from typing import Any, Union
+from abc import ABC, abstractmethod
 
 from ._utils import union
 from .DataItems import DataTypes, DataItem, Generic, Static, DataType, DataEntry, RedundantToken
@@ -56,8 +57,14 @@ class SegmentationObject:
         assert len(x) == len(y), 'Mismatch X and Y coordinates'
         return Static('SegObject', DataItem(DataTypes.POLYGON, list(zip(x, y)))), []
 
+class DataFile(ABC):
+    @abstractmethod
+    def parse(self, path: str) -> dict:
+        '''
+        Parses a file.
+        '''
 
-class JSONFile:
+class JSONFile(DataFile):
     '''
     Utility functions for parsing json files.
     '''
@@ -72,7 +79,7 @@ class JSONFile:
             data = json.load(f)
         return expand_generics(data, self.form)
 
-class TXTFile:
+class TXTFile(DataFile):
     '''
     Utility functions for parsing txt files.
     '''

@@ -3,10 +3,10 @@ Main module for processing datasets.
 '''
 import os
 import heapq
-from typing import Any, Union
+from typing import Any, Union, Optional, Callable
 from math import isnan
 import json
-from numpy import asarray, int32, full_like
+from numpy import asarray, int32, full_like, random
 from pandas import DataFrame
 from pandas.core.series import Series
 from cv2 import imread, fillPoly, IMREAD_GRAYSCALE
@@ -15,13 +15,13 @@ from torch.utils.data import Dataset, DataLoader
 from torch import Tensor, IntTensor, FloatTensor
 import torch
 
-
 from .DataItems import DataEntry, DataItem, DataTypes, DataType, UniqueToken, Static, Generic, \
                        Image, SegmentationImage, Folder, File
-from .Processing import TXTFile, JSONFile, Pairing
+from .Processing import DataFile, Pairing
 
-def _get_files(path: str) -> dict:
-    files = {}
+def _get_files(path: str) -> dict[str, Union[str, dict]]:
+    '''Step one of the processing. Expand the dataset to fit all the files.'''
+    files: dict[str, Union[str, dict]] = {}
     for file in os.listdir(path):
         if os.path.isdir(os.path.join(path, file)):
             files[file] = _get_files(os.path.join(path, file))
@@ -30,55 +30,60 @@ def _get_files(path: str) -> dict:
     return files
 
 def _expand_generics(path: str, dataset: dict[str, Any],
-                     root: dict[Union[str, Static, Generic], Any]) -> dict:
-    '''
-    Expand all generics and set to statics.
-    '''
+                     root: dict[Union[str, Static, Generic, DataType], Any]) -> dict:
+    '''Expand all generics and set to statics within filestructure.'''
     expanded_root: dict[Static, Any] = {}
     generics: list[Generic] = []
     names: set[Static] = set()
     pairings: list[Pairing] = []
+
+    # move Statics to expanded root, move Generics to priority queue for expansion
     for i, key in enumerate(root):
+        # convert DataType to Generic with low priority
         if isinstance(key, DataType):
             heapq.heappush(generics, (0, i, Generic('{}', key)))
+
+        # priority queue push to prioritize generics with the most wildcards for disambiguation
         if isinstance(key, Generic):
-            # priority queue push to prioritize generics with the most wildcards for disambiguation
             heapq.heappush(generics, (-len(key.data), i, key))
             continue
-        if isinstance(key, str):
-            if key in dataset:
-                names.add(key)
-                expanded_root[Static(key)] = root[key]
-            else: raise ValueError(f'Static value {key} not found in dataset')
-            continue
+        val = root[key]
+
+        # convert str to Static
+        if isinstance(key, str): key = Static(key)
+
+        # add Static directly to expanded root
         if key.name in dataset:
             names.add(key.name)
-            expanded_root[key] = root[key]
-        else:
-            raise ValueError(f'Static value {key} not found in dataset')
+            expanded_root[key] = val
+            continue
+        raise ValueError(f'Static value {key} not found in dataset')
 
+    # expand Generics 
     while len(generics) != 0:
         _, _, generic = heapq.heappop(generics)
         generic: Generic
         for name in dataset:
+            # basic checks
             if name in names: continue
             if isinstance(generic, Folder) and dataset[name] == "File": continue
             if isinstance(generic, File) and dataset[name] != "File": continue
+
+            # attempt to match name to generic
             status, items = generic.match(name)
             if not status: continue
-            new_name: str = generic.substitute(items)
-            names.add(new_name)
-            expanded_root[Static(new_name, items)] = root[generic]
+            names.add(name)
+            expanded_root[Static(name, items)] = root[generic]
 
     to_pop = []
-
+    # all items are statics, now process values 
     for key, value in expanded_root.items():
         if isinstance(value, dict):
-            uniques, pairing = _expand_generics(os.path.join(path, key.name),
-                                                           dataset[key.name], expanded_root[key])
+            next_path: str = os.path.join(path, key.name)
+            uniques, pairing = _expand_generics(next_path, dataset[key.name], expanded_root[key])
             expanded_root[key] = uniques
             pairings += pairing
-        elif isinstance(value, (TXTFile, JSONFile)):
+        elif isinstance(value, DataFile):
             uniques, pairing = value.parse(os.path.join(path, key.name))
             expanded_root[key] = uniques
             pairings += pairing
@@ -91,35 +96,15 @@ def _expand_generics(path: str, dataset: dict[str, Any],
         elif isinstance(value, Pairing):
             to_pop.append(key)
             value.find_pairings(dataset[key.name])
-            
+        else: 
+            raise ValueError(f'Unknown value found in format: {value}')
+    for item in to_pop: expanded_root.pop(item)
     return expanded_root, pairings
-
-def _split(data: Union[dict[Union[Static, int], Any], Static]) -> tuple[dict, dict]:
-    if isinstance(data, Static):
-        return (None, data) if DataEntry(data.data).unique else (data, None)
-    count = 0
-    pairings = {}
-    uniques = {}
-    for key, val in data.items():
-        if isinstance(key, Static) and DataEntry(key.data).unique:
-            count += 1
-            uniques[key] = val
-            continue
-        if isinstance(val, Static) and DataEntry(val.data).unique:
-            count += 1
-            uniques[key] = val
-            continue
-        pairs, unique_vals = _split(val)
-        if pairs: pairings[key] = pairs
-        if unique_vals: uniques[key] = unique_vals
-    if count == 1:
-        return (None, data)
-    return pairings, uniques
 
 def _add_to_hashmap(hashmaps: dict[str, dict[str, DataEntry]], entry: DataEntry,
                     unique_identifiers: list[DataType]) -> None:
     '''
-    Helper method for _merge_lists()
+    Helper method for _merge_lists(), adds an item to all corresponding hashmaps and handles merge.
     '''
     for id_try in unique_identifiers:
         value = entry.data.get(id_try.desc)
@@ -140,15 +125,18 @@ def _merge_lists(lists: list[list[DataEntry]]) -> list[DataEntry]:
     Merge two DataEntry lists.
     '''
     if len(lists) == 0: return []
-    # needs to be changed if allow custom definition of datatypes
+
+    # get all unique identifiers
     unique_identifiers: list[DataType] = [var for var in vars(DataTypes).values() if
-                                            isinstance(var, DataType) and
-                                            isinstance(var.token_type, UniqueToken)]
+        isinstance(var, DataType) and isinstance(var.token_type, UniqueToken)]
+    
+    # append to hashmaps for efficient merge
     hashmaps: dict[str, dict[str, DataEntry]] = {id.desc:{} for id in unique_identifiers}
     for next_list in lists:
         for entry in next_list:
             _add_to_hashmap(hashmaps, entry, unique_identifiers)
 
+    # extract data from all hashmaps, same entries have same pointer so set works for unique items
     data = set()
     for identifier in unique_identifiers:
         data.update(hashmaps[identifier.desc].values())
@@ -156,28 +144,37 @@ def _merge_lists(lists: list[list[DataEntry]]) -> list[DataEntry]:
 
 def _merge(data: Union[dict[Union[Static, int], Any], Static]) -> \
         Union[DataEntry, list[DataEntry]]:
-    if isinstance(data, Static):
-        entry = DataEntry(data.data) # apply pairings here if possible
-        return entry
+    '''
+    Recursive process for merging unique data. 
+    Returns DataEntry if within unique item, list otherwise.
+    '''
+    # base cases
+    if isinstance(data, Static): return DataEntry(data.data)
     if len(data) == 0: return []
     recursive = []
+
+    # get result
     for key, val in data.items():
         result = _merge(val)
+        # unique entry result
         if isinstance(result, DataEntry):
-            recursive.append(DataEntry.merge(DataEntry(key.data), result)
-                             if isinstance(key, Static) else result)
+            if isinstance(key, Static): result = DataEntry.merge(DataEntry(key.data), result)
+            recursive.append(result)
             continue
+        # list entry result
         if isinstance(key, Static):
             for item in result: item.apply_tokens(key.data)
         recursive.append(result)
     lists = [item for item in recursive if isinstance(item, list)]
     tokens = [item for item in recursive if not isinstance(item, list)]
+
+    # if outside unique loop, merge lists and apply tokens as needed
     if lists:
         result = _merge_lists(lists)
-        if tokens:
-            for token in tokens:
-                for item in result: item.apply_tokens(token)
+        if tokens: (item.apply_tokens(token) for token in tokens for item in result)
         return result
+
+    # if inside unique loop, either can merge all together or result has multiple entries
     entries = []
     entry = recursive[0]
     for index, item in enumerate(recursive[1:], 1):
@@ -200,6 +197,10 @@ def _get_str(data):
 def get_str(data):
     '''Return pretty print string.'''
     return json.dumps(_get_str(data), indent=4).replace('"', '')
+
+###########################################
+# Dataloader functions for getting labels #
+###########################################
 
 def _get_class_labels(item: Series) -> Tensor:
     return int(item['CLASS_ID'])
@@ -224,6 +225,7 @@ def _get_seg_labels(item: Series, default=0) -> Tensor:
         mask = fillPoly(mask, pts=[asarray(polygon, dtype=int32)], color=class_id)
     mask = torch.from_numpy(asarray(mask))
     return mask
+
 def _collate(batch):
     return tuple(zip(*batch))
 
@@ -234,83 +236,38 @@ class CVData:
 
     _classification_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'CLASS_ID'}
     _detection_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'BBOX_CLASS_ID', 'BOX'}
-    _segmentation_cols = {'ABSOLUTE_FILE', 'IMAGE_ID'}
+    _segmentation_img_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'ABSOLUTE_FILE_SEG'}
+    _segmentation_poly_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'POLYGON', 'SEG_CLASS_ID'}
 
-    def __init__(self, root: str, form: dict[Union[Static, Generic], Any], transform=None,
-                 target_transform=None, remove_invalid=True):
+    def __init__(
+        self, 
+        root: str, 
+        form: dict[Union[Static, Generic], Any], 
+        transform: Optional[Callable] = None,
+        target_transform: Optional[Callable] = None, 
+        remove_invalid: bool = True
+    ) -> None:
         self.root = root
         self.form = form
         self.transform = transform
         self.target_transform = target_transform
         dataset = _get_files(self.root)
         data, pairings = _expand_generics(self.root, dataset, self.form)
-        self.data: list[DataEntry] = _merge(data)
+        self.data = _merge(data)
         for pairing in pairings:
             for entry in self.data:
                 pairing.update_pairing(entry)
-        # self.data = _apply_pairings(uniques, pairings)
-        self.dataframe: DataFrame = DataFrame([{key: val.value if isinstance(val, DataItem)
-                                                else [x.value for x in val]
-                                                for key, val in data.data.items()}
-                                               for data in self.data])
+        self.data = _merge_lists([self.data])
+        entries = [{key: val.value if isinstance(val, DataItem) else [x.value for x in val]
+                   for key, val in data.data.items()} for data in self.data]
+        self.dataframe = DataFrame(entries)
         self.image_set_to_idx = {}
-        self.image_sets = []
+        self.idx_to_image_sets = {}
+        self.seg_class_to_idx = {}
+        self.idx_to_seg_class = {}
         self.remove_invalid = remove_invalid
         self.available_modes = []
         self.cleaned = False
-
-    def _assign_ids(self, name: str, default=False, redundant=False, assign=False) -> \
-            tuple[dict, set]:
-        if not assign:
-            set_to_idx = {}
-            for _, (ids, vals) in self.dataframe[[f'{name}_ID', f'{name}_NAME']].iterrows():
-                if redundant:
-                    if len(ids) != len(vals):
-                        raise ValueError('Row id/name length mismatch')
-                    for i, v in zip(ids, vals):
-                        if isnan(i) or (isinstance(v, float) and isnan(v)): continue
-                        i = int(i)
-                        if v in set_to_idx and set_to_idx[v] != i:
-                            raise ValueError(f'Invalid {name} id {i} assigned to name {v}')
-                        else: set_to_idx[v] = i
-                else:
-                    if isnan(ids) or (isinstance(vals, float) and isnan(vals)): continue
-                    ids = int(ids)
-                    if vals in set_to_idx and set_to_idx[vals] != ids:
-                        raise ValueError(f'Invalid {name} id {ids} assigned to name {vals}')
-                    else: set_to_idx[vals] = ids
-            return set_to_idx, sorted(set_to_idx, key=set_to_idx.get)
-        sets = set()
-        default_value = ['default'] if redundant else 'default'
-        if default:
-            self.dataframe.loc[self.dataframe[f'{name}_NAME'].isna(), f'{name}_NAME'] = \
-                self.dataframe.loc[self.dataframe[f'{name}_NAME'].isna(), f'{name}_NAME'].apply(
-                    lambda x: default_value)
-        for v in self.dataframe[f'{name}_NAME']:
-            if redundant: sets.update(v)
-            else: sets.add(v)
-        set_to_idx = {v: i for i, v in enumerate(sets)}
-        if redundant:
-            self.dataframe[f'{name}_ID'] = self.dataframe[f'{name}_NAME'].apply(
-                lambda x: list(map(lambda y: set_to_idx[y], x)))
-        else:
-            self.dataframe[f'{name}_ID'] = self.dataframe[f'{name}_NAME'].apply(
-                lambda x: set_to_idx[x])
-        return set_to_idx, sorted(set_to_idx, key=set_to_idx.get)
-
-    def _patch_ids(self, name: str, set_to_idx: dict, idx_to_set: list, redundant=False) -> None:
-        for i, (ids, vals) in self.dataframe[[f'{name}_ID', f'{name}_NAME']].iterrows():
-            if redundant:
-                for index, (k, v) in enumerate(zip(ids, vals)):
-                    if isnan(i):
-                        self.dataframe.at[k, f'{name}_ID'][index] = set_to_idx[v]
-                    if isinstance(v, float) and isnan(v):
-                        self.dataframe.at[k, f'{name}_NAME'][index] = idx_to_set[v]
-            else:
-                if isnan(ids):
-                    self.dataframe.at[i, f'{name}_ID'] = set_to_idx[vals]
-                if isinstance(vals, float) and isnan(vals):
-                    self.dataframe.at[i, f'{name}_NAME'] = idx_to_set[ids]
 
     def cleanup(self) -> None:
         '''
@@ -332,41 +289,92 @@ class CVData:
         # assign class ids
         if 'CLASS_NAME' in self.dataframe:
             if 'CLASS_ID' not in self.dataframe:
-                print('[CVData] Assigning CLASS_ID')
-                self.class_to_idx, self.classes = self._assign_ids('CLASS', assign=True)
+                self.class_to_idx, self.idx_to_class = self._assign_ids('CLASS')
             else:
-                self.class_to_idx, self.classes = self._assign_ids('CLASS', assign=False)
-                self._patch_ids('CLASS', set_to_idx=self.class_to_idx, idx_to_set=self.classes)
+                self.class_to_idx, self.idx_to_class = self._validate_ids('CLASS')
+                self._patch_ids('CLASS', name_to_idx=self.class_to_idx, idx_to_name=self.idx_to_class)
 
+        # assign seg ids
         if 'SEG_CLASS_NAME' in self.dataframe:
-            if 'SEG_CLASS_ID' not in self.dataframe:
-                print('[CVData] Assigning SEG_CLASS_ID')
-                self.seg_class_to_idx, self.seg_classes = self._assign_ids('SEG_CLASS', assign=True, 
-                                                                   redundant=True)
-            else:
-                self.seg_class_to_idx, self.seg_classes = self._assign_ids('SEG_CLASS', redundant=True)
+            if 'SEG_CLASS_ID' not in self.dataframe: call = self._assign_ids
+            else: call = self._validate_ids
+            result = call('SEG_CLASS', redundant=True)
+            self.seg_class_to_idx, self.idx_to_seg_class = result
         elif 'SEG_CLASS_ID' in self.dataframe:
-            self.seg_classes = set()
-            for item in self.dataframe['SEG_CLASS_ID']: self.seg_classes.update(item)
+            self.idx_to_seg_class = {i: str(i) for item in self.dataframe['SEG_CLASS_ID'] for i in item}
+            self.seg_class_to_idx = {str(i): i for item in self.dataframe['SEG_CLASS_ID'] for i in item}
 
+        # check available columns to determine mode availability
         if CVData._classification_cols.issubset(self.dataframe.columns):
             self.available_modes.append('classification')
         if CVData._detection_cols.issubset(self.dataframe.columns):
             self.available_modes.append('detection')
-        if CVData._segmentation_cols.issubset(self.dataframe.columns) and \
-            ({'POLYGON', 'SEG_CLASS_ID'}.issubset(self.dataframe.columns) \
-                or 'ABSOLUTE_FILE_SEG' in self.dataframe):
+        if CVData._segmentation_img_cols.issubset(self.dataframe.columns) or \
+            CVData._segmentation_poly_cols.issubset(self.dataframe.columns):
             self.available_modes.append('segmentation')
-        # add segmentation mode
+        
+        # cleanup image sets
         self.dataframe.drop(columns='GENERIC', inplace=True, errors='ignore')
         self._cleanup_image_sets()
         self._cleanup_id()
         self.cleaned = True
         print('[CVData] Done!')
 
+    def _validate_ids(self, name: str, redundant=False) -> tuple[dict[str, int], dict[int, str]]:
+        def check(i: int, v: str, name_to_idx: dict[str, int]) -> None:
+            '''Check whether a value is corrupted/mismatch, and update dict accordingly'''
+            if isnan(i) or (isinstance(v, float) and isnan(v)): return
+            i = int(i)
+            if v in name_to_idx and name_to_idx[v] != i:
+                raise ValueError(f'Invalid {name} id {i} assigned to name {v}')
+            else: name_to_idx[v] = i
+        # validate all values and populate name_to_idx if assign is off=
+        name_to_idx = {}
+        for i, (ids, vals) in self.dataframe[[f'{name}_ID', f'{name}_NAME']].iterrows():
+            if redundant:
+                if len(ids) != len(vals): raise ValueError(f'ID/name mismatch at row {i}')
+                for i, v in zip(ids, vals): check(i, v, name_to_idx)
+            else: check(ids, vals, name_to_idx)
+        return name_to_idx, {v: k for k, v in name_to_idx.items()}
+
+    def _assign_ids(self, name: str, default=False, redundant=False) -> \
+            tuple[dict[str, int], dict[int, str]]:
+        sets = set()
+        default_value = ['default'] if redundant else 'default'
+        if default:
+            self.dataframe.loc[self.dataframe[f'{name}_NAME'].isna(), f'{name}_NAME'] = \
+                self.dataframe.loc[self.dataframe[f'{name}_NAME'].isna(), f'{name}_NAME'].apply(
+                    lambda x: default_value)
+        for v in self.dataframe[f'{name}_NAME']:
+            if redundant: sets.update(v)
+            else: sets.add(v)
+        name_to_idx = {v: i for i, v in enumerate(sets)}
+        idx_to_name = {v: k for k, v in name_to_idx.items()}
+        if redundant:
+            self.dataframe[f'{name}_ID'] = self.dataframe[f'{name}_NAME'].apply(
+                lambda x: list(map(lambda y: name_to_idx[y], x)))
+        else:
+            self.dataframe[f'{name}_ID'] = self.dataframe[f'{name}_NAME'].apply(
+                lambda x: name_to_idx[x])
+        return name_to_idx, idx_to_name
+
+    def _patch_ids(self, name: str, name_to_idx: dict, idx_to_name: dict, redundant=False) -> None:
+        '''Patch nan values of ids/vals accordingly.'''
+        if not redundant:
+            for i, (ids, vals) in self.dataframe[[f'{name}_ID', f'{name}_NAME']].iterrows():
+                if isnan(ids): self.dataframe.at[i, f'{name}_ID'] = name_to_idx[vals]
+                if isinstance(vals, float) and isnan(vals):
+                    self.dataframe.at[i, f'{name}_NAME'] = idx_to_name[ids]
+            return
+        for i, (ids, vals) in self.dataframe[[f'{name}_ID', f'{name}_NAME']].iterrows():
+            for index, (k, v) in enumerate(zip(ids, vals)):
+                if isnan(i): self.dataframe.at[k, f'{name}_ID'][index] = name_to_idx[v]
+                if isinstance(v, float) and isnan(v):
+                    self.dataframe.at[k, f'{name}_NAME'][index] = idx_to_name[v]
+
     def _convert_bbox(self, mode: int) -> None:
         boxes = []
-        def __execute_checks(boxes: list, cols: tuple):
+        def execute_checks(boxes: list, cols: tuple):
             if any([isinstance(row[cols[0]], float), isinstance(row[cols[1]], float),
                     isinstance(row[cols[2]], float), isinstance(row[cols[3]], float)]):
                 boxes.append([])
@@ -376,25 +384,20 @@ class CVData:
             return True
         if mode == 0:
             for _, row in self.dataframe.iterrows():
-                if not __execute_checks(boxes, ('X1', 'Y1', 'X2', 'Y2')): continue
+                if not execute_checks(boxes, ('X1', 'Y1', 'X2', 'Y2')): continue
                 boxes.append([(min(x1, x2), min(y1, y2), max(x1, x2), max(y1,y2)) for x1, y1, x2, y2
                               in zip(row['X1'], row['Y1'], row['X2'], row['Y2'])])
-            self.dataframe['BOX'] = boxes
-            return
-        if mode == 1:
+        elif mode == 1:
             for _, row in self.dataframe.iterrows():
-                if not __execute_checks(boxes, ('XMIN', 'YMIN', 'XMAX', 'YMAX')): continue
+                if not execute_checks(boxes, ('XMIN', 'YMIN', 'XMAX', 'YMAX')): continue
                 boxes.append([(xmin, ymin, xmax, ymax) for xmin, ymin, xmax, ymax
                               in zip(row['XMIN'], row['YMIN'], row['XMAX'], row['YMAX'])])
-            self.dataframe['BOX'] = boxes
-            return
-        if mode == 2:
+        elif mode == 2:
             for _, row in self.dataframe.iterrows():
-                if not __execute_checks(boxes, ('XMIN', 'YMIN', 'WIDTH', 'HEIGHT')): continue
+                if not execute_checks(boxes, ('XMIN', 'YMIN', 'WIDTH', 'HEIGHT')): continue
                 boxes.append([(xmin, ymin, xmin+width, ymin+height) for xmin, ymin, width, height
                               in zip(row['XMAX'], row['YMAX'], row['WIDTH'], row['HEIGHT'])])
-            self.dataframe['BOX'] = boxes
-            return
+        self.dataframe['BOX'] = boxes
 
     def _cleanup_id(self) -> None:
         cols = ['CLASS_ID', 'IMAGE_ID']
@@ -403,25 +406,18 @@ class CVData:
             self.dataframe[col] = self.dataframe[col].astype('Int64')
 
     def _cleanup_image_sets(self) -> None:
-        if 'IMAGE_SET_ID' not in self.dataframe:
-            if 'IMAGE_SET_NAME' not in self.dataframe:
-                print('[CVData] No image set found. Assigning to default image set')
-                self.dataframe['IMAGE_SET_NAME'] = [['default']] * len(self.dataframe)
-                self.dataframe['IMAGE_SET_ID'] = [[0]] * len(self.dataframe)
-                self.image_set_to_idx = {'default': 0}
-                self.image_sets = {'default'}
-            else:
-                print('[CVData] Converting IMAGE_SET names to IMAGE_SET_ID')
-                self.image_set_to_idx, self.image_sets = self._assign_ids('IMAGE_SET',
-                                                                          default=True,
-                                                                          redundant=True,
-                                                                          assign=True)
-        elif 'IMAGE_SET_NAME' in self.dataframe:
-            self.image_set_to_idx, self.image_sets = self._assign_ids('IMAGE_SET', default=True,
-                                                                      redundant=True)
+        if 'IMAGE_SET_NAME' in self.dataframe:
+            result = self._assign_ids('IMAGE_SET', default=True, redundant=True)
+            self.image_set_to_idx, self.idx_to_image_sets = result
+        elif 'IMAGE_SET_ID' not in self.dataframe:
+            self.dataframe['IMAGE_SET_NAME'] = [['default']] * len(self.dataframe)
+            self.dataframe['IMAGE_SET_ID'] = [[0]] * len(self.dataframe)
+            self.image_set_to_idx = {'default': 0}
+            self.idx_to_image_sets = {0: 'default'}
         else:
             for ids in self.dataframe['IMAGE_SET_ID']:
-                self.image_sets.update(ids)
+                self.idx_to_image_sets.update({k: str(k) for k in ids})
+                self.image_set_to_idx.update({str(k): k for k in ids})
 
     def get_dataset(self, mode: str, image_set: str) -> Dataset:
         '''
@@ -432,23 +428,16 @@ class CVData:
         dataframe = self.dataframe[[image_set in item for item in self.dataframe['IMAGE_SET_NAME']]]
         seg_default = 0
         if len(dataframe) == 0: raise ValueError(f'Image set {image_set} not available.')
-        if mode == 'classification':
-            dataframe = dataframe[list(CVData._classification_cols)]
-            if self.remove_invalid:
-                print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
-                dataframe = dataframe.dropna()
-        elif mode == 'detection':
-            dataframe = dataframe[list(CVData._detection_cols)]
-            if self.remove_invalid:
-                print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
-                dataframe = dataframe.dropna()
+        if mode == 'classification': dataframe = dataframe[list(CVData._classification_cols)]
+        elif mode == 'detection': dataframe = dataframe[list(CVData._detection_cols)]
         elif mode == 'segmentation':
-            dataframe = dataframe[list(CVData._segmentation_cols) + (['POLYGON', 'SEG_CLASS_ID'] \
-                if 'POLYGON' in dataframe else ['ABSOLUTE_FILE_SEG'])]
-            if self.remove_invalid:
-                print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
-                dataframe = dataframe.dropna()
-            seg_default = max(self.seg_classes) + 1
+            dataframe = dataframe[list(CVData._segmentation_poly_cols if 'POLYGON' in dataframe 
+                                       else CVData._segmentation_img_cols)]
+            
+            seg_default = max(self.idx_to_seg_class) + 1 if self.idx_to_seg_class else 0
+        if self.remove_invalid:
+            print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
+            dataframe = dataframe.dropna()
         if len(dataframe) == 0: raise ValueError('[CVData] After cleanup, this dataset is empty.')
         return CVDataset(dataframe, mode, seg_default=seg_default)
 
@@ -459,7 +448,49 @@ class CVData:
         '''
         return DataLoader(self.get_dataset(mode, image_set), batch_size=batch_size,
                           shuffle=shuffle, num_workers=num_workers, collate_fn=_collate)
+    
+    def split_image_set(self, image_set: str, *new_sets: tuple[str, float], inplace=False, seed=0):
+        '''
+        Split the existing image set into new image sets.
+        '''
+        # checks before splitting
+        if image_set not in self.image_set_to_idx: 
+            raise ValueError("Image set doesn't exist!")
+        if any(new_set[0] in self.image_set_to_idx for new_set in new_sets): 
+            raise ValueError(f'New set name already exists!')
+        tot_frac = sum(new_set[1] for new_set in new_sets)
+        if not inplace and tot_frac != 1:
+            raise ValueError(f'Split fraction invalid, not equal to 1')
+        if inplace and tot_frac > 1:
+            raise ValueError(f'Split fraction invalid, greater than 1')
 
+        # assemble new sets
+        new_sets: list = list(new_sets)
+        if inplace: new_sets.append((image_set, 1 - tot_frac))
+        gen = random.RandomState(seed=seed)
+        id_buf = max(self.idx_to_image_sets.keys()) + 1
+
+        # add to existing image set tracker
+        self.idx_to_image_sets.update({id_buf + i: k[0] for i, k in enumerate(new_sets)})
+        self.image_set_to_idx.update({k[0]: i + id_buf for i, k in enumerate(new_sets)})
+
+        # assign image sets
+        for _, row in self.dataframe.iterrows():
+            if image_set not in row['IMAGE_SET_NAME']: continue
+            next_selection = gen.rand()
+            running_sum = 0
+            for i, next_set in enumerate(new_sets):
+                if running_sum <= next_selection <= running_sum + next_set[1]:
+                    if inplace: 
+                        row['IMAGE_SET_NAME'][row['IMAGE_SET_NAME'].index(image_set)] = next_set[0]
+                        row['IMAGE_SET_ID'][row['IMAGE_SET_NAME'].index(image_set)] = i + id_buf
+                    else: 
+                        row['IMAGE_SET_NAME'].append(next_set[0])
+                        row['IMAGE_SET_ID'].append(i + id_buf)
+                    print(f'Allocating to {next_set[0]}')
+                    break
+                running_sum += next_set[1]
+        
 class CVDataset(Dataset):
     '''
     Dataset implementation for CVData environment.
