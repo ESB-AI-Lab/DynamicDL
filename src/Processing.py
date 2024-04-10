@@ -4,6 +4,7 @@ File processing module.
 import json
 import heapq
 import xmltodict
+import yaml
 from typing import Any, Union
 from abc import ABC, abstractmethod
 
@@ -143,17 +144,32 @@ class TXTFile(DataFile):
 
 class XMLFile(DataFile):
     '''
-    Utility functions for parsing json files.
+    Utility functions for parsing xml files.
     '''
     def __init__(self, form: dict[Union[Static, Generic], Any]):
         self.form = form
 
     def parse(self, path: str) -> dict:
         '''
-        Parses JSON file.
+        Parses XML file.
         '''
         with open(path, 'r', encoding='utf-8') as f:
             data = xmltodict.parse(f.read())
+        return expand_generics(data, self.form)
+
+class YAMLFile(DataFile):
+    '''
+    Utility functions for parsing yaml files.
+    '''
+    def __init__(self, form: dict[Union[Static, Generic], Any]):
+        self.form = form
+
+    def parse(self, path: str) -> dict:
+        '''
+        Parses yaml file.
+        '''
+        with open(path, 'r', encoding='utf-8') as f:
+            data = yaml.load(f)
         return expand_generics(data, self.form)
 
 class Pairing:
