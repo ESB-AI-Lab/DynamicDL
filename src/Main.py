@@ -488,7 +488,7 @@ class CVData:
         # assemble new sets
         new_sets: list = list(new_sets)
         if inplace: new_sets.append((image_set, 1 - tot_frac))
-        if seed: random.seed(seed)
+        if seed is not None: random.seed(seed)
 
         # add to existing image set tracker 
         for k in new_sets:
@@ -499,10 +499,10 @@ class CVData:
         # assign image sets
         for _, row in self.dataframe.iterrows():
             if image_set not in row['IMAGE_SET_NAME']: continue
-            next_selection = random.random()
+            partition = random.random()
             running_sum = 0
-            for i, next_set in enumerate(new_sets):
-                if running_sum <= next_selection <= running_sum + next_set[1]:
+            for _, next_set in enumerate(new_sets):
+                if running_sum <= partition <= running_sum + next_set[1]:
                     if inplace:
                         index = row['IMAGE_SET_NAME'].index(image_set)
                         row['IMAGE_SET_NAME'][index] = next_set[0]
@@ -527,6 +527,35 @@ class CVData:
         for image_set in to_pop:
             index = self.image_set_to_idx.pop(image_set)
             self.idx_to_image_set.pop(index)
+    
+    def delete_image_set(self, image_set: Union[str, int]) -> None:
+        using_id: bool = isinstance(image_set, int)
+        if using_id:
+            idx = image_set
+            name = self.idx_to_image_set[idx]
+        else:
+            name = image_set
+            idx = self.image_set_to_idx[name]
+
+        default = False
+        if 'default' in self.image_set_to_idx:
+            default_idx = self.image_set_to_idx['default'] 
+        else:   
+            default_idx = next_avail_id(self.idx_to_image_set)
+
+        for _, row in self.dataframe.iterrows():
+            if idx in row['IMAGE_SET_ID']:
+                row['IMAGE_SET_ID'].remove(idx)
+                row['IMAGE_SET_NAME'].remove(name)
+                if len(row['IMAGE_SET_ID']) == 0:
+                    row['IMAGE_SET_ID'].append(default_idx)
+                    row['IMAGE_SET_NAME'].append('default')
+                    default = True
+
+        if default and 'default' not in self.image_set_to_idx:
+            self.image_set_to_idx['default'] = default_idx
+            self.idx_to_image_set[default_idx] = 'default'
+                
         
 class CVDataset(Dataset):
     '''
