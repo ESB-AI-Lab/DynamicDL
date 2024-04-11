@@ -202,34 +202,6 @@ def get_str(data):
     '''Return pretty print string.'''
     return json.dumps(_get_str(data), indent=4).replace('"', '')
 
-###########################################
-# Dataloader functions for getting labels #
-###########################################
-
-def _get_class_labels(item: Series) -> Tensor:
-    return int(item['CLASS_ID'])
-
-def _get_bbox_labels(item: Series) -> dict[str, Tensor]:
-    # execute checks
-    assert len(item['BOX']) == len(item['BBOX_CLASS_ID']), \
-        'SEG_CLASS_ID and POLYGON len mismatch'
-    class_ids = item['BBOX_CLASS_ID']
-    boxes = item['BOX']
-    bbox_tensors = [FloatTensor(box) for box in boxes]
-    return {'boxes': torch.stack(bbox_tensors), 'labels': IntTensor(class_ids)}
-
-def _get_seg_labels(item: Series, default=0) -> Tensor:
-    if 'ABSOLUTE_FILE_SEG' in item:
-        return open_image(item['ABSOLUTE_FILE_SEG'])
-    assert len(item['POLYGON']) == len(item['SEG_CLASS_ID']), \
-        'SEG_CLASS_ID and POLYGON len mismatch'
-    mask = asarray(imread(item['ABSOLUTE_FILE'], IMREAD_GRAYSCALE), dtype=int32)
-    mask = full_like(mask, default)
-    for class_id, polygon in zip(item['SEG_CLASS_ID'], item['POLYGON']):
-        mask = fillPoly(mask, pts=[asarray(polygon, dtype=int32)], color=class_id)
-    mask = torch.from_numpy(asarray(mask))
-    return mask
-
 def _collate(batch):
     return tuple(zip(*batch))
 
@@ -455,20 +427,22 @@ class CVData:
         if not self.cleaned: self.cleanup()
         assert mode.lower().strip() in self.available_modes, 'Desired mode not available.'
         dataframe = self.dataframe[[image_set in item for item in self.dataframe['IMAGE_SET_NAME']]]
-        seg_default = 0
         if len(dataframe) == 0: raise ValueError(f'Image set {image_set} not available.')
-        if mode == 'classification': dataframe = dataframe[list(CVData._classification_cols)]
-        elif mode == 'detection': dataframe = dataframe[list(CVData._detection_cols)]
+        if mode == 'classification': 
+            dataframe = dataframe[list(CVData._classification_cols)]
+            id_mapping = {k: i for i, k in enumerate(self.idx_to_class)}
+        elif mode == 'detection': 
+            dataframe = dataframe[list(CVData._detection_cols)]
+            id_mapping = {k: i for i, k in enumerate(self.idx_to_bbox_class)}
         elif mode == 'segmentation':
             dataframe = dataframe[list(CVData._segmentation_poly_cols if 'POLYGON' in dataframe 
                                        else CVData._segmentation_img_cols)]
-            
-            seg_default = next_avail_id(self.idx_to_seg_class)
+            id_mapping = {k: i for i, k in enumerate(self.idx_to_seg_class)}
         if self.remove_invalid:
             print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
             dataframe = dataframe.dropna()
         if len(dataframe) == 0: raise ValueError('[CVData] After cleanup, this dataset is empty.')
-        return CVDataset(dataframe, self.root, mode, seg_default=seg_default, transform=self.transform,
+        return CVDataset(dataframe, self.root, mode, id_mapping=id_mapping, transform=self.transform,
                          target_transform=self.target_transform)
 
     def get_dataloader(self, mode: str, image_set: str, batch_size: int = 4, shuffle: bool = True,
@@ -477,7 +451,7 @@ class CVData:
         Retrieve the dataloader for this dataset.
         '''
         return DataLoader(self.get_dataset(mode, image_set), batch_size=batch_size,
-                          shuffle=shuffle, num_workers=num_workers, collate_fn=_collate)
+                          shuffle=shuffle, num_workers=num_workers, collate_fn=None)
     
     def split_image_set(self, image_set: str, *new_sets: tuple[str, float], inplace: bool = False,
                         seed: int = None):
@@ -580,7 +554,7 @@ class CVDataset(VisionDataset):
         df: DataFrame,
         root: str,
         mode: str,
-        seg_default: int = 0,
+        id_mapping: dict[int, int],
         transforms: Optional[Callable] = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None
@@ -588,22 +562,48 @@ class CVDataset(VisionDataset):
         self.dataframe = df
         self.data = self.dataframe.to_dict('records')
         self.mode = mode
-        self.seg_default = seg_default
+        self.id_mapping = id_mapping
+        if self.mode == 'segmentation': self.default = len(self.id_mapping)
         super().__init__(root, transforms=transforms, transform=transform, target_transform=target_transform)
 
     def __len__(self):
         return len(self.dataframe)
+
+    def _get_class_labels(self, item: Series) -> Tensor:
+        return self.id_mapping[int(item['CLASS_ID'])]
+
+    def _get_bbox_labels(self, item: Series) -> dict[str, Tensor]:
+        # execute checks
+        assert len(item['BOX']) == len(item['BBOX_CLASS_ID']), \
+            'SEG_CLASS_ID and POLYGON len mismatch'
+        class_ids = list(map(lambda x: self.id_mapping[x], item['BBOX_CLASS_ID']))
+        boxes = item['BOX']
+        bbox_tensors = [FloatTensor(box) for box in boxes]
+        return {'boxes': torch.stack(bbox_tensors), 'labels': IntTensor(class_ids)}
+
+    def _get_seg_labels(self, item: Series) -> Tensor:
+        if 'ABSOLUTE_FILE_SEG' in item:
+            return open_image(item['ABSOLUTE_FILE_SEG'])
+        assert len(item['POLYGON']) == len(item['SEG_CLASS_ID']), \
+            'SEG_CLASS_ID and POLYGON len mismatch'
+        mask = asarray(imread(item['ABSOLUTE_FILE'], IMREAD_GRAYSCALE), dtype=int32)
+        mask = full_like(mask, self.default)
+        for class_id, polygon in zip(item['SEG_CLASS_ID'], item['POLYGON']):
+            mask = fillPoly(mask, pts=[asarray(polygon, dtype=int32)],
+                            color=self.id_mapping[class_id])
+        mask = torch.from_numpy(asarray(mask))
+        return mask
 
     def __getitem__(self, idx):
         item: dict = self.data[idx]
         image: Tensor = open_image(item.get('ABSOLUTE_FILE'))
         label: dict[str, Tensor]
         if self.mode == 'classification':
-            label = _get_class_labels(item)
+            label = self._get_class_labels(item)
         elif self.mode == 'detection':
-            label = _get_bbox_labels(item)
+            label = self._get_bbox_labels(item)
         elif self.mode == 'segmentation':
-            label = _get_seg_labels(item, default=self.seg_default)
+            label = self._get_seg_labels(item)
         
         if self.transforms: image, label = self.transforms(image, label)
         return image, label
