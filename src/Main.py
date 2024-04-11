@@ -281,7 +281,7 @@ class CVData:
         if 'IMAGE_ID' in self.dataframe:
             self.dataframe.sort_values('IMAGE_ID', ignore_index=True, inplace=True)
         else:
-            self.dataframe.sort_values('IMAGE_NAME', ignore_Index=True, inplace=True)
+            self.dataframe.sort_values('IMAGE_NAME', ignore_index=True, inplace=True)
 
         # convert bounding boxes into proper format and store under 'BOX'
         if {'X1', 'X2', 'Y1', 'Y2'}.issubset(self.dataframe.columns):
@@ -382,15 +382,22 @@ class CVData:
         '''Patch nan values of ids/vals accordingly.'''
         if not redundant:
             for i, (ids, vals) in self.dataframe[[f'{name}_ID', f'{name}_NAME']].iterrows():
+                if isnan(ids) and isinstance(vals, float) and isnan(vals): 
+                    print(f'Found missing {name} id/name at row {i}')
+                    continue
                 if isnan(ids): self.dataframe.at[i, f'{name}_ID'] = name_to_idx[vals]
                 if isinstance(vals, float) and isnan(vals):
                     self.dataframe.at[i, f'{name}_NAME'] = idx_to_name[ids]
             return
         for i, (ids, vals) in self.dataframe[[f'{name}_ID', f'{name}_NAME']].iterrows():
             for index, (k, v) in enumerate(zip(ids, vals)):
-                if isnan(i): self.dataframe.at[k, f'{name}_ID'][index] = name_to_idx[v]
+                print(f'Found missing {name} id/name at row {i}')
+                if isnan(k) and isinstance(v, float) and isnan(v):
+                    print(f'Found missing {name} id/name at row {i}')
+                    continue
+                if isnan(k): self.dataframe.at[i, f'{name}_ID'][index] = name_to_idx[v]
                 if isinstance(v, float) and isnan(v):
-                    self.dataframe.at[k, f'{name}_NAME'][index] = idx_to_name[v]
+                    self.dataframe.at[i, f'{name}_NAME'][index] = idx_to_name[v]
 
     def _convert_bbox(self, mode: int) -> None:
         boxes = []
@@ -531,9 +538,13 @@ class CVData:
     def delete_image_set(self, image_set: Union[str, int]) -> None:
         using_id: bool = isinstance(image_set, int)
         if using_id:
+            if image_set not in self.idx_to_image_set: 
+                raise KeyError(f'Invalid ID: {image_set}')
             idx = image_set
             name = self.idx_to_image_set[idx]
         else:
+            if image_set not in self.image_set_to_idx: 
+                raise KeyError(f'Invalid name: {image_set}')
             name = image_set
             idx = self.image_set_to_idx[name]
 
