@@ -15,6 +15,7 @@ from torch.utils.data import Dataset, DataLoader
 from torch import Tensor, IntTensor, FloatTensor
 from torchvision.datasets.vision import VisionDataset
 import torch
+from functools import partial
 from PIL.Image import open as open_image
 from PIL.Image import fromarray
 
@@ -22,6 +23,7 @@ from ._utils import next_avail_id
 from .DataItems import DataEntry, DataItem, DataTypes, DataType, UniqueToken, Static, Generic, \
                        Image, SegmentationImage, Folder, File
 from .Processing import DataFile, Pairing
+from .Transforms import ImageClassification, ObjectDetection, SemanticSegmentation
 
 def _get_files(path: str) -> dict[str, Union[str, dict]]:
     '''Step one of the processing. Expand the dataset to fit all the files.'''
@@ -202,13 +204,26 @@ def get_str(data):
     '''Return pretty print string.'''
     return json.dumps(_get_str(data), indent=4).replace('"', '')
 
-def _collate(batch):
-    return tuple(zip(*batch))
+def _collate_detection(batch):
+    images, labels = zip(*batch)
+    return torch.stack(images), list(labels)
+
+def _collate_segmentation(batch):
+    images, labels = zip(*batch)
+    return torch.stack(images), torch.stack(labels)
+
+def _collate(mode: str) -> Callable:
+    if mode == 'segmentation': return _collate_segmentation
+    if mode == 'detection': return _collate_detection
 
 class CVData:
     '''
     Main dataset class utils.
     '''
+    CLASSIFICATION_TRANSFORMS = (partial(ImageClassification, crop_size=224)(), None)
+    DETECTION_TRANSFORMS = (ObjectDetection(), None)
+    SEGMENTATION_TRANSFORMS = (partial(SemanticSegmentation, resize_size=520, normalize=True)(), 
+                               partial(SemanticSegmentation, resize_size=520, normalize=False)())
 
     _classification_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'CLASS_ID'}
     _detection_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'BBOX_CLASS_ID', 'BOX'}
@@ -218,15 +233,11 @@ class CVData:
     def __init__(
         self, 
         root: str, 
-        form: dict[Union[Static, Generic], Any], 
-        transform: Optional[Callable] = None,
-        target_transform: Optional[Callable] = None, 
+        form: dict[Union[Static, Generic], Any],
         remove_invalid: bool = True
     ) -> None:
         self.root = root
         self.form = form
-        self.transform = transform
-        self.target_transform = target_transform
         dataset = _get_files(self.root)
         data, pairings = _expand_generics(self.root, dataset, self.form)
         self.data = _merge(data)
@@ -264,7 +275,6 @@ class CVData:
             self._convert_bbox(1)
         elif {'XMIN', 'YMIN', 'WIDTH', 'HEIGHT'}.issubset(self.dataframe.columns):
             self._convert_bbox(2)
-        
 
         # assign image ids
         if 'IMAGE_ID' not in self.dataframe: self.dataframe['IMAGE_ID'] = self.dataframe.index
@@ -286,7 +296,7 @@ class CVData:
         elif 'SEG_CLASS_ID' in self.dataframe:
             self.idx_to_seg_class = {i: str(i) for item in self.dataframe['SEG_CLASS_ID'] for i in item}
             self.seg_class_to_idx = {str(i): i for item in self.dataframe['SEG_CLASS_ID'] for i in item}
-        
+
         # assign bbox ids
         if 'BBOX_CLASS_NAME' in self.dataframe:
             if 'BBOX_CLASS_ID' not in self.dataframe: call = self._assign_ids
@@ -420,10 +430,20 @@ class CVData:
                 self.idx_to_image_set.update({k: str(k) for k in ids})
                 self.image_set_to_idx.update({str(k): k for k in ids})
 
-    def get_dataset(self, mode: str, image_set: str) -> Dataset:
+    def get_dataset(
+        self, 
+        mode: str, 
+        image_set: str,
+        transform: Optional[Callable] = None,
+        target_transform: Optional[Callable] = None,
+        transforms: Optional[tuple[Callable]] = None
+    ) -> Dataset:
         '''
         Retrieve the dataset.
         '''
+        if transforms: transform, target_transform = transforms
+        print(f'Image transform: {transform}')
+        print(f'Target transform: {target_transform}')
         if not self.cleaned: self.cleanup()
         assert mode.lower().strip() in self.available_modes, 'Desired mode not available.'
         dataframe = self.dataframe[[image_set in item for item in self.dataframe['IMAGE_SET_NAME']]]
@@ -442,16 +462,35 @@ class CVData:
             print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
             dataframe = dataframe.dropna()
         if len(dataframe) == 0: raise ValueError('[CVData] After cleanup, this dataset is empty.')
-        return CVDataset(dataframe, self.root, mode, id_mapping=id_mapping, transform=self.transform,
-                         target_transform=self.target_transform)
+        return CVDataset(dataframe, self.root, mode, id_mapping=id_mapping, transform=transform,
+                         target_transform=target_transform)
 
-    def get_dataloader(self, mode: str, image_set: str, batch_size: int = 4, shuffle: bool = True,
-                       num_workers: int = 1) -> DataLoader:
+    def get_dataloader(
+        self, 
+        mode: str,
+        image_set: str,
+        batch_size: int = 4,
+        shuffle: bool = True,
+        num_workers: int = 1,
+        transform: Optional[Callable] = None,
+        target_transform: Optional[Callable] = None,
+        transforms: Optional[tuple[Callable]] = None
+    ) -> DataLoader:
         '''
         Retrieve the dataloader for this dataset.
         '''
-        return DataLoader(self.get_dataset(mode, image_set), batch_size=batch_size,
-                          shuffle=shuffle, num_workers=num_workers, collate_fn=None)
+        return DataLoader(
+            self.get_dataset(
+                mode, 
+                image_set,
+                transform=transform,
+                target_transform=target_transform,
+                transforms=transforms),
+            batch_size=batch_size,
+            shuffle=shuffle,
+            num_workers=num_workers,
+            collate_fn=_collate(mode)
+        )
     
     def split_image_set(self, image_set: str, *new_sets: tuple[str, float], inplace: bool = False,
                         seed: int = None):
@@ -555,16 +594,17 @@ class CVDataset(VisionDataset):
         root: str,
         mode: str,
         id_mapping: dict[int, int],
-        transforms: Optional[Callable] = None,
         transform: Optional[Callable] = None,
-        target_transform: Optional[Callable] = None
+        target_transform: Optional[Callable] = None,
+        image_type: str = 'RGB'
     ):
         self.dataframe = df
         self.data = self.dataframe.to_dict('records')
         self.mode = mode
+        self.image_type = image_type
         self.id_mapping = id_mapping
         if self.mode == 'segmentation': self.default = len(self.id_mapping)
-        super().__init__(root, transforms=transforms, transform=transform, target_transform=target_transform)
+        super().__init__(root, transforms=None, transform=transform, target_transform=target_transform)
 
     def __len__(self):
         return len(self.dataframe)
@@ -591,12 +631,12 @@ class CVDataset(VisionDataset):
         for class_id, polygon in zip(item['SEG_CLASS_ID'], item['POLYGON']):
             mask = fillPoly(mask, pts=[asarray(polygon, dtype=int32)],
                             color=self.id_mapping[class_id])
-        mask = torch.from_numpy(asarray(mask))
+        mask = fromarray(asarray(mask))
         return mask
 
     def __getitem__(self, idx):
         item: dict = self.data[idx]
-        image: Tensor = open_image(item.get('ABSOLUTE_FILE'))
+        image: Tensor = open_image(item.get('ABSOLUTE_FILE')).convert(self.image_type)
         label: dict[str, Tensor]
         if self.mode == 'classification':
             label = self._get_class_labels(item)

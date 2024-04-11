@@ -1,11 +1,11 @@
-from trainer import ClassificationTrainer
+from trainer import SegmentationTrainer
 from src import *
-from torchvision.models import VGG16_Weights as base
+from torchvision.models.segmentation import DeepLabV3_ResNet50_Weights as base
 
 if __name__ == '__main__':
     image_channels: int = 3
     mask_channels: int = 1
-    batch_size: int = 4
+    batch_size: int = 1
     learning_rate: float = 2.5e-4
     epochs: int = 4
 
@@ -23,7 +23,7 @@ if __name__ == '__main__':
                 ignore_type = '#'
             ),
             "trimaps": {
-                Generic("{}.png", DataTypes.IMAGE_NAME, ignore='._{}'): SegmentationImage()
+                Generic("{}.png", DataTypes.IMAGE_NAME): SegmentationImage()
             },
             "xmls": {
                 Generic("{}.xml", DataTypes.IMAGE_NAME): XMLFile({
@@ -47,17 +47,20 @@ if __name__ == '__main__':
         }
     }
     cvdata = CVData(root, form)
+    # since the oxford pets dataset does not specify seg classes, we will have to do so manually
+    cvdata.seg_class_to_idx = {'body': 0, 'outline': 1, 'background': 2}
+    cvdata.idx_to_seg_class = {0: 'body', 1: 'outline', 2: 'background'}
     cvdata.cleanup()
     cvdata.split_image_set('trainval', ('train', 0.8), ('val', 0.2), inplace = True, seed = 0)
-    trainloader = cvdata.get_dataloader('classification', 'train', batch_size=batch_size, transforms=CVData.CLASSIFICATION_TRANSFORMS)
-    valloader = cvdata.get_dataloader('classification', 'val', batch_size=batch_size, transforms=CVData.CLASSIFICATION_TRANSFORMS)
-    testloader = cvdata.get_dataloader('classification', 'test', batch_size=batch_size, transforms=CVData.CLASSIFICATION_TRANSFORMS)
+    trainloader = cvdata.get_dataloader('segmentation', 'train', batch_size=batch_size, transforms=CVData.SEGMENTATION_TRANSFORMS)
+    valloader = cvdata.get_dataloader('segmentation', 'val', batch_size=batch_size, transforms=CVData.SEGMENTATION_TRANSFORMS)
+    testloader = cvdata.get_dataloader('segmentation', 'test', batch_size=batch_size, transforms=CVData.SEGMENTATION_TRANSFORMS)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     config = {
         'device': device,
         'model_args': {
-            'name': 'vgg16',
+            'name': 'deeplabv3_resnet50',
             'weight_type': None
         },
         'optimizer_args': {
@@ -68,10 +71,11 @@ if __name__ == '__main__':
             'train': trainloader,
             'test': testloader,
             'val': valloader,
-            'classes': cvdata.class_to_idx
+            'classes': cvdata.seg_class_to_idx
         },
         'checkpointing': True,
         'num_epochs': 25
     }
-    trainer = ClassificationTrainer.from_config(config)
-    trainer.do_training('run_1_cls')
+    trainer = SegmentationTrainer.from_config(config)
+    print(next(iter(trainer.train_dataloader)))
+    trainer.do_training('run_1_seg')
