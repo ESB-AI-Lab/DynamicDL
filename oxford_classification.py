@@ -1,6 +1,5 @@
 from trainer import ClassificationTrainer
 from src import *
-from torchvision.models import VGG16_Weights as base
 
 if __name__ == '__main__':
     image_channels: int = 3

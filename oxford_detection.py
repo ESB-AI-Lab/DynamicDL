@@ -1,10 +1,10 @@
-from trainer import SegmentationTrainer
+from trainer import DetectionTrainer
 from src import *
 
 if __name__ == '__main__':
     image_channels: int = 3
     mask_channels: int = 1
-    batch_size: int = 1
+    batch_size: int = 4
     learning_rate: float = 2.5e-4
     epochs: int = 4
 
@@ -46,20 +46,20 @@ if __name__ == '__main__':
         }
     }
     cvdata = CVData(root, form)
-    # since the oxford pets dataset does not specify seg classes, we will have to do so manually
-    cvdata.seg_class_to_idx = {'body': 0, 'outline': 1, 'background': 2}
-    cvdata.idx_to_seg_class = {0: 'body', 1: 'outline', 2: 'background'}
     cvdata.cleanup()
-    cvdata.split_image_set('trainval', ('train', 0.8), ('val', 0.2), inplace = True, seed = 0)
-    trainloader = cvdata.get_dataloader('segmentation', 'train', batch_size=batch_size, transforms=CVData.SEGMENTATION_TRANSFORMS)
-    valloader = cvdata.get_dataloader('segmentation', 'val', batch_size=batch_size, transforms=CVData.SEGMENTATION_TRANSFORMS)
-    testloader = cvdata.get_dataloader('segmentation', 'test', batch_size=batch_size, transforms=CVData.SEGMENTATION_TRANSFORMS)
+    cvdata.delete_image_set('test')
+    print(cvdata.image_set_to_idx)
+    cvdata.split_image_set('trainval', ('train', 0.64), ('val', 0.16), ('test', 0.2), inplace = True, seed = 0)
+    trainloader = cvdata.get_dataloader('detection', 'train', batch_size=batch_size, transforms=CVData.DETECTION_TRANSFORMS)
+    valloader = cvdata.get_dataloader('detection', 'val', batch_size=batch_size, transforms=CVData.DETECTION_TRANSFORMS)
+    testloader = cvdata.get_dataloader('detection', 'test', batch_size=batch_size, transforms=CVData.DETECTION_TRANSFORMS)
+    print(cvdata.bbox_class_to_idx)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     config = {
         'device': device,
         'model_args': {
-            'name': 'deeplabv3_resnet50',
+            'name': 'fasterrcnn_resnet50_fpn_v2',
             'weight_type': None
         },
         'optimizer_args': {
@@ -70,11 +70,11 @@ if __name__ == '__main__':
             'train': trainloader,
             'test': testloader,
             'val': valloader,
-            'classes': cvdata.seg_class_to_idx
+            'classes': cvdata.bbox_class_to_idx
         },
         'checkpointing': True,
         'num_epochs': 25
     }
-    trainer = SegmentationTrainer.from_config(config)
+    trainer = DetectionTrainer.from_config(config)
     print(next(iter(trainer.train_dataloader)))
     trainer.do_training('run_1_seg')

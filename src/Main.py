@@ -12,7 +12,7 @@ from pandas import DataFrame
 from pandas.core.series import Series
 from cv2 import imread, fillPoly, IMREAD_GRAYSCALE
 from torch.utils.data import Dataset, DataLoader
-from torch import Tensor, IntTensor, FloatTensor
+from torch import Tensor, LongTensor, FloatTensor
 from torchvision.datasets.vision import VisionDataset
 import torch
 from functools import partial
@@ -206,7 +206,7 @@ def get_str(data):
 
 def _collate_detection(batch):
     images, labels = zip(*batch)
-    return torch.stack(images), list(labels)
+    return tuple(images), tuple(labels)
 
 def _collate_segmentation(batch):
     images, labels = zip(*batch)
@@ -582,6 +582,8 @@ class CVData:
         if default and 'default' not in self.image_set_to_idx:
             self.image_set_to_idx['default'] = default_idx
             self.idx_to_image_set[default_idx] = 'default'
+        
+        self.clear_image_sets()
                 
         
 class CVDataset(VisionDataset):
@@ -619,7 +621,7 @@ class CVDataset(VisionDataset):
         class_ids = list(map(lambda x: self.id_mapping[x], item['BBOX_CLASS_ID']))
         boxes = item['BOX']
         bbox_tensors = [FloatTensor(box) for box in boxes]
-        return {'boxes': torch.stack(bbox_tensors), 'labels': IntTensor(class_ids)}
+        return {'boxes': torch.stack(bbox_tensors), 'labels': LongTensor(class_ids)}
 
     def _get_seg_labels(self, item: Series) -> Tensor:
         if 'ABSOLUTE_FILE_SEG' in item:

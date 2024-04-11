@@ -1,3 +1,7 @@
+'''
+Adapted from torchvision: https://github.com/pytorch/vision/blob/main/torchvision/transforms/_presets.py
+'''
+
 from typing import Optional, Tuple
 
 import torch
@@ -19,7 +23,6 @@ class ObjectDetection(nn.Module):
             "Accepts ``PIL.Image``, batched ``(B, C, H, W)`` and single ``(C, H, W)`` image ``torch.Tensor`` objects. "
             "The images are rescaled to ``[0.0, 1.0]``."
         )
-
 
 class ImageClassification(nn.Module):
     def __init__(

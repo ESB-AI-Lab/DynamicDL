@@ -4,8 +4,6 @@ Represents all possible (required) data items for parsing a dataset.
 
 import re
 import os
-import heapq
-import numpy as np
 from copy import copy
 from typing import Any, Union
 from typing_extensions import Self
