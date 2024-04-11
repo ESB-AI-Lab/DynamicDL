@@ -1,26 +1,14 @@
 from trainer import ClassificationTrainer
-print("Imported Trainer")
 from src import *
-print("Imported Dataloader")
 from torchvision.models import VGG16_Weights as base
 import torchvision.transforms as transforms
 
 if __name__ == '__main__':
-    # Number of channels in the image. $3$ for RGB.
     image_channels: int = 3
-    # Number of channels in the output mask. $1$ for binary mask.
     mask_channels: int = 1
-
-    # Batch size
     batch_size: int = 4
-    # Learning rate
     learning_rate: float = 2.5e-4
-
     epochs: int = 4
-
-    transform = transforms.Compose([
-        base.DEFAULT.transforms()
-    ])
 
     root = '/Users/atong/Documents/Datasets/OxfordPets'
     alias = Alias([
@@ -88,4 +76,3 @@ if __name__ == '__main__':
     }
     trainer = ClassificationTrainer.from_config(config)
     trainer.do_training('run_1_cls')
-
