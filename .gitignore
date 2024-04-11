@@ -162,6 +162,5 @@ cython_debug/
 .DS_Store
 example.ipynb
 trainer
-train.py
 models
 logs
