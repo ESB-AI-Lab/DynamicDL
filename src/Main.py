@@ -11,10 +11,12 @@ import random
 from pandas import DataFrame
 from pandas.core.series import Series
 from cv2 import imread, fillPoly, IMREAD_GRAYSCALE
-from torchvision.io import read_image
 from torch.utils.data import Dataset, DataLoader
 from torch import Tensor, IntTensor, FloatTensor
+from torchvision.datasets.vision import VisionDataset
 import torch
+from PIL.Image import open as open_image
+from PIL.Image import fromarray
 
 from ._utils import next_avail_id
 from .DataItems import DataEntry, DataItem, DataTypes, DataType, UniqueToken, Static, Generic, \
@@ -218,7 +220,7 @@ def _get_bbox_labels(item: Series) -> dict[str, Tensor]:
 
 def _get_seg_labels(item: Series, default=0) -> Tensor:
     if 'ABSOLUTE_FILE_SEG' in item:
-        return read_image(item['ABSOLUTE_FILE_SEG'])
+        return open_image(item['ABSOLUTE_FILE_SEG'])
     assert len(item['POLYGON']) == len(item['SEG_CLASS_ID']), \
         'SEG_CLASS_ID and POLYGON len mismatch'
     mask = asarray(imread(item['ABSOLUTE_FILE'], IMREAD_GRAYSCALE), dtype=int32)
@@ -466,7 +468,8 @@ class CVData:
             print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
             dataframe = dataframe.dropna()
         if len(dataframe) == 0: raise ValueError('[CVData] After cleanup, this dataset is empty.')
-        return CVDataset(dataframe, mode, seg_default=seg_default)
+        return CVDataset(dataframe, self.root, mode, seg_default=seg_default, transform=self.transform,
+                         target_transform=self.target_transform)
 
     def get_dataloader(self, mode: str, image_set: str, batch_size: int = 4, shuffle: bool = True,
                        num_workers: int = 1) -> DataLoader:
@@ -568,22 +571,32 @@ class CVData:
             self.idx_to_image_set[default_idx] = 'default'
                 
         
-class CVDataset(Dataset):
+class CVDataset(VisionDataset):
     '''
     Dataset implementation for CVData environment.
     '''
-    def __init__(self, df: DataFrame, mode: str, seg_default: int = 0):
+    def __init__(
+        self,
+        df: DataFrame,
+        root: str,
+        mode: str,
+        seg_default: int = 0,
+        transforms: Optional[Callable] = None,
+        transform: Optional[Callable] = None,
+        target_transform: Optional[Callable] = None
+    ):
         self.dataframe = df
         self.data = self.dataframe.to_dict('records')
         self.mode = mode
         self.seg_default = seg_default
+        super().__init__(root, transforms=transforms, transform=transform, target_transform=target_transform)
 
     def __len__(self):
         return len(self.dataframe)
 
     def __getitem__(self, idx):
         item: dict = self.data[idx]
-        image: Tensor = read_image(item.get('ABSOLUTE_FILE'))
+        image: Tensor = open_image(item.get('ABSOLUTE_FILE'))
         label: dict[str, Tensor]
         if self.mode == 'classification':
             label = _get_class_labels(item)
@@ -591,4 +604,6 @@ class CVDataset(Dataset):
             label = _get_bbox_labels(item)
         elif self.mode == 'segmentation':
             label = _get_seg_labels(item, default=self.seg_default)
+        
+        if self.transforms: image, label = self.transforms(image, label)
         return image, label
