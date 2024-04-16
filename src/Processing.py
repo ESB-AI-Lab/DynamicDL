@@ -9,7 +9,7 @@ from typing import Any, Union
 from abc import ABC, abstractmethod
 
 from ._utils import union
-from .DataItems import DataTypes, DataItem, Generic, Static, DataType, DataEntry, RedundantToken
+from .data_items import DataTypes, DataItem, Generic, Static, DataType, DataEntry, RedundantToken
 
 class GenericList:
     '''

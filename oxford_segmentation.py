@@ -1,3 +1,4 @@
+import torch
 from trainer import SegmentationTrainer
 from src import *
 

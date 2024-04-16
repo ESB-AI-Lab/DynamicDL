@@ -3,10 +3,9 @@ Adapted from torchvision: https://github.com/pytorch/vision/blob/main/torchvisio
 '''
 
 from typing import Optional, Tuple
-
+from functools import partial
 import torch
 from torch import nn, Tensor
-
 from torchvision.transforms import functional as F, InterpolationMode
 
 class ObjectDetection(nn.Module):
@@ -115,3 +114,12 @@ class SemanticSegmentation(nn.Module):
             f"Finally the values are first rescaled to ``[0.0, 1.0]`` and then normalized using ``mean={self.mean}`` and "
             f"``std={self.std}``."
         )
+
+class CVTransforms:
+    '''
+    Standard transforms presets for computer vision. Adapted from torchvision 0.17.2
+    '''
+    CLASSIFICATION_TRANSFORMS = (partial(ImageClassification, crop_size=224)(), None)
+    DETECTION_TRANSFORMS = (ObjectDetection(), None)
+    SEGMENTATION_TRANSFORMS = (partial(SemanticSegmentation, resize_size=520, normalize=True)(), 
+                               partial(SemanticSegmentation, resize_size=520, normalize=False)())

@@ -1,3 +1,4 @@
+import torch
 from trainer import DetectionTrainer
 from src import *
 

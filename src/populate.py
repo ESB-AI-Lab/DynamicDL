@@ -1,3 +1,6 @@
+'''
+Data population & processing algorithms for CVData.
+'''
 import os
 import heapq
 from typing import Any, Union
@@ -175,10 +178,10 @@ def _merge(data: Union[dict[Union[Static, int], Any], Static]) -> \
     return entries if len(entries) > 1 else entries[0]
 
 def populate_data(root, form) -> list[DataEntry]:
-        dataset = _get_files(root)
-        data, pairings = _expand_generics(root, dataset, form)
-        data = _merge(data)
-        for pairing in pairings:
-            for entry in data:
-                pairing.update_pairing(entry)
-        return _merge_lists([data])
+    dataset = _get_files(root)
+    data, pairings = _expand_generics(root, dataset, form)
+    data = _merge(data)
+    for pairing in pairings:
+        for entry in data:
+            pairing.update_pairing(entry)
+    return _merge_lists([data])

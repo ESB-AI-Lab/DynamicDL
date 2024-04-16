@@ -1,3 +1,4 @@
+import torch
 from trainer import ClassificationTrainer
 from src import *
 
@@ -46,9 +47,18 @@ if __name__ == '__main__':
     cvdata = CVData(root, form)
     cvdata.cleanup()
     cvdata.split_image_set('trainval', ('train', 0.8), ('val', 0.2), inplace = True, seed = 0)
-    trainloader = cvdata.get_dataloader('classification', 'train', batch_size=batch_size, transforms=CVData.CLASSIFICATION_TRANSFORMS)
-    valloader = cvdata.get_dataloader('classification', 'val', batch_size=batch_size, transforms=CVData.CLASSIFICATION_TRANSFORMS)
-    testloader = cvdata.get_dataloader('classification', 'test', batch_size=batch_size, transforms=CVData.CLASSIFICATION_TRANSFORMS)
+    trainloader = cvdata.get_dataloader('classification',
+                                        'train',
+                                        batch_size=batch_size,
+                                        transforms=CVTransforms.CLASSIFICATION_TRANSFORMS)
+    valloader = cvdata.get_dataloader('classification',
+                                      'val',
+                                      batch_size=batch_size,
+                                      transforms=CVTransforms.CLASSIFICATION_TRANSFORMS)
+    testloader = cvdata.get_dataloader('classification',
+                                       'test',
+                                       batch_size=batch_size,
+                                       transforms=CVTransforms.CLASSIFICATION_TRANSFORMS)
 
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
     config = {

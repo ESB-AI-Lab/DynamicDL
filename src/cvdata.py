@@ -12,13 +12,12 @@ from torch.utils.data import Dataset, DataLoader
 from torch import Tensor, LongTensor, FloatTensor
 from torchvision.datasets.vision import VisionDataset
 import torch
-from functools import partial
+
 from PIL.Image import open as open_image
 from PIL.Image import fromarray
 
 from ._utils import next_avail_id
 from .data_items import DataItem, Static, Generic
-from .transforms import ImageClassification, ObjectDetection, SemanticSegmentation
 from .populate import populate_data
 
 def _collate_detection(batch):
@@ -37,11 +36,6 @@ class CVData:
     '''
     Main dataset class utils.
     '''
-    CLASSIFICATION_TRANSFORMS = (partial(ImageClassification, crop_size=224)(), None)
-    DETECTION_TRANSFORMS = (ObjectDetection(), None)
-    SEGMENTATION_TRANSFORMS = (partial(SemanticSegmentation, resize_size=520, normalize=True)(), 
-                               partial(SemanticSegmentation, resize_size=520, normalize=False)())
-
     _classification_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'CLASS_ID'}
     _detection_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'BBOX_CLASS_ID', 'BOX'}
     _segmentation_img_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'ABSOLUTE_FILE_SEG'}
