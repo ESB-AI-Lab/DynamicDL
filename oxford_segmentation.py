@@ -55,7 +55,7 @@ if __name__ == '__main__':
     valloader = cvdata.get_dataloader('segmentation', 'val', batch_size=batch_size, transforms=CVData.SEGMENTATION_TRANSFORMS)
     testloader = cvdata.get_dataloader('segmentation', 'test', batch_size=batch_size, transforms=CVData.SEGMENTATION_TRANSFORMS)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
     config = {
         'device': device,
         'model_args': {
@@ -76,5 +76,4 @@ if __name__ == '__main__':
         'num_epochs': 25
     }
     trainer = SegmentationTrainer.from_config(config)
-    print(next(iter(trainer.train_dataloader)))
     trainer.do_training('run_1_seg')

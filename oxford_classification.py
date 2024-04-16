@@ -2,8 +2,6 @@ from trainer import ClassificationTrainer
 from src import *
 
 if __name__ == '__main__':
-    image_channels: int = 3
-    mask_channels: int = 1
     batch_size: int = 4
     learning_rate: float = 2.5e-4
     epochs: int = 4
@@ -52,7 +50,7 @@ if __name__ == '__main__':
     valloader = cvdata.get_dataloader('classification', 'val', batch_size=batch_size, transforms=CVData.CLASSIFICATION_TRANSFORMS)
     testloader = cvdata.get_dataloader('classification', 'test', batch_size=batch_size, transforms=CVData.CLASSIFICATION_TRANSFORMS)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
     config = {
         'device': device,
         'model_args': {
