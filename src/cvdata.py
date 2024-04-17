@@ -43,8 +43,6 @@ class CVData:
     Args:
     - root (str): the root directory to access the dataset.
     - form (dict): the form of the dataset. See documentation for further details on valid forms.
-    - remove_invalid (bool): when set to True, automatically removes any entries with NaN on dataset
-                             creation. Default: True
     - get_img_dim (bool): when set to True, create a new column which finds image dimensions for
                           every image available. Default: True
     '''
@@ -58,7 +56,6 @@ class CVData:
         self, 
         root: str, 
         form: dict,
-        remove_invalid: bool = True,
         get_img_dim: bool = True
     ) -> None:
         self.root = root
@@ -71,7 +68,6 @@ class CVData:
         self.idx_to_bbox_class = {}
         self.available_modes = []
         self.cleaned = False
-        self.remove_invalid = remove_invalid
         self.get_img_dim = get_img_dim
 
     def parse(self, override: bool = False) -> None:
@@ -290,8 +286,9 @@ class CVData:
 
     def get_dataset(
         self, 
-        mode: str, 
-        image_set: str = None,
+        mode: str,
+        remove_invalid: bool = True,
+        image_set: Optional[str] = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
         transforms: Optional[tuple[Callable]] = None
@@ -301,6 +298,10 @@ class CVData:
         
         Args:
         - mode (str): the mode of training to select. See available modes with `available_modes`.
+        - remove_invalid (bool): if set to True, deletes any NaN/corrupt items in the image set
+                                 pertaining to the relevant mode. In the False case, either NaN
+                                 values are substituted with empty values or an error is thrown,
+                                 depending on the mode selected.
         - image_set (str, Optional): the image set to pull from. Default: all images.
         - transform (Callable, Optional): the transform operation to apply to the images.
         - target_transform (Callable, Optional): the transform operation on the labels.
@@ -324,9 +325,20 @@ class CVData:
             dataframe = dataframe[list(CVData._segmentation_poly_cols if 'POLYGON' in dataframe 
                                        else CVData._segmentation_img_cols)]
             id_mapping = {k: i for i, k in enumerate(self.idx_to_seg_class)}
-        if self.remove_invalid:
+        if remove_invalid:
             print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
             dataframe = dataframe.dropna()
+        else:
+            replace_nan = (lambda x: ([] if isinstance(x, float) and isnan(x) else x))
+            if mode == 'detection': cols = ['BBOX_CLASS_ID'] # BOX already accounted for in bbox creation
+            elif mode == 'segmentation': cols = ['POLYGON', 'SEG_CLASS_ID'] if 'POLYGON' in dataframe else []
+            for col in cols: dataframe[col] = dataframe[col].apply(replace_nan)
+            for i, row in dataframe.iterrows():
+                for val in row.values:
+                    if isinstance(val, float) and isnan(val):
+                        error = '[CVData] Found NaN values that will cause errors in row:\n'
+                        error += str(dataframe.iloc[i])
+                        raise ValueError(error)
         if len(dataframe) == 0: raise ValueError('[CVData] After cleanup, this dataset is empty.')
         return CVDataset(dataframe, self.root, mode, id_mapping=id_mapping, transform=transform,
                          target_transform=target_transform)
@@ -334,10 +346,11 @@ class CVData:
     def get_dataloader(
         self,
         mode: str,
-        image_set: str,
         batch_size: int = 4,
         shuffle: bool = True,
         num_workers: int = 1,
+        remove_invalid: bool = True,
+        image_set: Optional[str] = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
         transforms: Optional[tuple[Callable]] = None
@@ -347,10 +360,14 @@ class CVData:
         
         Args:
         - mode (str): the mode of training to select. See available modes with `available_modes`.
-        - image_set (str, Optional): the image set to pull from. Default: all images.
         - batch_size (int): the batch size of the image. Default: 4.
         - shuffle (bool): whether to shuffle the data before loading. Default: True.
         - num_workers (int): number of workers for the dataloader. Default: 1.
+        - remove_invalid (bool): if set to True, deletes any NaN/corrupt items in the image set
+                                 pertaining to the relevant mode. In the False case, either NaN
+                                 values are substituted with empty values or an error is thrown,
+                                 depending on the mode selected.
+        - image_set (str, Optional): the image set to pull from. Default: all images.
         - transform (Callable, Optional): the transform operation to apply to the images.
         - target_transform (Callable, Optional): the transform operation on the labels.
         - transforms (tuple, Optional): tuple in the format (transform, target_transform). Default
@@ -359,7 +376,8 @@ class CVData:
         return DataLoader(
             self.get_dataset(
                 mode,
-                image_set,
+                remove_invalid=remove_invalid,
+                image_set=image_set,
                 transform=transform,
                 target_transform=target_transform,
                 transforms=transforms),
@@ -549,7 +567,6 @@ class CVData:
             'idx_to_seg_class': self.idx_to_seg_class,
             'bbox_class_to_idx': self.bbox_class_to_idx,
             'idx_to_bbox_class': self.idx_to_bbox_class,
-            'remove_invalid': self.remove_invalid,
             'get_img_dim': self.get_img_dim,
             'available_modes': self.available_modes,
             'cleaned': self.cleaned,
