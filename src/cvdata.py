@@ -1,5 +1,6 @@
 '''
-Main module for processing datasets.
+Main module for processing datasets. Collects all parsed objects into the CVData object, and
+maintains the CVDataset class for PyTorch Dataset and DataLoader functionalities.
 '''
 import os
 import time
@@ -21,7 +22,6 @@ from PIL.Image import open as open_image
 from PIL.Image import fromarray
 
 from ._utils import next_avail_id
-from .data_items import Static, Generic
 from .populate import populate_data
 
 def _collate_detection(batch):
@@ -38,8 +38,15 @@ def _collate(mode: str) -> Callable:
 
 class CVData:
     '''
-    Main dataset class utils.
+    Main dataset class. Accepts root directory path and dictionary form of the structure.
+    
+    Args:
+    - root (str): the root directory to access the dataset.
+    - form (dict): the form of the dataset. See documentation for further details on valid forms.
+    - remove_invalid (bool): when set to True, automatically removes any entries with NaN on dataset
+                             creation. Default: True
     '''
+
     _classification_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'CLASS_ID'}
     _detection_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'BBOX_CLASS_ID', 'BOX'}
     _segmentation_img_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'ABSOLUTE_FILE_SEG'}
@@ -48,7 +55,7 @@ class CVData:
     def __init__(
         self, 
         root: str, 
-        form: dict[Union[Static, Generic], Any],
+        form: dict,
         remove_invalid: bool = True
     ) -> None:
         self.root = root
@@ -64,6 +71,14 @@ class CVData:
         self.remove_invalid = remove_invalid
 
     def parse(self, override: bool = False) -> None:
+        '''
+        Must be called to instantiate the data in the dataset instance. Performs the recursive
+        populate_data algorithm and creates the dataframe, and then cleans up the data.
+        
+        Args:
+        - override (bool): whether to overwrite existing data if it has already been parsed and
+                           cleaned. Default: False
+        '''
         print('[CVData] Parsing data...')
         start = time.time()
         if self.cleaned and not override:
@@ -81,7 +96,7 @@ class CVData:
 
     def cleanup(self) -> None:
         '''
-        Run cleanup and sanity checks on all data.
+        Run cleanup and sanity checks on all data. Assigns IDs to name-only values.
         '''
         print('[CVData] Cleaning up data...')
 
@@ -90,6 +105,7 @@ class CVData:
             self.dataframe.sort_values('IMAGE_ID', ignore_index=True, inplace=True)
         else:
             self.dataframe.sort_values('IMAGE_NAME', ignore_index=True, inplace=True)
+            self.dataframe['IMAGE_ID'] = self.dataframe.index
 
         # convert bounding boxes into proper format and store under 'BOX'
         if {'X1', 'X2', 'Y1', 'Y2'}.issubset(self.dataframe.columns):
@@ -98,9 +114,6 @@ class CVData:
             self._convert_bbox(1)
         elif {'XMIN', 'YMIN', 'WIDTH', 'HEIGHT'}.issubset(self.dataframe.columns):
             self._convert_bbox(2)
-
-        # assign image ids
-        if 'IMAGE_ID' not in self.dataframe: self.dataframe['IMAGE_ID'] = self.dataframe.index
 
         # assign class ids
         if 'CLASS_NAME' in self.dataframe:
@@ -258,18 +271,28 @@ class CVData:
     def get_dataset(
         self, 
         mode: str, 
-        image_set: str,
+        image_set: str = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
         transforms: Optional[tuple[Callable]] = None
     ) -> Dataset:
         '''
-        Retrieve the dataset.
+        Retrieve the PyTorch dataset (torch.utils.data.Dataset) of a specific mode and image set.
+        
+        Args:
+        - mode (str): the mode of training to select. See available modes with `available_modes`.
+        - image_set (str, Optional): the image set to pull from. Default: all images.
+        - transform (Callable, Optional): the transform operation to apply to the images.
+        - target_transform (Callable, Optional): the transform operation on the labels.
+        - transforms (tuple, Optional): tuple in the format (transform, target_transform). Default
+                                        PyTorch transforms are available in the CVTransforms class.
         '''
         if transforms: transform, target_transform = transforms
         if not self.cleaned: self.cleanup()
         assert mode.lower().strip() in self.available_modes, 'Desired mode not available.'
+        
         dataframe = self.dataframe[[image_set in item for item in self.dataframe['IMAGE_SET_NAME']]]
+        if image_set is None: dataframe = self.dataframe
         if len(dataframe) == 0: raise ValueError(f'Image set {image_set} not available.')
         if mode == 'classification': 
             dataframe = dataframe[list(CVData._classification_cols)]
@@ -300,7 +323,18 @@ class CVData:
         transforms: Optional[tuple[Callable]] = None
     ) -> DataLoader:
         '''
-        Retrieve the dataloader for this dataset.
+        Retrieve the PyTorch dataloader (torch.utils.data.DataLoader) for this dataset.
+        
+        Args:
+        - mode (str): the mode of training to select. See available modes with `available_modes`.
+        - image_set (str, Optional): the image set to pull from. Default: all images.
+        - batch_size (int): the batch size of the image. Default: 4.
+        - shuffle (bool): whether to shuffle the data before loading. Default: True.
+        - num_workers (int): number of workers for the dataloader. Default: 1.
+        - transform (Callable, Optional): the transform operation to apply to the images.
+        - target_transform (Callable, Optional): the transform operation on the labels.
+        - transforms (tuple, Optional): tuple in the format (transform, target_transform). Default
+                                        PyTorch transforms are available in the CVTransforms class.
         '''
         return DataLoader(
             self.get_dataset(
@@ -316,19 +350,39 @@ class CVData:
         )
     
     def split_image_set(
-        self, image_set: str,
+        self,
+        image_set: Union[str, int],
         *new_sets: tuple[str, float],
         inplace: bool = False,
-        seed: int = None
+        seed: Optional[int] = None
     ) -> None:
         '''
-        Split the existing image set into new image sets.
+        Split the existing image set into new image sets. If inplace is True, the existing image
+        set will receive the percentage that is missing from the rest of the sets, or deleted if
+        the other sets add up to 1.
+        
+        Args:
+        - image_set (str, int): the old image set name to split. Accepts both name and ID.
+        - new_sets (tuple[str, float]): each entry of new_sets has a name for the set accompanied
+                                        with a float to represent the percentage to split data into.
+        - inplace (bool): whether to perform the operation inplace on the existing image set. If
+                          False, then the new sets are required to add up to exactly 100% of the
+                          compositions. If True, any remaining percentages less than 100% will be
+                          filled back into the old image set. Default: False.
+        - seed (int, Optional): the seed to use for the operation, in case consistent dataset
+                      manipulation in memory is required. Default: None
         '''
         # checks before splitting
-        if image_set not in self.image_set_to_idx: 
+        mode = 'name' if isinstance(image_set, str) else 'id'
+        if mode == 'name' and image_set not in self.image_set_to_idx: 
             raise ValueError("Image set doesn't exist!")
-        if any(new_set[0] in self.image_set_to_idx for new_set in new_sets): 
+        if mode == 'name' and any(new_set[0] in self.image_set_to_idx for new_set in new_sets): 
             raise ValueError(f'New set name already exists!')
+        if mode == 'id' and image_set not in self.idx_to_image_set: 
+            raise ValueError("Image set ID doesn't exist!")
+        if mode == 'id' and any(new_set[0] in self.idx_to_image_set for new_set in new_sets): 
+            raise ValueError(f'New set ID already exists!')
+
         tot_frac = sum(new_set[1] for new_set in new_sets)
         if not inplace and tot_frac != 1:
             raise ValueError(f'Split fraction invalid, not equal to 1')
@@ -341,10 +395,15 @@ class CVData:
         if seed is not None: random.seed(seed)
 
         # add to existing image set tracker 
-        for k in new_sets:
-            next_id = next_avail_id(self.idx_to_image_set)
-            self.idx_to_image_set[next_id] = k[0]
-            self.image_set_to_idx[k[0]] = next_id
+        if mode == 'name':
+            for k in new_sets:
+                next_id = next_avail_id(self.idx_to_image_set)
+                self.idx_to_image_set[next_id] = k[0]
+                self.image_set_to_idx[k[0]] = next_id
+        else:
+            for k in new_sets:
+                self.idx_to_image_set[k[0]] = str(k[0])
+                self.image_set_to_idx[str(k[0])] = k[0]
 
         # assign image sets
         for _, row in self.dataframe.iterrows():
@@ -353,40 +412,68 @@ class CVData:
             running_sum = 0
             for _, next_set in enumerate(new_sets):
                 if running_sum <= partition <= running_sum + next_set[1]:
+                    next_id = next_set[0] if mode == 'id' else self.image_set_to_idx[next_set[0]]
+                    next_name = str(next_set[0]) if mode == 'id' else next_set[0]
                     if inplace:
                         index = row['IMAGE_SET_NAME'].index(image_set)
-                        row['IMAGE_SET_NAME'][index] = next_set[0]
-                        row['IMAGE_SET_ID'][index] = self.image_set_to_idx[next_set[0]]
+                        row['IMAGE_SET_NAME'][index] = next_name
+                        row['IMAGE_SET_ID'][index] = next_id
                     else: 
-                        row['IMAGE_SET_NAME'].append(next_set[0])
-                        row['IMAGE_SET_ID'].append(self.image_set_to_idx[next_set[0]])
+                        row['IMAGE_SET_NAME'].append(next_name)
+                        row['IMAGE_SET_ID'].append(next_id)
                     break
                 running_sum += next_set[1]
-        if inplace: self.clear_image_sets()
+        if inplace: self.clear_image_sets(image_set)
     
     def get_image_set(
         self,
         image_set: Union[str, int]
     ) -> DataFrame:
+        '''
+        Retrieve the sub-DataFrame which contains all images in a specific image set.
+        
+        Args:
+        - image_set (str, int): the image set. Accepts both string and int.
+        '''
         if isinstance(image_set, str):
             return self.dataframe[self.dataframe['IMAGE_SET_NAME'].apply(lambda x: image_set in x)]
         return self.dataframe[self.dataframe['IMAGE_SET_ID'].apply(lambda x: image_set in x)]
     
     def clear_image_sets(
-        self
+        self,
+        sets: Optional[list[Union[str, int]]] = None
     ) -> None:
+        '''
+        Clear image sets from the dict if they contain no elements.
+        
+        Args:
+        - sets (list[str | int], Optional): If defined, only scan the provided list, otherwise
+                                                  scan all sets. Default: None.
+        '''
         to_pop = []
-        for image_set in self.image_set_to_idx:
+        if sets is None: sets = self.image_set_to_idx
+        for image_set in sets:
             if len(self.get_image_set(image_set)) == 0:
                 to_pop.append(image_set)
         for image_set in to_pop:
-            index = self.image_set_to_idx.pop(image_set)
-            self.idx_to_image_set.pop(index)
+            if isinstance(image_set, str):
+                index = self.image_set_to_idx.pop(image_set, None)
+                if index is not None: self.idx_to_image_set.pop(index, None)
+            else:
+                self.image_set_to_idx.pop(str(image_set), None)
+                self.idx_to_image_set.pop(image_set, None)
     
     def delete_image_set(
         self,
         image_set: Union[str, int]
     ) -> None:
+        '''
+        Delete image set from all entries. If an entry has only that image set, replace with the
+        default dataset.
+        
+        Args:
+        - image_set (str, int): the image set to delete. Accepts both name and ID.
+        '''
         using_id: bool = isinstance(image_set, int)
         if using_id:
             if image_set not in self.idx_to_image_set: 
@@ -426,7 +513,11 @@ class CVData:
         overwrite: bool = False
     ) -> None:
         '''
-        Save the dataset into json format.
+        Save the dataset into CVData json format.
+        
+        Args:
+        - filename (str): the filename to save the dataset.
+        - overwrite (bool): whether to overwrite the file if it already exists. Default: False.
         '''
         this = {
             'root': self.root,
@@ -449,6 +540,14 @@ class CVData:
 
     @classmethod
     def load(cls, filename: str) -> Self:
+        '''
+        Load a CVData object from file. Warning: do not load any json files that you did not create.
+        This method uses jsonpickle, an insecure loading system with potential for arbitrary Python
+        code execution.
+        
+        Args:
+        - filename (str): the filename to load the data from.
+        '''
         try:
             print('[CVData] Loading dataset...')
             start = time.time()
@@ -474,7 +573,20 @@ class CVData:
         
 class CVDataset(VisionDataset):
     '''
-    Dataset implementation for CVData environment.
+    Dataset implementation for the CVData environment.
+    
+    Args:
+    - df (DataFrame): the dataframe from CVData.
+    - root (str): the root of the dataset folder.
+    - mode (str): the mode of the data to retrieve, i.e. classification, segmentation, detection.
+    - id_mapping (dict[int, int]): the id mapping from the dataframe to retrieve class names.
+                                   this is used primarily as a safety feature in order to make sure
+                                   that used IDs are provided in order starting from 0 without holes
+                                   so that training works properly.
+    - image_type (str): the type of the image to export, to convert PIL images to. Default: 'RGB'.
+                        Also accepts 'L' and 'CMYK'.
+    - transform (Callable, Optional): the transform operation to apply to the images.
+    - target_transform (Callable, Optional): the transform operation on the labels.
     '''
     def __init__(
         self,
@@ -482,9 +594,9 @@ class CVDataset(VisionDataset):
         root: str,
         mode: str,
         id_mapping: dict[int, int],
+        image_type: str = 'RGB',
         transform: Optional[Callable] = None,
-        target_transform: Optional[Callable] = None,
-        image_type: str = 'RGB'
+        target_transform: Optional[Callable] = None
     ):
         self.dataframe = df
         self.data = self.dataframe.to_dict('records')
