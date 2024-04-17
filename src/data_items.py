@@ -436,7 +436,7 @@ class Generic:
         - entry (str): the string to match to the pattern, assuming it does match
         '''
         for ignore_pattern in self.ignore:
-            ignore_pattern = '^' + self.name.replace('{}', '(.+)') + '+$'
+            ignore_pattern = '^' + ignore_pattern.replace('{}', '(.+)') + '+$'
             if re.findall(ignore_pattern, entry): return False, []
         pattern: str = '^' + self.name.replace('{}', '(.+)') + '+$'
         matches: list[str] = re.findall(pattern, entry)
