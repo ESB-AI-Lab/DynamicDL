@@ -45,6 +45,8 @@ class CVData:
     - form (dict): the form of the dataset. See documentation for further details on valid forms.
     - remove_invalid (bool): when set to True, automatically removes any entries with NaN on dataset
                              creation. Default: True
+    - get_img_dim (bool): when set to True, create a new column which finds image dimensions for
+                          every image available. Default: True
     '''
 
     _classification_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'CLASS_ID'}
@@ -56,7 +58,8 @@ class CVData:
         self, 
         root: str, 
         form: dict,
-        remove_invalid: bool = True
+        remove_invalid: bool = True,
+        get_img_dim: bool = True
     ) -> None:
         self.root = root
         self.form = form
@@ -69,6 +72,7 @@ class CVData:
         self.available_modes = []
         self.cleaned = False
         self.remove_invalid = remove_invalid
+        self.get_img_dim = get_img_dim
 
     def parse(self, override: bool = False) -> None:
         '''
@@ -107,6 +111,8 @@ class CVData:
             self.dataframe.sort_values('IMAGE_NAME', ignore_index=True, inplace=True)
             self.dataframe['IMAGE_ID'] = self.dataframe.index
 
+        if self.get_img_dim: self._get_img_sizes()
+
         # convert bounding boxes into proper format and store under 'BOX'
         if {'X1', 'X2', 'Y1', 'Y2'}.issubset(self.dataframe.columns):
             self._convert_bbox(0)
@@ -114,6 +120,10 @@ class CVData:
             self._convert_bbox(1)
         elif {'XMIN', 'YMIN', 'WIDTH', 'HEIGHT'}.issubset(self.dataframe.columns):
             self._convert_bbox(2)
+        elif {'XMID', 'YMID', 'WIDTH', 'HEIGHT'}.issubset(self.dataframe.columns):
+            self._convert_bbox(3)
+        elif {'XMAX', 'YMAX', 'WIDTH', 'HEIGHT'}.issubset(self.dataframe.columns):
+            self._convert_bbox(4)
 
         # assign class ids
         if 'CLASS_NAME' in self.dataframe:
@@ -162,6 +172,10 @@ class CVData:
         self._cleanup_id()
         self.cleaned = True
         print('[CVData] Done!')
+
+    def _get_img_sizes(self) -> None:
+        self.dataframe['IMAGE_DIM'] = [open_image(filename).size if isinstance(filename, str)
+                                       else nan for filename in self.dataframe['ABSOLUTE_FILE']]
 
     def _validate_ids(self, name: str, redundant=False) -> tuple[dict[str, int], dict[int, str]]:
         def check(i: int, v: str, name_to_idx: dict[str, int]) -> None:
@@ -227,29 +241,31 @@ class CVData:
 
     def _convert_bbox(self, mode: int) -> None:
         boxes = []
-        def execute_checks(i: int, row: Series, boxes: list, cols: tuple):
-            if any([isinstance(row[cols[0]], float), isinstance(row[cols[1]], float),
-                    isinstance(row[cols[2]], float), isinstance(row[cols[3]], float)]):
-                boxes.append([])
-                return False
+        def execute_checks(i: int, row: Series, cols: tuple):
+            if any(isinstance(row[cols[i]], float) for i in range(4)): return False
             if not all(len(row[x]) == len(row[cols[0]]) for x in cols):
                 raise ValueError(f'Length of bbox lists at index {i} does not match ({len(row[cols[0]])}, {len(row[cols[1]])}, {len(row[cols[2]])}, {len(row[cols[3]])})')
             return True
         if mode == 0:
-            for i, row in self.dataframe.iterrows():
-                if not execute_checks(i, row, boxes, ('X1', 'Y1', 'X2', 'Y2')): continue
-                boxes.append([(min(x1, x2), min(y1, y2), max(x1, x2), max(y1,y2)) for x1, y1, x2, y2
-                              in zip(row['X1'], row['Y1'], row['X2'], row['Y2'])])
+            cols = ('X1', 'Y1', 'X2', 'Y2')
+            funcs = (min, min, max, max)
         elif mode == 1:
-            for i, row in self.dataframe.iterrows():
-                if not execute_checks(i, row, boxes, ('XMIN', 'YMIN', 'XMAX', 'YMAX')): continue
-                boxes.append([(xmin, ymin, xmax, ymax) for xmin, ymin, xmax, ymax
-                              in zip(row['XMIN'], row['YMIN'], row['XMAX'], row['YMAX'])])
+            cols = ('XMIN', 'YMIN', 'XMAX', 'YMAX')
+            funcs = (lambda x: x[0], lambda y: y[0], lambda x: x[1], lambda y: y[1])
         elif mode == 2:
-            for i, row in self.dataframe.iterrows():
-                if not execute_checks(i, row, boxes, ('XMIN', 'YMIN', 'WIDTH', 'HEIGHT')): continue
-                boxes.append([(xmin, ymin, xmin+width, ymin+height) for xmin, ymin, width, height
-                              in zip(row['XMAX'], row['YMAX'], row['WIDTH'], row['HEIGHT'])])
+            cols = ('XMIN', 'YMIN', 'WIDTH', 'HEIGHT')
+            funcs = (lambda x: x[0], lambda y: y[0], lambda x: x[0]+x[1], lambda y: y[0]+y[1])
+        elif mode == 3:
+            cols = ('XMID', 'YMID', 'WIDTH', 'HEIGHT')
+            funcs = (lambda x: x[0]-x[1]/2, lambda y: y[0]-y[1]/2, lambda x: x[0]+x[1]/2, lambda y: y[0]+y[1]/2)
+        elif mode == 4:
+            cols = ('XMAX', 'YMAX', 'WIDTH', 'HEIGHT')
+            funcs = (lambda x: x[0]-x[1], lambda y: y[0]-y[1], lambda x: x[0], lambda y: y[0])
+        for i, row in self.dataframe.iterrows():
+            if not execute_checks(i, row, cols):
+                boxes.append([])
+            else: boxes.append([(funcs[0]((x1, x2)), funcs[1]((y1, y2)), funcs[2]((x1, x2)), funcs[3]((y1, y2)))
+                                for x1, y1, x2, y2 in zip(row[cols[0]], row[cols[1]], row[cols[2]], row[cols[3]])])
         self.dataframe['BOX'] = boxes
 
     def _cleanup_id(self) -> None:
@@ -534,6 +550,7 @@ class CVData:
             'bbox_class_to_idx': self.bbox_class_to_idx,
             'idx_to_bbox_class': self.idx_to_bbox_class,
             'remove_invalid': self.remove_invalid,
+            'get_img_dim': self.get_img_dim,
             'available_modes': self.available_modes,
             'cleaned': self.cleaned,
         }
@@ -557,7 +574,12 @@ class CVData:
             start = time.time()
             with open(filename, 'r') as f:
                 data = json.load(f)
-            this: CVData = cls(data['root'], jsonpickle.decode(data['form'], keys=True))
+            this: CVData = cls(
+                data['root'],
+                jsonpickle.decode(data['form'], keys=True),
+                remove_invalid=data['remove_invalid'],
+                get_img_dim=data['get_img_dim']
+            )
             this.dataframe = DataFrame.from_dict(json.loads(data['dataframe']))
             this.image_set_to_idx = data['image_set_to_idx']
             this.idx_to_image_set = data['idx_to_image_set']
@@ -565,7 +587,6 @@ class CVData:
             this.idx_to_seg_class = data['idx_to_seg_class']
             this.bbox_class_to_idx = data['bbox_class_to_idx']
             this.idx_to_bbox_class = data['idx_to_bbox_class']
-            this.remove_invalid = data['remove_invalid']
             this.available_modes = data['available_modes']
             this.cleaned = data['cleaned']
             end = time.time()

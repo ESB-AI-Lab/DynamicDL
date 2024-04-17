@@ -194,6 +194,8 @@ class DataTypes:
     YMIN = DataType('YMIN', RedundantQuantityToken())
     XMAX = DataType('XMAX', RedundantQuantityToken())
     YMAX = DataType('YMAX', RedundantQuantityToken())
+    XMID = DataType('XMID', RedundantQuantityToken())
+    YMID = DataType('YMID', RedundantQuantityToken())
     X1 = DataType('X1', RedundantQuantityToken())
     Y1 = DataType('Y1', RedundantQuantityToken())
     X2 = DataType('X2', RedundantQuantityToken())
