@@ -22,7 +22,7 @@ from PIL.Image import open as open_image
 from PIL.Image import fromarray
 
 from ._utils import next_avail_id
-from .populate import populate_data
+from .processing import populate_data
 
 def _collate_detection(batch):
     images, labels = zip(*batch)
