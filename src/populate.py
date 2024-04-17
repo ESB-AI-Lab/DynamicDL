@@ -8,7 +8,7 @@ from typing import Any, Union
 from .data_items import DataEntry, DataItem, DataTypes, DataType, UniqueToken, Static, Generic, \
                        Image, SegmentationImage, Folder, File
 from .processing import DataFile, Pairing
-from ._utils import get_str
+from ._utils import get_str, check_map
 
 def _get_files(path: str) -> dict[str, Union[str, dict]]:
     '''Step one of the processing. Expand the dataset to fit all the files.'''
@@ -149,15 +149,17 @@ def _merge(data: Union[dict[Union[Static, int], Any], Static]) -> \
         # unique entry result
         if isinstance(result, DataEntry):
             if isinstance(key, Static): result = DataEntry.merge(DataEntry(key.data), result)
-            if isinstance(result, DataEntry) and result.unique: recursive.append([result])
+            if result.unique: recursive.append([result])
             else: recursive.append(result)
             continue
         # list entry result
         if isinstance(key, Static):
             for item in result: item.apply_tokens(key.data)
         recursive.append(result)
-    lists = [item for item in recursive if isinstance(item, list)]
-    tokens = [item for item in recursive if not isinstance(item, list)]
+    lists: list[list[DataEntry]] = []
+    tokens: list[DataEntry] = []
+    for item in recursive:
+        lists.append(item) if isinstance(item, list) else tokens.append(item)
 
     # if outside unique loop, merge lists and apply tokens as needed
     if lists:
@@ -166,21 +168,23 @@ def _merge(data: Union[dict[Union[Static, int], Any], Static]) -> \
         return result
 
     # if inside unique loop, either can merge all together or result has multiple entries
-    entries = []
-    entry = recursive[0]
-    for index, item in enumerate(recursive[1:], 1):
-        res = DataEntry.merge(entry, item, overlap=False)
-        if res:
-            entry = res
-            continue
-        entries.append(entry)
-        entry = recursive[index]
-    entries.append(entry)
-    return entries if len(entries) > 1 else entries[0]
+    if not check_map((item.unique for item in tokens), 2):
+        result = DataEntry([])
+        for item in tokens:
+            result = DataEntry.merge(item, result)
+        return result
+
+    uniques: list[DataEntry] = []
+    others: list[DataEntry] = []
+    for item in tokens:
+        uniques.append(item) if item.unique else others.append(item)
+    (entry.apply_tokens(data.data) for data in others for entry in uniques)
+    return uniques
 
 def populate_data(root, form) -> list[DataEntry]:
     dataset = _get_files(root)
     data, pairings = _expand_generics(root, dataset, form)
+    # print(get_str(data))
     data = _merge(data)
     for pairing in pairings:
         for entry in data:

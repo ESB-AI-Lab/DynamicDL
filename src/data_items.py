@@ -208,6 +208,9 @@ class DataTypes:
     GENERIC = DataType('GENERIC', WildcardToken())
     POLYGON = DataType('POLYGON', RedundantObjectToken())
 
+ALWAYS_ADD = {'XMIN', 'XMAX', 'YMIN', 'YMAX', 'X1', 'X2', 'Y1', 'Y2', 'X', 'Y', 'WIDTH', 'HEIGHT',
+              'BBOX_CLASS_NAME', 'BBOX_CLASS_ID', 'SEG_CLASS_NAME', 'SEG_CLASS_ID'}
+
 class DataItem:
     '''
     Base, abstract class for representing a data item. Contains a DataType and a value associated
@@ -287,6 +290,7 @@ class DataEntry:
                 merged.data[desc] = item
                 continue
             if isinstance(item.delimiter.token_type, RedundantToken):
+                if desc not in ALWAYS_ADD and merged.data[desc].value == item.value: continue
                 merged.data[desc].add(item)
         return merged
 
@@ -311,7 +315,7 @@ class DataEntry:
             if isinstance(item.delimiter.token_type, RedundantToken):
                 # merge_inplace is called only in merge_lists, and we want to preserve when existing
                 # redundant values are the same and should not be overwritten/added onto
-                if self.data[desc].value == item.value: continue
+                if desc not in ALWAYS_ADD and self.data[desc].value == item.value: continue
                 self.data[desc].add(item)
         return True
 

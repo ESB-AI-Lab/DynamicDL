@@ -1,5 +1,6 @@
 import json
 from typing import Union
+from itertools import repeat
 
 def union(item: Union[list[object], object]) -> list[object]:
     '''
@@ -24,3 +25,6 @@ def _get_str(data):
 def get_str(data):
     '''Return pretty print string.'''
     return json.dumps(_get_str(data), indent=4).replace('"', '')
+
+def check_map(it, num):
+    return all(map(any, repeat(iter(it), num)))

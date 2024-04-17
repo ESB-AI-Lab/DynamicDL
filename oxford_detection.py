@@ -49,9 +49,9 @@ if __name__ == '__main__':
     cvdata.delete_image_set('test')
     print(cvdata.image_set_to_idx)
     cvdata.split_image_set('trainval', ('train', 0.64), ('val', 0.16), ('test', 0.2), inplace = True, seed = 0)
-    trainloader = cvdata.get_dataloader('detection', 'train', batch_size=batch_size, transforms=CVData.DETECTION_TRANSFORMS)
-    valloader = cvdata.get_dataloader('detection', 'val', batch_size=batch_size, transforms=CVData.DETECTION_TRANSFORMS)
-    testloader = cvdata.get_dataloader('detection', 'test', batch_size=batch_size, transforms=CVData.DETECTION_TRANSFORMS)
+    trainloader = cvdata.get_dataloader('detection', 'train', batch_size=batch_size, transforms=CVTransforms.DETECTION_TRANSFORMS)
+    valloader = cvdata.get_dataloader('detection', 'val', batch_size=batch_size, transforms=CVTransforms.DETECTION_TRANSFORMS)
+    testloader = cvdata.get_dataloader('detection', 'test', batch_size=batch_size, transforms=CVTransforms.DETECTION_TRANSFORMS)
     print(cvdata.bbox_class_to_idx)
 
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")

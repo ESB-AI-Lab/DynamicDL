@@ -227,27 +227,27 @@ class CVData:
 
     def _convert_bbox(self, mode: int) -> None:
         boxes = []
-        def execute_checks(boxes: list, cols: tuple):
+        def execute_checks(i: int, row: Series, boxes: list, cols: tuple):
             if any([isinstance(row[cols[0]], float), isinstance(row[cols[1]], float),
                     isinstance(row[cols[2]], float), isinstance(row[cols[3]], float)]):
                 boxes.append([])
                 return False
-            assert all(len(row[x]) == len(row[cols[0]]) for x in cols), \
-                'Length of bbox lists does not match'
+            if not all(len(row[x]) == len(row[cols[0]]) for x in cols):
+                raise ValueError(f'Length of bbox lists at index {i} does not match ({len(row[cols[0]])}, {len(row[cols[1]])}, {len(row[cols[2]])}, {len(row[cols[3]])})')
             return True
         if mode == 0:
-            for _, row in self.dataframe.iterrows():
-                if not execute_checks(boxes, ('X1', 'Y1', 'X2', 'Y2')): continue
+            for i, row in self.dataframe.iterrows():
+                if not execute_checks(i, row, boxes, ('X1', 'Y1', 'X2', 'Y2')): continue
                 boxes.append([(min(x1, x2), min(y1, y2), max(x1, x2), max(y1,y2)) for x1, y1, x2, y2
                               in zip(row['X1'], row['Y1'], row['X2'], row['Y2'])])
         elif mode == 1:
-            for _, row in self.dataframe.iterrows():
-                if not execute_checks(boxes, ('XMIN', 'YMIN', 'XMAX', 'YMAX')): continue
+            for i, row in self.dataframe.iterrows():
+                if not execute_checks(i, row, boxes, ('XMIN', 'YMIN', 'XMAX', 'YMAX')): continue
                 boxes.append([(xmin, ymin, xmax, ymax) for xmin, ymin, xmax, ymax
                               in zip(row['XMIN'], row['YMIN'], row['XMAX'], row['YMAX'])])
         elif mode == 2:
-            for _, row in self.dataframe.iterrows():
-                if not execute_checks(boxes, ('XMIN', 'YMIN', 'WIDTH', 'HEIGHT')): continue
+            for i, row in self.dataframe.iterrows():
+                if not execute_checks(i, row, boxes, ('XMIN', 'YMIN', 'WIDTH', 'HEIGHT')): continue
                 boxes.append([(xmin, ymin, xmin+width, ymin+height) for xmin, ymin, width, height
                               in zip(row['XMAX'], row['YMAX'], row['WIDTH'], row['HEIGHT'])])
         self.dataframe['BOX'] = boxes
