@@ -8,6 +8,7 @@ from typing import Any, Union
 from .data_items import DataEntry, DataItem, DataTypes, DataType, UniqueToken, Static, Generic, \
                        Image, SegmentationImage, Folder, File
 from .processing import DataFile, Pairing
+from ._utils import get_str
 
 def _get_files(path: str) -> dict[str, Union[str, dict]]:
     '''Step one of the processing. Expand the dataset to fit all the files.'''
@@ -64,7 +65,6 @@ def _expand_generics(path: str, dataset: dict[str, Any],
             if not status: continue
             names.add(name)
             expanded_root[Static(name, items)] = root[generic]
-
     to_pop = []
     # all items are statics, now process values 
     for key, value in expanded_root.items():
@@ -149,7 +149,8 @@ def _merge(data: Union[dict[Union[Static, int], Any], Static]) -> \
         # unique entry result
         if isinstance(result, DataEntry):
             if isinstance(key, Static): result = DataEntry.merge(DataEntry(key.data), result)
-            recursive.append(result)
+            if isinstance(result, DataEntry) and result.unique: recursive.append([result])
+            else: recursive.append(result)
             continue
         # list entry result
         if isinstance(key, Static):

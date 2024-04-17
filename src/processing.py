@@ -9,7 +9,8 @@ from typing import Any, Union
 from abc import ABC, abstractmethod
 
 from ._utils import union
-from .data_items import DataTypes, DataItem, Generic, Static, DataType, DataEntry, RedundantToken
+from .data_items import DataTypes, DataItem, Generic, Static, DataType, DataEntry, RedundantToken, \
+                        Folder, File
 
 class GenericList:
     '''
@@ -26,6 +27,7 @@ class GenericList:
                 f'List length ({len(dataset)})must be a multiple of length of provided form ({len(self.form)})'
         item_list: list[Any] = []
         item: list[Static | dict] = []
+        pairings = []
         for index, entry in enumerate(dataset):
             result, pairings = expand_generics(entry, self.form[index % len(self.form)])
             item.append(result)
@@ -252,34 +254,42 @@ def expand_generics(dataset: Union[dict[str, Any], Any],
     generics: list[Generic] = []
     names: set[Static] = set()
     pairings: list[Pairing] = []
-    for key in root:
+    for i, key in enumerate(root):
+        # convert DataType to Generic with low priority
+        if isinstance(key, DataType):
+            heapq.heappush(generics, (0, i, Generic('{}', key)))
+
+        # priority queue push to prioritize generics with the most wildcards for disambiguation
         if isinstance(key, Generic):
-            # push to prioritize generics with the most wildcards for disambiguation
-            heapq.heappush(generics, (-len(key.data), key))
+            heapq.heappush(generics, (-len(key.data), i, key))
             continue
-        if isinstance(key, str):
-            if key in dataset:
-                names.add(key)
-                expanded_root[Static(key)] = root[key]
-            else:
-                raise ValueError(f'Static value {key} not found in dataset')
-            continue
+        val = root[key]
+
+        # convert str to Static
+        if isinstance(key, str): key = Static(key)
+
+        # add Static directly to expanded root
         if key.name in dataset:
             names.add(key.name)
-            expanded_root[key] = root[key]
-        else:
-            raise ValueError(f'Static value {key} not found in dataset')
+            expanded_root[key] = val
+            continue
+        raise ValueError(f'Static value {key} not found in dataset')
 
+     # expand Generics 
     while len(generics) != 0:
-        _, generic = heapq.heappop(generics)
+        _, _, generic = heapq.heappop(generics)
         generic: Generic
         for name in dataset:
+            # basic checks
             if name in names: continue
+            if isinstance(generic, Folder) and dataset[name] == "File": continue
+            if isinstance(generic, File) and dataset[name] != "File": continue
+
+            # attempt to match name to generic
             status, items = generic.match(name)
             if not status: continue
-            new_name: str = generic.substitute(items)
-            names.add(new_name)
-            expanded_root[Static(new_name, items)] = root[generic]
+            names.add(name)
+            expanded_root[Static(name, items)] = root[generic]
 
     to_pop = []
 

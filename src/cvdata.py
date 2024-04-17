@@ -5,7 +5,7 @@ maintains the CVDataset class for PyTorch Dataset and DataLoader functionalities
 import os
 import time
 import json
-from typing import Any, Union, Optional, Callable
+from typing import Union, Optional, Callable
 from typing_extensions import Self
 from math import isnan
 from numpy import asarray, int32, full_like, nan
@@ -130,8 +130,10 @@ class CVData:
             result = call('SEG_CLASS', redundant=True)
             self.seg_class_to_idx, self.idx_to_seg_class = result
         elif 'SEG_CLASS_ID' in self.dataframe:
-            self.idx_to_seg_class = {i: str(i) for item in self.dataframe['SEG_CLASS_ID'] for i in item}
-            self.seg_class_to_idx = {str(i): i for item in self.dataframe['SEG_CLASS_ID'] for i in item}
+            self.idx_to_seg_class = {i: str(i) for item in self.dataframe['SEG_CLASS_ID']
+                                     if isinstance(item, list) for i in item}
+            self.seg_class_to_idx = {str(i): i for item in self.dataframe['SEG_CLASS_ID']
+                                     if isinstance(item, list) for i in item}
 
         # assign bbox ids
         if 'BBOX_CLASS_NAME' in self.dataframe:
@@ -140,8 +142,10 @@ class CVData:
             result = call('BBOX_CLASS', redundant=True)
             self.bbox_class_to_idx, self.idx_to_bbox_class = result
         elif 'BBOX_CLASS_ID' in self.dataframe:
-            self.idx_to_bbox_class = {i: str(i) for item in self.dataframe['BBOX_CLASS_ID'] for i in item}
-            self.bbox_class_to_idx = {str(i): i for item in self.dataframe['BBOX_CLASS_ID'] for i in item}
+            self.idx_to_bbox_class = {i: str(i) for item in self.dataframe['BBOX_CLASS_ID']
+                                      if isinstance(item, list) for i in item}
+            self.bbox_class_to_idx = {str(i): i for item in self.dataframe['BBOX_CLASS_ID']
+                                      if isinstance(item, list) for i in item}
 
         # check available columns to determine mode availability
         if CVData._classification_cols.issubset(self.dataframe.columns):
