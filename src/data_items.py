@@ -356,6 +356,7 @@ class Alias:
     '''
     def __init__(self, generics: list['Generic']):
         assert len(generics) > 0, 'Must have at least 1 generic in list.'
+        self.generics = generics
         self.patterns: list[str] = [generic.name for generic in generics]
         self.aliases: list[tuple[DataType, ...]] = [generic.data for generic in generics]
         self.desc = ''.join([token.desc for alias in self.aliases for token in alias])
@@ -419,6 +420,9 @@ class Generic:
     Represents an object with a generic name.
     '''
     def __init__(self, name: str, *data: Union[DataType, Alias], ignore: Union[list[str], str] = []):
+        if isinstance(name, DataType):
+            data = tuple([name])
+            name = '{}'
         assert len(data) == name.count('{}'), 'Format must have same number of wildcards'
         self.name: str = name
         self.data: tuple[Union[DataType, Alias], ...] = data

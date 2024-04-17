@@ -20,10 +20,8 @@ import torch
 from PIL.Image import open as open_image
 from PIL.Image import fromarray
 
-
-
 from ._utils import next_avail_id
-from .data_items import Static, Generic, DataTypes, DataType
+from .data_items import Static, Generic
 from .populate import populate_data
 
 def _collate_detection(batch):
@@ -80,7 +78,6 @@ class CVData:
         self.cleanup()
         end = time.time()
         print(f'[CVData] Cleaned! ({end - start}s)')
-        
 
     def cleanup(self) -> None:
         '''

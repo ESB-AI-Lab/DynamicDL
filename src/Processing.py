@@ -169,7 +169,7 @@ class YAMLFile(DataFile):
         Parses yaml file.
         '''
         with open(path, 'r', encoding='utf-8') as f:
-            data = yaml.load(f)
+            data = yaml.safe_load(f)
         return expand_generics(data, self.form)
 
 class Pairing:

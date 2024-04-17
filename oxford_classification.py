@@ -9,22 +9,22 @@ if __name__ == '__main__':
 
     root = '/Users/atong/Documents/Datasets/OxfordPets'
     alias = Alias([
-        Generic("{}", DataTypes.IMAGE_NAME),
+        Generic(DataTypes.IMAGE_NAME),
         Generic("{}_{}", DataTypes.CLASS_NAME, DataTypes.GENERIC)
     ])
     form = {
-        Static("annotations"): {
-            Generic("{}.txt", DataTypes.IMAGE_SET_NAME): TXTFile(
+        "annotations": {
+            File("{}.txt", DataTypes.IMAGE_SET_NAME): TXTFile(
                 GenericList(Generic(
                     "{} {} {} {}", alias, DataTypes.CLASS_ID, DataTypes.GENERIC, DataTypes.GENERIC
                 )),
                 ignore_type = '#'
             ),
             "trimaps": {
-                Generic("{}.png", DataTypes.IMAGE_NAME, ignore='._{}'): SegmentationImage()
+                File("{}.png", DataTypes.IMAGE_NAME, ignore='._{}'): SegmentationImage()
             },
             "xmls": {
-                Generic("{}.xml", DataTypes.IMAGE_NAME): XMLFile({
+                File("{}.xml", DataTypes.IMAGE_NAME): XMLFile({
                     "annotation": {
                         "filename": Generic("{}.jpg", DataTypes.IMAGE_NAME),
                         "object": AmbiguousList({
@@ -40,12 +40,12 @@ if __name__ == '__main__':
                 })
             }
         },
-        Static("images"): {
-            Generic("{}.jpg", alias): Image()
+        "images": {
+            File("{}.jpg", alias): Image()
         }
     }
     cvdata = CVData(root, form)
-    cvdata.cleanup()
+    cvdata.parse()
     cvdata.split_image_set('trainval', ('train', 0.8), ('val', 0.2), inplace = True, seed = 0)
     trainloader = cvdata.get_dataloader('classification',
                                         'train',
