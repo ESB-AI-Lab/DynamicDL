@@ -1,10 +1,15 @@
 '''
 Main module for processing datasets.
 '''
+import os
+import time
+import json
 from typing import Any, Union, Optional, Callable
+from typing_extensions import Self
 from math import isnan
 from numpy import asarray, int32, full_like, nan
 import random
+import jsonpickle
 from pandas import DataFrame
 from pandas.core.series import Series
 from cv2 import imread, fillPoly, IMREAD_GRAYSCALE
@@ -12,12 +17,13 @@ from torch.utils.data import Dataset, DataLoader
 from torch import Tensor, LongTensor, FloatTensor
 from torchvision.datasets.vision import VisionDataset
 import torch
-
 from PIL.Image import open as open_image
 from PIL.Image import fromarray
 
+
+
 from ._utils import next_avail_id
-from .data_items import DataItem, Static, Generic
+from .data_items import Static, Generic, DataTypes, DataType
 from .populate import populate_data
 
 def _collate_detection(batch):
@@ -49,19 +55,32 @@ class CVData:
     ) -> None:
         self.root = root
         self.form = form
-        self.data = populate_data(root, form)
-        entries = [{key: val.value if isinstance(val, DataItem) else [x.value for x in val]
-                   for key, val in data.data.items()} for data in self.data]
-        self.dataframe = DataFrame(entries)
         self.image_set_to_idx = {}
         self.idx_to_image_set = {}
         self.seg_class_to_idx = {}
         self.idx_to_seg_class = {}
-        self.remove_invalid = remove_invalid
+        self.bbox_class_to_idx = {}
+        self.idx_to_bbox_class = {}
         self.available_modes = []
         self.cleaned = False
+        self.remove_invalid = remove_invalid
 
-    
+    def parse(self, override: bool = False) -> None:
+        print('[CVData] Parsing data...')
+        start = time.time()
+        if self.cleaned and not override:
+            raise ValueError('Dataset has already been parsed. Use override=True to override')
+        data = populate_data(self.root, self.form)
+        entries = [{key: val.value for key, val in item.data.items()} for item in data]
+        self.dataframe = DataFrame(entries)
+        end = time.time()
+        print(f'[CVData] Parsed! ({end - start}s)')
+        print('[CVData] Cleaning up...')
+        start = time.time()
+        self.cleanup()
+        end = time.time()
+        print(f'[CVData] Cleaned! ({end - start}s)')
+        
 
     def cleanup(self) -> None:
         '''
@@ -288,7 +307,7 @@ class CVData:
         '''
         return DataLoader(
             self.get_dataset(
-                mode, 
+                mode,
                 image_set,
                 transform=transform,
                 target_transform=target_transform,
@@ -403,7 +422,58 @@ class CVData:
             self.idx_to_image_set[default_idx] = 'default'
         
         self.clear_image_sets()
-                
+
+    def save(
+        self,
+        filename: str,
+        overwrite: bool = False
+    ) -> None:
+        '''
+        Save the dataset into json format.
+        '''
+        this = {
+            'root': self.root,
+            'form': jsonpickle.encode(self.form, keys=True),
+            'dataframe': self.dataframe.to_json(),
+            'image_set_to_idx': self.image_set_to_idx,
+            'idx_to_image_set': self.idx_to_image_set,
+            'seg_class_to_idx': self.seg_class_to_idx,
+            'idx_to_seg_class': self.idx_to_seg_class,
+            'bbox_class_to_idx': self.bbox_class_to_idx,
+            'idx_to_bbox_class': self.idx_to_bbox_class,
+            'remove_invalid': self.remove_invalid,
+            'available_modes': self.available_modes,
+            'cleaned': self.cleaned,
+        }
+        if os.path.exists(filename) and not overwrite:
+            raise ValueError(f'File already exists: {filename}')
+        with open(filename, 'w') as f:
+            f.write(json.dumps(this))
+
+    @classmethod
+    def load(cls, filename: str) -> Self:
+        try:
+            print('[CVData] Loading dataset...')
+            start = time.time()
+            with open(filename, 'r') as f:
+                data = json.load(f)
+            this: CVData = cls(data['root'], jsonpickle.decode(data['form'], keys=True))
+            this.dataframe = DataFrame.from_dict(json.loads(data['dataframe']))
+            this.image_set_to_idx = data['image_set_to_idx']
+            this.idx_to_image_set = data['idx_to_image_set']
+            this.seg_class_to_idx = data['seg_class_to_idx']
+            this.idx_to_seg_class = data['idx_to_seg_class']
+            this.bbox_class_to_idx = data['bbox_class_to_idx']
+            this.idx_to_bbox_class = data['idx_to_bbox_class']
+            this.remove_invalid = data['remove_invalid']
+            this.available_modes = data['available_modes']
+            this.cleaned = data['cleaned']
+            end = time.time()
+            print(f'[CVData] Loaded dataset! ({end - start}s)')
+        except Exception:
+            print('[CVData] This is not a CVData dataset!')
+            return None
+        return this
         
 class CVDataset(VisionDataset):
     '''
