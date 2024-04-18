@@ -8,7 +8,7 @@ import json
 from typing import Union, Optional, Callable
 from typing_extensions import Self
 from math import isnan
-from numpy import asarray, int32, full_like, nan
+from numpy import asarray, full_like, full, nan, int32
 import random
 import jsonpickle
 from pandas import DataFrame
@@ -16,14 +16,16 @@ from pandas.core.series import Series
 from cv2 import imread, fillPoly, IMREAD_GRAYSCALE
 from torch.utils.data import Dataset, DataLoader
 from torch import Tensor, LongTensor, FloatTensor
-from torchvision.datasets.vision import VisionDataset
 import torch
+from torchvision.datasets.vision import VisionDataset
+from torchvision.utils import draw_bounding_boxes
+import torchvision.transforms.functional as F
+import torchvision.transforms as transforms
 from hashlib import md5
-from collections import Counter
 from PIL.Image import open as open_image
-from PIL.Image import fromarray
+import matplotlib.pyplot as plt
 
-from ._utils import next_avail_id
+from ._utils import next_avail_id, union
 from .processing import populate_data
 
 def _collate_detection(batch):
@@ -49,6 +51,10 @@ class CVData:
                           every image available. Default: True
     - get_md5_hashes (bool): when set to True, create a new column which finds md5 hashes for each
                              image available, and makes sure there are no duplicates. Default: False
+    - bbox_scale_option (str): choose from either 'auto', 'zeroone', or 'full' scale options to
+                               define, or leave empty for automatic. Default: 'auto'
+    - seg_scale_option (str): choose from either 'auto', 'zeroone', or 'full' scale options to
+                              define, or leave empty for automatic. Default: 'auto'
     '''
 
     _classification_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'CLASS_ID'}
@@ -61,7 +67,9 @@ class CVData:
         root: str, 
         form: dict,
         get_img_dim: bool = True,
-        get_md5_hashes: bool = False
+        get_md5_hashes: bool = False,
+        bbox_scale_option: str = 'auto',
+        seg_scale_option: str = 'auto'
     ) -> None:
         self.root = root
         self.form = form
@@ -75,6 +83,8 @@ class CVData:
         self.cleaned = False
         self.get_img_dim = get_img_dim
         self.get_md5_hashes = get_md5_hashes
+        self.bbox_scale_option = bbox_scale_option
+        self.seg_scale_option = seg_scale_option
 
     def parse(self, override: bool = False) -> None:
         '''
@@ -131,13 +141,28 @@ class CVData:
         elif {'XMAX', 'YMAX', 'WIDTH', 'HEIGHT'}.issubset(self.dataframe.columns):
             self._convert_bbox(4)
 
+        if 'BOX' in self.dataframe:
+            self._get_box_scale()
+            self._convert_box_scale()
+        
+        if 'POLYGON' in self.dataframe:
+            self._get_seg_scale()
+            self._convert_seg_scale()
+
         # assign class ids
         if 'CLASS_NAME' in self.dataframe:
-            if 'CLASS_ID' not in self.dataframe:
-                self.class_to_idx, self.idx_to_class = self._assign_ids('CLASS')
-            else:
-                self.class_to_idx, self.idx_to_class = self._validate_ids('CLASS')
-                self._patch_ids('CLASS', name_to_idx=self.class_to_idx, idx_to_name=self.idx_to_class)
+            if 'CLASS_ID' not in self.dataframe: call = self._assign_ids
+            else: call = self._validate_ids
+            result = call('CLASS', redundant=False)
+            self.class_to_idx, self.idx_to_class = result
+        elif 'CLASS_ID' in self.dataframe:
+            self.idx_to_class = {i: str(i) for item in self.dataframe['CLASS_ID']
+                                 if not isinstance(item, float) for i in item}
+            self.class_to_idx = {str(i): i for item in self.dataframe['CLASS_ID']
+                                 if not isinstance(item, float) for i in item}
+            names = [str(i) if not isinstance(i, float)
+                     else nan for i in self.dataframe['CLASS_ID']]
+            self.dataframe['CLASS_NAME'] = names
 
         # assign seg ids
         if 'SEG_CLASS_NAME' in self.dataframe:
@@ -150,6 +175,9 @@ class CVData:
                                      if isinstance(item, list) for i in item}
             self.seg_class_to_idx = {str(i): i for item in self.dataframe['SEG_CLASS_ID']
                                      if isinstance(item, list) for i in item}
+            names = [list(map(lambda x: self.idx_to_bbox_class[x], i)) if isinstance(i, list)
+                     else [] for i in self.dataframe['SEG_CLASS_ID']]
+            self.dataframe['SEG_CLASS_NAME'] = names
 
         # assign bbox ids
         if 'BBOX_CLASS_NAME' in self.dataframe:
@@ -162,6 +190,9 @@ class CVData:
                                       if isinstance(item, list) for i in item}
             self.bbox_class_to_idx = {str(i): i for item in self.dataframe['BBOX_CLASS_ID']
                                       if isinstance(item, list) for i in item}
+            names = [list(map(lambda x: self.idx_to_bbox_class[x], i)) if isinstance(i, list)
+                     else [] for i in self.dataframe['BBOX_CLASS_ID']]
+            self.dataframe['BBOX_CLASS_NAME'] = names
 
         # check available columns to determine mode availability
         if CVData._classification_cols.issubset(self.dataframe.columns):
@@ -192,6 +223,61 @@ class CVData:
         for locs in duplicates:
             raise ValueError(f'Found equivalent md5-hash images in the dataset at indices {locs}')
         self.dataframe['MD5'] = hashes
+
+    def _get_box_scale(self) -> None:
+        if self.bbox_scale_option == 'auto':
+            for boxes in self.dataframe['BOX']:
+                if any(coord > 1 for box in boxes for coord in box):
+                    self.bbox_scale_option = 'full'
+                    print('[CVData] Detected full size bounding box scale option')
+                    return
+                if any(coord < 0 for box in boxes for coord in box):
+                    raise ValueError('[CVData] Detected unknown bounding box scale option')
+        print('[CVData] Detected [0, 1] bounding box scale option')
+        self.bbox_scale_option = 'zeroone'
+        return
+
+    def _get_seg_scale(self) -> None:
+        if self.seg_scale_option == 'auto':
+            for shapes in self.dataframe['POLYGON']:
+                if any(coord > 1 for shape in shapes for coord in shape):
+                    self.seg_scale_option = 'full'
+                    print('[CVData] Detected full size bounding box scale option')
+                    return
+                if any(coord < 0 for shape in shapes for coord in shape):
+                    raise ValueError('[CVData] Detected unknown bounding box scale option')
+        print('[CVData] Detected [0, 1] bounding box scale option')
+        self.seg_scale_option = 'zeroone'
+        return
+
+    def _convert_box_scale(self) -> None:
+        if not self.get_img_dim:
+            self.get_img_dim = True
+            self._get_img_sizes()
+        if self.bbox_scale_option == 'zeroone':
+            boxes_list = []
+            for _, row in self.dataframe[['BOX', 'IMAGE_DIM']].iterrows():
+                if any(row.isna()):
+                    boxes_list.append([])
+                    continue
+                apply_resize = lambda p: (p[0] * row['IMAGE_DIM'][0], p[1] * row['IMAGE_DIM'][1],
+                                          p[2] * row['IMAGE_DIM'][0], p[3] * row['IMAGE_DIM'][1])
+                boxes_list.append(list(map(apply_resize, row['BOX'])))
+            self.dataframe['BOX'] = boxes_list
+    
+    def _convert_seg_scale(self) -> None:
+        if not self.get_img_dim:
+            self.get_img_dim = True
+            self._get_img_sizes()
+        if self.seg_scale_option == 'zeroone':
+            shapes_list = []
+            for _, row in self.dataframe[['POLYGON', 'IMAGE_DIM']].iterrows():
+                if any(row.isna()):
+                    shapes_list.append([])
+                    continue
+                apply_resize = lambda p: (p[0] * row['IMAGE_DIM'][0], p[1] * row['IMAGE_DIM'][1])
+                shapes_list.append([list(map(apply_resize, shape)) for shape in row['POLYGON']])
+            self.dataframe['POLYGON'] = shapes_list
 
     def _validate_ids(self, name: str, redundant=False) -> tuple[dict[str, int], dict[int, str]]:
         def check(i: int, v: str, name_to_idx: dict[str, int]) -> None:
@@ -311,7 +397,9 @@ class CVData:
         image_set: Optional[str] = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
-        transforms: Optional[tuple[Callable]] = None
+        transforms: Optional[tuple[Callable]] = None,
+        resize: Optional[tuple[int, int]] = None,
+        normalize: Optional[str] = None
     ) -> Dataset:
         '''
         Retrieve the PyTorch dataset (torch.utils.data.Dataset) of a specific mode and image set.
@@ -327,7 +415,17 @@ class CVData:
         - target_transform (Callable, Optional): the transform operation on the labels.
         - transforms (tuple, Optional): tuple in the format (transform, target_transform). Default
                                         PyTorch transforms are available in the CVTransforms class.
+        - resize (tuple[int, int], Optional): if provided, resize all images to exact configuration.
+        - normalize (str, Optional): if provided, normalize bounding box/segmentation coordinates
+                                     to a specific configuration. Options: '0-1', '+-1', 'Full'
         '''
+        resize_col = set()
+        if resize:
+            if not self.get_img_dim: 
+                self.get_img_dim = True
+                self._get_img_sizes()
+            resize_col = {'IMAGE_DIM'}
+            
         if transforms: transform, target_transform = transforms
         if not self.cleaned: self.parse()
         assert mode.lower().strip() in self.available_modes, 'Desired mode not available.'
@@ -336,14 +434,14 @@ class CVData:
         if image_set is None: dataframe = self.dataframe
         if len(dataframe) == 0: raise ValueError(f'Image set {image_set} not available.')
         if mode == 'classification': 
-            dataframe = dataframe[list(CVData._classification_cols)]
+            dataframe = dataframe[list(CVData._classification_cols.union(resize_col))]
             id_mapping = {k: i for i, k in enumerate(self.idx_to_class)}
         elif mode == 'detection': 
-            dataframe = dataframe[list(CVData._detection_cols)]
+            dataframe = dataframe[list(CVData._detection_cols.union(resize_col))]
             id_mapping = {k: i for i, k in enumerate(self.idx_to_bbox_class)}
         elif mode == 'segmentation':
-            dataframe = dataframe[list(CVData._segmentation_poly_cols if 'POLYGON' in dataframe 
-                                       else CVData._segmentation_img_cols)]
+            dataframe = dataframe[list(CVData._segmentation_poly_cols.union(resize_col) if 'POLYGON' in
+                                       dataframe else CVData._segmentation_img_cols.union(resize_col))]
             id_mapping = {k: i for i, k in enumerate(self.idx_to_seg_class)}
         if remove_invalid:
             print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
@@ -361,7 +459,7 @@ class CVData:
                         raise ValueError(error)
         if len(dataframe) == 0: raise ValueError('[CVData] After cleanup, this dataset is empty.')
         return CVDataset(dataframe, self.root, mode, id_mapping=id_mapping, transform=transform,
-                         target_transform=target_transform)
+                         target_transform=target_transform, resize=resize)
 
     def get_dataloader(
         self,
@@ -373,7 +471,9 @@ class CVData:
         image_set: Optional[str] = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
-        transforms: Optional[tuple[Callable]] = None
+        transforms: Optional[tuple[Callable]] = None,
+        resize: Optional[tuple[int, int]] = None,
+        normalize: Optional[str] = None
     ) -> DataLoader:
         '''
         Retrieve the PyTorch dataloader (torch.utils.data.DataLoader) for this dataset.
@@ -392,6 +492,9 @@ class CVData:
         - target_transform (Callable, Optional): the transform operation on the labels.
         - transforms (tuple, Optional): tuple in the format (transform, target_transform). Default
                                         PyTorch transforms are available in the CVTransforms class.
+        - resize (tuple[int, int], Optional): if provided, resize all images to exact configuration.
+        - normalize (str, Optional): if provided, normalize bounding box/segmentation coordinates
+                                     to a specific configuration. Options: '0-1', '+-1', 'Full'
         '''
         return DataLoader(
             self.get_dataset(
@@ -400,7 +503,9 @@ class CVData:
                 image_set=image_set,
                 transform=transform,
                 target_transform=target_transform,
-                transforms=transforms),
+                transforms=transforms,
+                resize=resize,
+                normalize=normalize),
             batch_size=batch_size,
             shuffle=shuffle,
             num_workers=num_workers,
@@ -589,6 +694,8 @@ class CVData:
             'idx_to_bbox_class': self.idx_to_bbox_class,
             'get_img_dim': self.get_img_dim,
             'get_md5_hashes': self.get_md5_hashes,
+            'bbox_scale_option': self.bbox_scale_option,
+            'seg_scale_option': self.seg_scale_option,
             'available_modes': self.available_modes,
             'cleaned': self.cleaned,
         }
@@ -617,7 +724,9 @@ class CVData:
                 jsonpickle.decode(data['form'], keys=True),
                 remove_invalid=data['remove_invalid'],
                 get_img_dim=data['get_img_dim'],
-                get_md5_hashes=data['get_md5_hashes']
+                get_md5_hashes=data['get_md5_hashes'],
+                bbox_scale_option=data['bbox_scale_option'],
+                seg_scale_option=data['seg_scale_option']
             )
             this.dataframe = DataFrame.from_dict(json.loads(data['dataframe']))
             this.image_set_to_idx = data['image_set_to_idx']
@@ -634,6 +743,53 @@ class CVData:
             print('[CVData] This is not a CVData dataset!')
             return None
         return this
+        
+    def sample_image(
+        self,
+        dpi: float = 1200,
+        mode: Optional[str] = None,
+        idx: Optional[int] = None,
+    ) -> None:
+        if not self.cleaned: raise ValueError('Run parse() to populate data first!')
+        if mode is not None: 
+            mode = union(mode)
+            for try_mode in mode:
+                if try_mode not in self.available_modes: 
+                    raise ValueError(f'Mode {try_mode} not available.')
+        else: mode = self.available_modes
+        item = self.dataframe.iloc[idx] if idx is not None else self.dataframe.sample().iloc[0]
+        transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.ConvertImageDtype(torch.uint8)
+        ])
+        image = transform(open_image(item['ABSOLUTE_FILE']).convert('RGB'))
+        # plt.figure(dpi=dpi)
+        if 'classification' in mode:
+            print(f'[CVData] Image Class ID/Name: {item["CLASS_ID"]}/{item["CLASS_NAME"]}')
+        if 'detection' in mode:
+            if len(item['BOX']) != 0:
+                image = draw_bounding_boxes(image,
+                                            torch.stack([FloatTensor(box) for box in item['BOX']]),
+                                            width=3,
+                                            labels=item['BBOX_CLASS_NAME'],
+                                            colors='red')
+            else: print('[CVData] Warning: Image has no bounding boxes.')
+        if 'segmentation' in mode:
+            if 'ABSOLUTE_FILE_SEG' in item: mask = F.to_tensor(open_image(item['ABSOLUTE_FILE_SEG']))
+            else:
+                assert len(item['POLYGON']) == len(item['SEG_CLASS_ID']), \
+                    'SEG_CLASS_ID and POLYGON len mismatch'
+                mask = asarray(imread(item['ABSOLUTE_FILE'], IMREAD_GRAYSCALE), dtype=int32)
+                mask = full_like(mask, next_avail_id(self.idx_to_seg_class))
+                for class_id, polygon in zip(item['SEG_CLASS_ID'], item['POLYGON']):
+                    mask = fillPoly(mask, pts=[asarray(polygon, dtype=int32)],
+                                    color=class_id)
+                mask = torch.from_numpy(asarray(mask))
+            _, axarr = plt.subplots(ncols=2)
+            axarr[0].imshow(image.permute(1, 2, 0))
+            axarr[1].imshow(mask.permute(1, 2, 0))
+        else:
+            plt.imshow(image.permute(1, 2, 0))
         
 class CVDataset(VisionDataset):
     '''
@@ -659,6 +815,7 @@ class CVDataset(VisionDataset):
         mode: str,
         id_mapping: dict[int, int],
         image_type: str = 'RGB',
+        resize: Optional[tuple[int, int]] = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None
     ):
@@ -667,6 +824,8 @@ class CVDataset(VisionDataset):
         self.mode = mode
         self.image_type = image_type
         self.id_mapping = id_mapping
+        self.resize = resize
+        print(f'Resize: {self.resize}')
         if self.mode == 'segmentation': self.default = len(self.id_mapping)
         super().__init__(root, transforms=None, transform=transform, target_transform=target_transform)
 
@@ -682,7 +841,13 @@ class CVDataset(VisionDataset):
             'SEG_CLASS_ID and POLYGON len mismatch'
         class_ids = list(map(lambda x: self.id_mapping[x], item['BBOX_CLASS_ID']))
         boxes = item['BOX']
-        bbox_tensors = [FloatTensor(box) for box in boxes]
+        if self.resize:
+            apply_resize = lambda p: (p[0] * self.resize[0] / item['IMAGE_DIM'][0],
+                                      p[1] * self.resize[1] / item['IMAGE_DIM'][1],
+                                      p[2] * self.resize[0] / item['IMAGE_DIM'][0],
+                                      p[3] * self.resize[1] / item['IMAGE_DIM'][1])
+            bbox_tensors = [FloatTensor(apply_resize(box)) for box in boxes]
+        else: bbox_tensors = [FloatTensor(box) for box in boxes]
         return {'boxes': torch.stack(bbox_tensors), 'labels': LongTensor(class_ids)}
 
     def _get_seg_labels(self, item: Series) -> Tensor:
@@ -690,17 +855,23 @@ class CVDataset(VisionDataset):
             return open_image(item['ABSOLUTE_FILE_SEG'])
         assert len(item['POLYGON']) == len(item['SEG_CLASS_ID']), \
             'SEG_CLASS_ID and POLYGON len mismatch'
-        mask = asarray(imread(item['ABSOLUTE_FILE'], IMREAD_GRAYSCALE), dtype=int32)
-        mask = full_like(mask, self.default)
+        if self.resize is not None:
+            mask = full(self.resize, self.default, dtype=int32)
+            apply_resize = lambda p: (p[0] * self.resize[0] / item['IMAGE_DIM'][0],
+                                      p[1] * self.resize[1] / item['IMAGE_DIM'][1])
+        else:
+            mask = asarray(imread(item['ABSOLUTE_FILE'], IMREAD_GRAYSCALE), dtype=int32)
+            mask = full_like(mask, self.default)
         for class_id, polygon in zip(item['SEG_CLASS_ID'], item['POLYGON']):
+            if self.resize is not None: polygon = list(map(apply_resize, polygon))
             mask = fillPoly(mask, pts=[asarray(polygon, dtype=int32)],
                             color=self.id_mapping[class_id])
-        mask = fromarray(asarray(mask))
-        return mask
+        return torch.from_numpy(asarray(mask))
 
     def __getitem__(self, idx):
         item: dict = self.data[idx]
-        image: Tensor = open_image(item.get('ABSOLUTE_FILE')).convert(self.image_type)
+        image: Tensor = F.to_tensor(open_image(item.get('ABSOLUTE_FILE')).convert(self.image_type))
+        if self.resize: image = F.resize(image, [self.resize[1], self.resize[0]])
         label: dict[str, Tensor]
         if self.mode == 'classification':
             label = self._get_class_labels(item)
@@ -708,5 +879,6 @@ class CVDataset(VisionDataset):
             label = self._get_bbox_labels(item)
         elif self.mode == 'segmentation':
             label = self._get_seg_labels(item)
+        
         if self.transforms: image, label = self.transforms(image, label)
         return image, label

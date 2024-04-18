@@ -239,9 +239,6 @@ class DataItem:
         '''
         assert isinstance(self.delimiter.token_type, RedundantToken), \
             'Cannot add to item which is not redundant'
-        if isinstance(self.delimiter.token_type, RedundantObjectToken):
-            self.value.append(item.value)
-            return
         self.value = self.value + item.value
 
     @classmethod
@@ -287,7 +284,8 @@ class DataEntry:
         merged = cls(list(first.data.values()))
         redundant_overlap = set()
         for desc, item in second.data.items():
-            if isinstance(item.delimiter.token_type, (RedundantToken, WildcardToken)):
+            if isinstance(item.delimiter.token_type, WildcardToken): continue
+            if isinstance(item.delimiter.token_type, RedundantToken):
                 if desc in merged.data and merged.data[desc] != second.data[desc]:
                     redundant_overlap.add(desc)
                 continue
@@ -321,7 +319,8 @@ class DataEntry:
         '''
         redundant_overlap = set()
         for desc, item in other.data.items():
-            if isinstance(item.delimiter.token_type, (RedundantToken, WildcardToken)):
+            if isinstance(item.delimiter.token_type, WildcardToken): continue
+            if isinstance(item.delimiter.token_type, RedundantToken):
                 if desc in self.data and self.data[desc] != other.data[desc]:
                     redundant_overlap.add(desc)
                 continue
