@@ -1,6 +1,7 @@
 import json
 from typing import Union
 from itertools import repeat
+from math import isclose
 
 def union(item: Union[list[object], object]) -> list[object]:
     '''

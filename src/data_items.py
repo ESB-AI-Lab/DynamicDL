@@ -210,9 +210,6 @@ class DataTypes:
     GENERIC = DataType('GENERIC', WildcardToken())
     POLYGON = DataType('POLYGON', RedundantObjectToken())
 
-ALWAYS_ADD = {'XMIN', 'XMAX', 'YMIN', 'YMAX', 'X1', 'X2', 'Y1', 'Y2', 'X', 'Y', 'WIDTH', 'HEIGHT',
-              'BBOX_CLASS_NAME', 'BBOX_CLASS_ID', 'SEG_CLASS_NAME', 'SEG_CLASS_ID', 'POLYGON', 'BOX'}
-
 class DataItem:
     '''
     Base, abstract class for representing a data item. Contains a DataType and a value associated
@@ -245,7 +242,7 @@ class DataItem:
         if isinstance(self.delimiter.token_type, RedundantObjectToken):
             self.value.append(item.value)
             return
-        self.value = self.value + union(item.value)
+        self.value = self.value + item.value
 
     @classmethod
     def copy(cls, first: Self) -> Self:
@@ -262,6 +259,13 @@ class DataEntry:
     - unique (bool): true if this entry contains unique data, paired data otherwise.
     - data (list[DataItem]): list of data items to associate together.
     '''
+    
+    _valid_sets = [
+        {'IMAGE_SET_ID', 'IMAGE_SET_NAME'},
+        {'XMIN', 'XMAX', 'YMIN', 'YMAX', 'XMID', 'YMID', 'X1', 'X2', 'Y1', 'Y2', 'WIDTH', 'HEIGHT',
+         'BBOX_CLASS_ID', 'BBOX_CLASS_NAME'},
+        {'POLYGON', 'SEG_CLASS_ID', 'SEG_CLASS_NAME'}
+    ]
     def __init__(self, items: Union[list[DataItem], DataItem]):
         items: list[DataItem] = union(items)
         self.unique: bool = any([isinstance(item.delimiter.token_type, UniqueToken)
@@ -270,7 +274,7 @@ class DataEntry:
                                            else item[0].delimiter.desc): item for item in items}
 
     @classmethod
-    def merge(cls, first: Self, second: Self, overlap: bool = True) -> Self:
+    def merge(cls, first: Self, second: Self) -> Self:
         '''
         Merge two data entries together, storing it in a new instance. 
         
@@ -281,22 +285,26 @@ class DataEntry:
         Returns new DataEntry object.
         '''
         merged = cls(list(first.data.values()))
-
+        redundant_overlap = set()
         for desc, item in second.data.items():
-            if isinstance(item.delimiter.token_type, (RedundantToken, WildcardToken)): continue
-            if overlap or isinstance(item.delimiter.token_type, UniqueToken):
-                if desc in merged.data and merged.data[desc] != second.data[desc]: return None
+            if isinstance(item.delimiter.token_type, (RedundantToken, WildcardToken)):
+                if desc in merged.data and merged.data[desc] != second.data[desc]:
+                    redundant_overlap.add(desc)
+                continue
+            if desc in merged.data and merged.data[desc] != second.data[desc]:
+                raise ValueError(f'Conflicting information found while merging two entries: {first} and {second}')
 
+        if not any(redundant_overlap.issubset(group) for group in DataEntry._valid_sets):
+            raise ValueError(f'Illegal differences in more than one redundant group: {first} and {second}')
+        for desc in redundant_overlap:
+            merged.data[desc].add(second.data[desc])
         for desc, item in second.data.items():
             if desc not in merged.data:
                 merged.data[desc] = item
                 continue
-            if isinstance(item.delimiter.token_type, RedundantToken):
-                if desc not in ALWAYS_ADD and merged.data[desc].value == item.value: continue
-                merged.data[desc].add(item)
         return merged
 
-    def merge_inplace(self, other: Self, overlap=True) -> bool:
+    def merge_inplace(self, other: Self) -> bool:
         '''
         Merge two data entries together, storing it in this instance. 
         
@@ -305,20 +313,22 @@ class DataEntry:
         
         Returns true if merge operation succeeded, false otherwise.
         '''
+        redundant_overlap = set()
         for desc, item in other.data.items():
-            if isinstance(item.delimiter.token_type, (RedundantToken, WildcardToken)): continue
-            if overlap or isinstance(item.delimiter.token_type, UniqueToken):
-                if desc in self.data and self.data[desc] != other.data[desc]: return False
-
+            if isinstance(item.delimiter.token_type, (RedundantToken, WildcardToken)):
+                if desc in self.data and self.data[desc] != other.data[desc]:
+                    redundant_overlap.add(desc)
+                continue
+            if desc in self.data and self.data[desc] != other.data[desc]:
+                raise ValueError(f'Conflicting information found while merging two entries: {self} and {other}')
+        if not any(redundant_overlap.issubset(group) for group in DataEntry._valid_sets):
+            raise ValueError(f'Illegal differences ({redundant_overlap}) in more than one redundant group: \n{self}\n{other}')
+        for desc in redundant_overlap:
+            self.data[desc].add(other.data[desc])
         for desc, item in other.data.items():
             if desc not in self.data:
                 self.data[desc] = item
                 continue
-            if isinstance(item.delimiter.token_type, RedundantToken):
-                # merge_inplace is called only in merge_lists, and we want to preserve when existing
-                # redundant values are the same and should not be overwritten/added onto
-                if desc not in ALWAYS_ADD and self.data[desc].value == item.value: continue
-                self.data[desc].add(item)
         return True
 
     def apply_tokens(self, items: Union[list[DataItem], DataItem]) -> None:
