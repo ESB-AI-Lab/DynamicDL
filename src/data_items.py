@@ -293,11 +293,17 @@ class DataEntry:
                 continue
             if desc in merged.data and merged.data[desc] != second.data[desc]:
                 raise ValueError(f'Conflicting information found while merging two entries: {first} and {second}')
-
-        if not any(redundant_overlap.issubset(group) for group in DataEntry._valid_sets):
-            raise ValueError(f'Illegal differences in more than one redundant group: {first} and {second}')
+        allocated = False
+        for group in DataEntry._valid_sets:
+            if redundant_overlap.issubset(group):
+                redundant_overlap = group
+                allocated = True
+                break
+        if not allocated:
+            raise ValueError(f'Illegal differences ({redundant_overlap}) in more than one redundant group: \n{first}\n{second}')
         for desc in redundant_overlap:
-            merged.data[desc].add(second.data[desc])
+            if desc in merged.data and desc in second.data:
+                merged.data[desc].add(second.data[desc])
         for desc, item in second.data.items():
             if desc not in merged.data:
                 merged.data[desc] = item
@@ -321,10 +327,17 @@ class DataEntry:
                 continue
             if desc in self.data and self.data[desc] != other.data[desc]:
                 raise ValueError(f'Conflicting information found while merging two entries: {self} and {other}')
-        if not any(redundant_overlap.issubset(group) for group in DataEntry._valid_sets):
+        allocated = False
+        for group in DataEntry._valid_sets:
+            if redundant_overlap.issubset(group):
+                redundant_overlap = group
+                allocated = True
+                break
+        if not allocated:
             raise ValueError(f'Illegal differences ({redundant_overlap}) in more than one redundant group: \n{self}\n{other}')
         for desc in redundant_overlap:
-            self.data[desc].add(other.data[desc])
+            if desc in self.data and desc in other.data:
+                self.data[desc].add(other.data[desc])
         for desc, item in other.data.items():
             if desc not in self.data:
                 self.data[desc] = item

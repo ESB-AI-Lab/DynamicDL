@@ -18,6 +18,8 @@ from torch.utils.data import Dataset, DataLoader
 from torch import Tensor, LongTensor, FloatTensor
 from torchvision.datasets.vision import VisionDataset
 import torch
+from hashlib import md5
+from collections import Counter
 from PIL.Image import open as open_image
 from PIL.Image import fromarray
 
@@ -45,6 +47,8 @@ class CVData:
     - form (dict): the form of the dataset. See documentation for further details on valid forms.
     - get_img_dim (bool): when set to True, create a new column which finds image dimensions for
                           every image available. Default: True
+    - get_md5_hashes (bool): when set to True, create a new column which finds md5 hashes for each
+                             image available, and makes sure there are no duplicates. Default: False
     '''
 
     _classification_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'CLASS_ID'}
@@ -56,7 +60,8 @@ class CVData:
         self, 
         root: str, 
         form: dict,
-        get_img_dim: bool = True
+        get_img_dim: bool = True,
+        get_md5_hashes: bool = False
     ) -> None:
         self.root = root
         self.form = form
@@ -69,6 +74,7 @@ class CVData:
         self.available_modes = []
         self.cleaned = False
         self.get_img_dim = get_img_dim
+        self.get_md5_hashes = get_md5_hashes
 
     def parse(self, override: bool = False) -> None:
         '''
@@ -107,7 +113,11 @@ class CVData:
             self.dataframe.sort_values('IMAGE_NAME', ignore_index=True, inplace=True)
             self.dataframe['IMAGE_ID'] = self.dataframe.index
 
+        # get image sizes
         if self.get_img_dim: self._get_img_sizes()
+
+        # get md5 hashes
+        if self.get_md5_hashes: self._get_md5_hashes()
 
         # convert bounding boxes into proper format and store under 'BOX'
         if {'X1', 'X2', 'Y1', 'Y2'}.issubset(self.dataframe.columns):
@@ -172,6 +182,16 @@ class CVData:
     def _get_img_sizes(self) -> None:
         self.dataframe['IMAGE_DIM'] = [open_image(filename).size if isinstance(filename, str)
                                        else nan for filename in self.dataframe['ABSOLUTE_FILE']]
+
+    def _get_md5_hashes(self) -> None:
+        hashes = [md5(open_image(item).tobytes()) for item in self.dataframe['ABSOLUTE_FILE']]
+        counter = {}
+        for i, md5hash in enumerate(hashes):
+            counter[md5hash] = counter.get(md5hash, []) + [i]
+        duplicates = (locs for locs in counter.values() if len(locs) > 1)
+        for locs in duplicates:
+            raise ValueError(f'Found equivalent md5-hash images in the dataset at indices {locs}')
+        self.dataframe['MD5'] = hashes
 
     def _validate_ids(self, name: str, redundant=False) -> tuple[dict[str, int], dict[int, str]]:
         def check(i: int, v: str, name_to_idx: dict[str, int]) -> None:
@@ -568,6 +588,7 @@ class CVData:
             'bbox_class_to_idx': self.bbox_class_to_idx,
             'idx_to_bbox_class': self.idx_to_bbox_class,
             'get_img_dim': self.get_img_dim,
+            'get_md5_hashes': self.get_md5_hashes,
             'available_modes': self.available_modes,
             'cleaned': self.cleaned,
         }
@@ -595,7 +616,8 @@ class CVData:
                 data['root'],
                 jsonpickle.decode(data['form'], keys=True),
                 remove_invalid=data['remove_invalid'],
-                get_img_dim=data['get_img_dim']
+                get_img_dim=data['get_img_dim'],
+                get_md5_hashes=data['get_md5_hashes']
             )
             this.dataframe = DataFrame.from_dict(json.loads(data['dataframe']))
             this.image_set_to_idx = data['image_set_to_idx']
