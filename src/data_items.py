@@ -211,7 +211,7 @@ class DataTypes:
     POLYGON = DataType('POLYGON', RedundantObjectToken())
 
 ALWAYS_ADD = {'XMIN', 'XMAX', 'YMIN', 'YMAX', 'X1', 'X2', 'Y1', 'Y2', 'X', 'Y', 'WIDTH', 'HEIGHT',
-              'BBOX_CLASS_NAME', 'BBOX_CLASS_ID', 'SEG_CLASS_NAME', 'SEG_CLASS_ID'}
+              'BBOX_CLASS_NAME', 'BBOX_CLASS_ID', 'SEG_CLASS_NAME', 'SEG_CLASS_ID', 'POLYGON', 'BOX'}
 
 class DataItem:
     '''

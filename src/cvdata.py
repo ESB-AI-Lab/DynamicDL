@@ -309,7 +309,7 @@ class CVData:
                                         PyTorch transforms are available in the CVTransforms class.
         '''
         if transforms: transform, target_transform = transforms
-        if not self.cleaned: self.cleanup()
+        if not self.cleaned: self.parse()
         assert mode.lower().strip() in self.available_modes, 'Desired mode not available.'
         
         dataframe = self.dataframe[[image_set in item for item in self.dataframe['IMAGE_SET_NAME']]]
