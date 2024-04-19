@@ -47,12 +47,12 @@ if __name__ == '__main__':
     cvdata = CVData(root, form)
     cvdata.parse()
     cvdata.delete_image_set('test')
-    print(cvdata.image_set_to_idx)
+    #print(cvdata.image_set_to_idx)
     cvdata.split_image_set('trainval', ('train', 0.64), ('val', 0.16), ('test', 0.2), inplace = True, seed = 0)
-    trainloader = cvdata.get_dataloader('detection', 'train', batch_size=batch_size, transforms=CVTransforms.DETECTION_TRANSFORMS)
-    valloader = cvdata.get_dataloader('detection', 'val', batch_size=batch_size, transforms=CVTransforms.DETECTION_TRANSFORMS)
-    testloader = cvdata.get_dataloader('detection', 'test', batch_size=batch_size, transforms=CVTransforms.DETECTION_TRANSFORMS)
-    print(cvdata.bbox_class_to_idx)
+    trainloader = cvdata.get_dataloader('detection', image_set='train', batch_size=batch_size, transforms=CVTransforms.DETECTION_TRANSFORMS)
+    valloader = cvdata.get_dataloader('detection', image_set='val', batch_size=batch_size, transforms=CVTransforms.DETECTION_TRANSFORMS)
+    testloader = cvdata.get_dataloader('detection', image_set='test', batch_size=batch_size, transforms=CVTransforms.DETECTION_TRANSFORMS)
+    #print(cvdata.bbox_class_to_idx)
 
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
     print(f'Using device {device}')
@@ -76,5 +76,4 @@ if __name__ == '__main__':
         'num_epochs': 25
     }
     trainer = DetectionTrainer.from_config(config)
-    print(next(iter(trainer.train_dataloader)))
     trainer.do_training('run_1_bbox')

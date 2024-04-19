@@ -58,7 +58,7 @@ form = {
     }
 }
 cvdata = CVData(root, form)
-cvdata.cleanup()
+cvdata.parse()
 
 ####
 # OxfordPets

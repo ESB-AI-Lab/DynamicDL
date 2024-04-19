@@ -240,7 +240,7 @@ class CVData:
     def _get_seg_scale(self) -> None:
         if self.seg_scale_option == 'auto':
             for shapes in self.dataframe['POLYGON']:
-                if any(coord > 1 for shape in shapes for coord in shape):
+                if any(val > 1 for shape in shapes for coord in shape for val in coord):
                     self.seg_scale_option = 'full'
                     print('[CVData] Detected full size bounding box scale option')
                     return
@@ -417,7 +417,7 @@ class CVData:
                                         PyTorch transforms are available in the CVTransforms class.
         - resize (tuple[int, int], Optional): if provided, resize all images to exact configuration.
         - normalize (str, Optional): if provided, normalize bounding box/segmentation coordinates
-                                     to a specific configuration. Options: '0-1', '+-1', 'Full'
+                                     to a specific configuration. Options: 'zeroone', 'full'
         '''
         resize_col = set()
         if resize:
@@ -494,7 +494,7 @@ class CVData:
                                         PyTorch transforms are available in the CVTransforms class.
         - resize (tuple[int, int], Optional): if provided, resize all images to exact configuration.
         - normalize (str, Optional): if provided, normalize bounding box/segmentation coordinates
-                                     to a specific configuration. Options: '0-1', '+-1', 'Full'
+                                     to a specific configuration. Options: 'zeroone', 'full'
         '''
         return DataLoader(
             self.get_dataset(
@@ -763,7 +763,7 @@ class CVData:
             transforms.ConvertImageDtype(torch.uint8)
         ])
         image = transform(open_image(item['ABSOLUTE_FILE']).convert('RGB'))
-        # plt.figure(dpi=dpi)
+        plt.figure(dpi=dpi)
         if 'classification' in mode:
             print(f'[CVData] Image Class ID/Name: {item["CLASS_ID"]}/{item["CLASS_NAME"]}')
         if 'detection' in mode:
@@ -816,6 +816,7 @@ class CVDataset(VisionDataset):
         id_mapping: dict[int, int],
         image_type: str = 'RGB',
         resize: Optional[tuple[int, int]] = None,
+        normalize: Optional[str] = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None
     ):
