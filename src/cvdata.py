@@ -869,7 +869,7 @@ class CVDataset(VisionDataset):
             if self.resize is not None: polygon = list(map(apply_resize, polygon))
             mask = fillPoly(mask, pts=[asarray(polygon, dtype=int32)],
                             color=self.id_mapping[class_id])
-        return torch.from_numpy(asarray(mask))
+        return torch.from_numpy(asarray(mask)).unsqueeze(-1).permute(2, 0, 1)
 
     def __getitem__(self, idx):
         item: dict = self.data[idx]
