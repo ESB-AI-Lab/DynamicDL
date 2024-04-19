@@ -775,7 +775,11 @@ class CVData:
                                             colors='red')
             else: print('[CVData] Warning: Image has no bounding boxes.')
         if 'segmentation' in mode:
-            if 'ABSOLUTE_FILE_SEG' in item: mask = F.to_tensor(open_image(item['ABSOLUTE_FILE_SEG']))
+            _, axarr = plt.subplots(ncols=2)
+            axarr[0].imshow(image.permute(1, 2, 0))
+            if 'ABSOLUTE_FILE_SEG' in item: 
+                mask = F.to_tensor(open_image(item['ABSOLUTE_FILE_SEG']))
+                axarr[1].imshow(mask.permute(1, 2, 0))
             else:
                 assert len(item['POLYGON']) == len(item['SEG_CLASS_ID']), \
                     'SEG_CLASS_ID and POLYGON len mismatch'
@@ -785,9 +789,7 @@ class CVData:
                     mask = fillPoly(mask, pts=[asarray(polygon, dtype=int32)],
                                     color=class_id)
                 mask = torch.from_numpy(asarray(mask))
-            _, axarr = plt.subplots(ncols=2)
-            axarr[0].imshow(image.permute(1, 2, 0))
-            axarr[1].imshow(mask.permute(1, 2, 0))
+                axarr[1].imshow(mask)
         else:
             plt.imshow(image.permute(1, 2, 0))
         
