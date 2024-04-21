@@ -119,7 +119,11 @@ class CVTransforms:
     '''
     Standard transforms presets for computer vision. Adapted from torchvision 0.17.2
     '''
-    CLASSIFICATION_TRANSFORMS = (partial(ImageClassification, crop_size=224)(), None)
-    DETECTION_TRANSFORMS = (ObjectDetection(), None)
-    SEGMENTATION_TRANSFORMS = (partial(SemanticSegmentation, resize_size=520, normalize=True)(), 
+    CLASSIFICATION = (partial(ImageClassification, crop_size=224)(), None)
+    DETECTION = (ObjectDetection(), None)
+    SEGMENTATION = (partial(SemanticSegmentation, resize_size=520, normalize=True)(), 
                                partial(SemanticSegmentation, resize_size=520, normalize=False)())
+    
+    DETECTION_NORESIZE = (ObjectDetection(), None)
+    SEGMENTATION_NORESIZE = (partial(SemanticSegmentation, resize_size=None, normalize=True)(), 
+                               partial(SemanticSegmentation, resize_size=None, normalize=False)())

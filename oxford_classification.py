@@ -50,15 +50,15 @@ if __name__ == '__main__':
     trainloader = cvdata.get_dataloader('classification',
                                         'train',
                                         batch_size=batch_size,
-                                        transforms=CVTransforms.CLASSIFICATION_TRANSFORMS)
+                                        transforms=CVTransforms.CLASSIFICATION)
     valloader = cvdata.get_dataloader('classification',
                                       'val',
                                       batch_size=batch_size,
-                                      transforms=CVTransforms.CLASSIFICATION_TRANSFORMS)
+                                      transforms=CVTransforms.CLASSIFICATION)
     testloader = cvdata.get_dataloader('classification',
                                        'test',
                                        batch_size=batch_size,
-                                       transforms=CVTransforms.CLASSIFICATION_TRANSFORMS)
+                                       transforms=CVTransforms.CLASSIFICATION)
 
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
     config = {

@@ -52,9 +52,27 @@ if __name__ == '__main__':
     cvdata.idx_to_seg_class = {0: 'body', 1: 'outline', 2: 'background'}
     cvdata.parse()
     cvdata.split_image_set('trainval', ('train', 0.8), ('val', 0.2), inplace = True, seed = 0)
-    trainloader = cvdata.get_dataloader('segmentation', 'train', batch_size=batch_size, transforms=CVData.SEGMENTATION_TRANSFORMS)
-    valloader = cvdata.get_dataloader('segmentation', 'val', batch_size=batch_size, transforms=CVData.SEGMENTATION_TRANSFORMS)
-    testloader = cvdata.get_dataloader('segmentation', 'test', batch_size=batch_size, transforms=CVData.SEGMENTATION_TRANSFORMS)
+    trainloader = cvdata.get_dataloader(
+        'segmentation',
+        resize=(512, 512),
+        image_set='train',
+        batch_size=batch_size,
+        transforms=CVTransforms.DETECTION_NORESIZE
+    )
+    valloader = cvdata.get_dataloader(
+        'segmentation',
+        resize=(512, 512),
+        image_set='val',
+        batch_size=batch_size,
+        transforms=CVTransforms.DETECTION_NORESIZE
+    )
+    testloader = cvdata.get_dataloader(
+        'segmentation',
+        resize=(512, 512),
+        image_set='test',
+        batch_size=batch_size,
+        transforms=CVTransforms.DETECTION_NORESIZE
+    )
 
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
     config = {
