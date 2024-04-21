@@ -807,6 +807,10 @@ class CVDataset(VisionDataset):
                                    so that training works properly.
     - image_type (str): the type of the image to export, to convert PIL images to. Default: 'RGB'.
                         Also accepts 'L' and 'CMYK'.
+    - normalization (str): the type of normalization that the dataset currently is formatted in,
+                           for box and polygon items. Accepts 'full' or 'zeroone'.
+    - normalize_to (str): the type of normalization that the dataset is to be resized to, for box
+                          and polygon items. Accepts 'full' or 'zeroone'.
     - transform (Callable, Optional): the transform operation to apply to the images.
     - target_transform (Callable, Optional): the transform operation on the labels.
     '''
@@ -817,8 +821,9 @@ class CVDataset(VisionDataset):
         mode: str,
         id_mapping: dict[int, int],
         image_type: str = 'RGB',
+        normalization: str = 'full',
         resize: Optional[tuple[int, int]] = None,
-        normalize: Optional[str] = None,
+        normalize_to: Optional[str] = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None
     ):
@@ -828,6 +833,8 @@ class CVDataset(VisionDataset):
         self.image_type = image_type
         self.id_mapping = id_mapping
         self.resize = resize
+        self.normalize_to = normalize_to
+        self.normalization = normalization
         print(f'Resize: {self.resize}')
         if self.mode == 'segmentation': self.default = len(self.id_mapping)
         super().__init__(root, transforms=None, transform=transform, target_transform=target_transform)
@@ -841,16 +848,20 @@ class CVDataset(VisionDataset):
     def _get_bbox_labels(self, item: Series) -> dict[str, Tensor]:
         # execute checks
         assert len(item['BOX']) == len(item['BBOX_CLASS_ID']), \
-            'SEG_CLASS_ID and POLYGON len mismatch'
+            'BOX and BBOX_CLASS_ID len mismatch'
         class_ids = list(map(lambda x: self.id_mapping[x], item['BBOX_CLASS_ID']))
         boxes = item['BOX']
-        if self.resize:
-            apply_resize = lambda p: (p[0] * self.resize[0] / item['IMAGE_DIM'][0],
-                                      p[1] * self.resize[1] / item['IMAGE_DIM'][1],
-                                      p[2] * self.resize[0] / item['IMAGE_DIM'][0],
-                                      p[3] * self.resize[1] / item['IMAGE_DIM'][1])
-            bbox_tensors = [FloatTensor(apply_resize(box)) for box in boxes]
-        else: bbox_tensors = [FloatTensor(box) for box in boxes]
+        if self.resize: factor_resize = self.resize
+        else: factor_resize = (1, 1)
+        if self.normalization == 'full':
+            factor_norm = item['IMAGE_DIM']
+        else:
+            factor_norm = (1, 1)
+        apply_resize = lambda p: (p[0] * factor_resize[0] / factor_norm[0],
+                                  p[1] * factor_resize[1] / factor_norm[1],
+                                  p[2] * factor_resize[0] / factor_norm[0],
+                                  p[3] * factor_resize[1] / factor_norm[1])
+        bbox_tensors = [FloatTensor(apply_resize(box)) for box in boxes]
         return {'boxes': torch.stack(bbox_tensors), 'labels': LongTensor(class_ids)}
 
     def _get_seg_labels(self, item: Series) -> Tensor:
@@ -860,11 +871,14 @@ class CVDataset(VisionDataset):
             'SEG_CLASS_ID and POLYGON len mismatch'
         if self.resize is not None:
             mask = full(self.resize, self.default, dtype=int32)
-            apply_resize = lambda p: (p[0] * self.resize[0] / item['IMAGE_DIM'][0],
-                                      p[1] * self.resize[1] / item['IMAGE_DIM'][1])
+            factor_resize = self.resize
         else:
-            mask = asarray(imread(item['ABSOLUTE_FILE'], IMREAD_GRAYSCALE), dtype=int32)
-            mask = full_like(mask, self.default)
+            mask = full(self.resize, self.default, dtype=int32)
+            factor_resize = (1, 1)
+        if self.normalization == 'full': factor_norm = item['IMAGE_DIM']
+        else: factor_norm = (1, 1)
+        apply_resize = lambda p: (p[0] * factor_resize[0] / factor_norm[0],
+                                  p[1] * factor_resize[1] / factor_norm[1])
         for class_id, polygon in zip(item['SEG_CLASS_ID'], item['POLYGON']):
             if self.resize is not None: polygon = list(map(apply_resize, polygon))
             mask = fillPoly(mask, pts=[asarray(polygon, dtype=int32)],
