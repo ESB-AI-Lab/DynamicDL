@@ -47,8 +47,6 @@ class CVData:
     Args:
     - root (str): the root directory to access the dataset.
     - form (dict): the form of the dataset. See documentation for further details on valid forms.
-    - get_img_dim (bool): when set to True, create a new column which finds image dimensions for
-                          every image available. Default: True
     - get_md5_hashes (bool): when set to True, create a new column which finds md5 hashes for each
                              image available, and makes sure there are no duplicates. Default: False
     - bbox_scale_option (str): choose from either 'auto', 'zeroone', or 'full' scale options to
@@ -57,16 +55,15 @@ class CVData:
                               define, or leave empty for automatic. Default: 'auto'
     '''
 
-    _classification_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'CLASS_ID'}
-    _detection_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'BBOX_CLASS_ID', 'BOX'}
-    _segmentation_img_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'ABSOLUTE_FILE_SEG'}
-    _segmentation_poly_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'POLYGON', 'SEG_CLASS_ID'}
+    _classification_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'CLASS_ID', 'IMAGE_DIM'}
+    _detection_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'BBOX_CLASS_ID', 'BOX', 'IMAGE_DIM'}
+    _segmentation_img_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'ABSOLUTE_FILE_SEG', 'IMAGE_DIM'}
+    _segmentation_poly_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'POLYGON', 'SEG_CLASS_ID', 'IMAGE_DIM'}
 
     def __init__(
         self, 
         root: str, 
         form: dict,
-        get_img_dim: bool = True,
         get_md5_hashes: bool = False,
         bbox_scale_option: str = 'auto',
         seg_scale_option: str = 'auto'
@@ -81,7 +78,7 @@ class CVData:
         self.idx_to_bbox_class = {}
         self.available_modes = []
         self.cleaned = False
-        self.get_img_dim = get_img_dim
+        self.get_img_dim = True
         self.get_md5_hashes = get_md5_hashes
         self.bbox_scale_option = bbox_scale_option
         self.seg_scale_option = seg_scale_option
@@ -419,12 +416,6 @@ class CVData:
         - normalize (str, Optional): if provided, normalize bounding box/segmentation coordinates
                                      to a specific configuration. Options: 'zeroone', 'full'
         '''
-        resize_col = set()
-        if resize:
-            if not self.get_img_dim: 
-                self.get_img_dim = True
-                self._get_img_sizes()
-            resize_col = {'IMAGE_DIM'}
             
         if transforms: transform, target_transform = transforms
         if not self.cleaned: self.parse()
@@ -434,14 +425,14 @@ class CVData:
         if image_set is None: dataframe = self.dataframe
         if len(dataframe) == 0: raise ValueError(f'Image set {image_set} not available.')
         if mode == 'classification': 
-            dataframe = dataframe[list(CVData._classification_cols.union(resize_col))]
+            dataframe = dataframe[list(CVData._classification_cols)]
             id_mapping = {k: i for i, k in enumerate(self.idx_to_class)}
         elif mode == 'detection': 
-            dataframe = dataframe[list(CVData._detection_cols.union(resize_col))]
+            dataframe = dataframe[list(CVData._detection_cols)]
             id_mapping = {k: i for i, k in enumerate(self.idx_to_bbox_class)}
         elif mode == 'segmentation':
-            dataframe = dataframe[list(CVData._segmentation_poly_cols.union(resize_col) if 'POLYGON' in
-                                       dataframe else CVData._segmentation_img_cols.union(resize_col))]
+            dataframe = dataframe[list(CVData._segmentation_poly_cols if 'POLYGON' in
+                                       dataframe else CVData._segmentation_img_cols)]
             id_mapping = {k: i for i, k in enumerate(self.idx_to_seg_class)}
         if remove_invalid:
             print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
