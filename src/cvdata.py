@@ -864,7 +864,7 @@ class CVDataset(VisionDataset):
             mask = full(self.resize, self.default, dtype=int32)
             factor_resize = self.resize
         else:
-            mask = full(self.resize, self.default, dtype=int32)
+            mask = full(item['IMAGE_DIM'], self.default, dtype=int32)
             factor_resize = (1, 1)
         if self.normalization == 'full': factor_norm = item['IMAGE_DIM']
         else: factor_norm = (1, 1)
