@@ -5,7 +5,7 @@ maintains the CVDataset class for PyTorch Dataset and DataLoader functionalities
 import os
 import time
 import json
-from typing import Union, Optional, Callable
+from typing import Union, Optional, Callable, Any
 from typing_extensions import Self
 from math import isnan
 from numpy import asarray, full_like, full, nan, int32
@@ -32,13 +32,34 @@ def _collate_detection(batch):
     images, labels = zip(*batch)
     return tuple(images), tuple(labels)
 
+def _collate_segmentation_dim(batch):
+    images, labels = zip(*batch)
+    labels = {'label': torch.stack([label['label'] for label in labels]),
+              'dim': [label['dim'] for label in labels]}
+    return torch.stack(images), labels
+
 def _collate_segmentation(batch):
     images, labels = zip(*batch)
     return torch.stack(images), torch.stack(labels)
 
-def _collate(mode: str) -> Callable:
-    if mode == 'segmentation': return _collate_segmentation
-    if mode == 'detection': return _collate_detection
+def _collate_classification_dim(batch):
+    images, labels = zip(*batch)
+    labels = {'label': torch.IntTensor([label['label'] for label in labels]),
+              'dim': [label['dim'] for label in labels]}
+    return torch.stack(images), labels
+
+def _collate_inference(batch):
+    return list(zip(*batch))
+
+def _collate(mode: str, store_dim: bool) -> Callable:
+    if mode == 'segmentation':
+        return _collate_segmentation_dim if store_dim else _collate_segmentation
+    if mode == 'detection':
+        return _collate_detection
+    if mode == 'classification' and store_dim:
+        return _collate_classification_dim
+    if mode == 'inference':
+        return _collate_inference
 
 class CVData:
     '''
@@ -55,6 +76,7 @@ class CVData:
                               define, or leave empty for automatic. Default: 'auto'
     '''
 
+    _inference_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'IMAGE_DIM'}
     _classification_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'CLASS_ID', 'IMAGE_DIM'}
     _detection_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'BBOX_CLASS_ID', 'BOX', 'IMAGE_DIM'}
     _segmentation_img_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'ABSOLUTE_FILE_SEG', 'IMAGE_DIM'}
@@ -192,6 +214,8 @@ class CVData:
             self.dataframe['BBOX_CLASS_NAME'] = names
 
         # check available columns to determine mode availability
+        if CVData._inference_cols.issubset(self.dataframe.columns):
+            self.available_modes.append('inference')
         if CVData._classification_cols.issubset(self.dataframe.columns):
             self.available_modes.append('classification')
         if CVData._detection_cols.issubset(self.dataframe.columns):
@@ -391,6 +415,7 @@ class CVData:
         self, 
         mode: str,
         remove_invalid: bool = True,
+        store_dim: bool = False,
         image_set: Optional[str] = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
@@ -434,6 +459,9 @@ class CVData:
             dataframe = dataframe[list(CVData._segmentation_poly_cols if 'POLYGON' in
                                        dataframe else CVData._segmentation_img_cols)]
             id_mapping = {k: i for i, k in enumerate(self.idx_to_seg_class)}
+        elif mode == 'inference':
+            dataframe = dataframe[list(CVData._inference_cols)]
+            id_mapping = None
         if remove_invalid:
             print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
             dataframe = dataframe.dropna()
@@ -450,7 +478,7 @@ class CVData:
                         raise ValueError(error)
         if len(dataframe) == 0: raise ValueError('[CVData] After cleanup, this dataset is empty.')
         return CVDataset(dataframe, self.root, mode, id_mapping=id_mapping, transform=transform,
-                         target_transform=target_transform, resize=resize)
+                         target_transform=target_transform, resize=resize, store_dim=store_dim)
 
     def get_dataloader(
         self,
@@ -459,6 +487,7 @@ class CVData:
         shuffle: bool = True,
         num_workers: int = 1,
         remove_invalid: bool = True,
+        store_dim: bool = False,
         image_set: Optional[str] = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
@@ -491,6 +520,7 @@ class CVData:
             self.get_dataset(
                 mode,
                 remove_invalid=remove_invalid,
+                store_dim=store_dim,
                 image_set=image_set,
                 transform=transform,
                 target_transform=target_transform,
@@ -500,7 +530,7 @@ class CVData:
             batch_size=batch_size,
             shuffle=shuffle,
             num_workers=num_workers,
-            collate_fn=_collate(mode)
+            collate_fn=_collate(mode, store_dim)
         )
     
     def split_image_set(
@@ -739,7 +769,7 @@ class CVData:
         self,
         dpi: float = 1200,
         mode: Optional[str] = None,
-        idx: Optional[int] = None,
+        idx: Optional[int] = None
     ) -> None:
         if not self.cleaned: raise ValueError('Run parse() to populate data first!')
         if mode is not None: 
@@ -783,7 +813,38 @@ class CVData:
                 axarr[1].imshow(mask)
         else:
             plt.imshow(image.permute(1, 2, 0))
-        
+
+    def inference(
+        self,
+        image: torch.Tensor,
+        result: Any,
+        dpi: float = 1200,
+        mode: str = None
+    ) -> None:
+        if not self.cleaned: raise ValueError('Run parse() to populate data first!')
+        if mode is None: raise ValueError('Must specify a valid mode.')
+        if mode not in self.available_modes: 
+            raise ValueError(f'Mode {mode} not available.')
+        plt.figure(dpi=dpi)
+        if mode == 'classification':
+            _, pred = torch.max(result, dim=1)
+            print(f'[CVData] Image Class ID/Name: {pred}/{self.idx_to_class[pred]}')
+        elif mode == 'detection':
+            boxes = result['boxes']
+            labels = result['labels']
+            if len(boxes) != 0:
+                image = draw_bounding_boxes(image, boxes, width=3, colors='red',
+                                            labels=[self.idx_to_bbox_class[label] for label in labels])
+            else: print('[CVData] Warning: Image has no bounding boxes.')
+        if mode == 'segmentation':
+            _, axarr = plt.subplots(ncols=2)
+            axarr[0].imshow(image.permute(1, 2, 0))
+            mask = result
+            raise NotImplementedError("I haven't implemented this yet. Please ping me so we can figure it out")
+            axarr[1].imshow(mask.permute(1, 2, 0))
+        else:
+            plt.imshow(image.permute(1, 2, 0))
+
 class CVDataset(VisionDataset):
     '''
     Dataset implementation for the CVData environment.
@@ -810,9 +871,10 @@ class CVDataset(VisionDataset):
         df: DataFrame,
         root: str,
         mode: str,
-        id_mapping: dict[int, int],
+        id_mapping: Optional[dict[int, int]],
         image_type: str = 'RGB',
         normalization: str = 'full',
+        store_dim: bool = False,
         resize: Optional[tuple[int, int]] = None,
         normalize_to: Optional[str] = None,
         transform: Optional[Callable] = None,
@@ -823,6 +885,7 @@ class CVDataset(VisionDataset):
         self.mode = mode
         self.image_type = image_type
         self.id_mapping = id_mapping
+        self.store_dim = store_dim
         self.resize = resize
         self.normalize_to = normalize_to
         self.normalization = normalization
@@ -853,7 +916,10 @@ class CVDataset(VisionDataset):
                                   p[2] * factor_resize[0] / factor_norm[0],
                                   p[3] * factor_resize[1] / factor_norm[1])
         bbox_tensors = [FloatTensor(apply_resize(box)) for box in boxes]
-        return {'boxes': torch.stack(bbox_tensors), 'labels': LongTensor(class_ids)}
+        if self.store_dim:
+            return {'boxes': torch.stack(bbox_tensors), 'labels': LongTensor(class_ids), 'dim': item['IMAGE_DIM']}
+        else:
+            return {'boxes': torch.stack(bbox_tensors), 'labels': LongTensor(class_ids)}
 
     def _get_seg_labels(self, item: Series) -> Tensor:
         if 'ABSOLUTE_FILE_SEG' in item:
@@ -874,19 +940,26 @@ class CVDataset(VisionDataset):
             if self.resize is not None: polygon = list(map(apply_resize, polygon))
             mask = fillPoly(mask, pts=[asarray(polygon, dtype=int32)],
                             color=self.id_mapping[class_id])
-        return torch.from_numpy(asarray(mask)).unsqueeze(-1).permute(2, 0, 1)
+        mask = torch.from_numpy(asarray(mask)).unsqueeze(-1).permute(2, 0, 1)
+        return mask
 
     def __getitem__(self, idx):
         item: dict = self.data[idx]
         image: Tensor = F.to_tensor(open_image(item.get('ABSOLUTE_FILE')).convert(self.image_type))
         if self.resize: image = F.resize(image, [self.resize[1], self.resize[0]])
         label: dict[str, Tensor]
+        if self.mode == 'inference':
+            if self.transform:
+                image = self.transform(image)
+            return image, {'dim': item['IMAGE_DIM']}
         if self.mode == 'classification':
             label = self._get_class_labels(item)
         elif self.mode == 'detection':
             label = self._get_bbox_labels(item)
         elif self.mode == 'segmentation':
             label = self._get_seg_labels(item)
-        
-        if self.transforms: image, label = self.transforms(image, label)
+        if self.transforms:
+            image, label = self.transforms(image, label)
+        if self.store_dim:
+            return image, {'label': label, 'dim': item['IMAGE_DIM']}
         return image, label
