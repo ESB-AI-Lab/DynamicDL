@@ -817,6 +817,7 @@ class CVData:
     def inference(
         self,
         image: torch.Tensor,
+        label: Any,
         result: Any,
         dpi: float = 1200,
         mode: str = None
@@ -923,7 +924,10 @@ class CVDataset(VisionDataset):
 
     def _get_seg_labels(self, item: Series) -> Tensor:
         if 'ABSOLUTE_FILE_SEG' in item:
-            return open_image(item['ABSOLUTE_FILE_SEG'])
+            mask = F.to_tensor(open_image(item['ABSOLUTE_FILE_SEG']))
+            if self.resize:
+                return F.resize(mask, [self.resize[1], self.resize[0]])
+            return mask
         assert len(item['POLYGON']) == len(item['SEG_CLASS_ID']), \
             'SEG_CLASS_ID and POLYGON len mismatch'
         if self.resize is not None:
