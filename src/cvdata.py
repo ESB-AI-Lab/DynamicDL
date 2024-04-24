@@ -122,12 +122,22 @@ class CVData:
         entries = [{key: val.value for key, val in item.data.items()} for item in data]
         self.dataframe = DataFrame(entries)
         end = time.time()
-        print(f'[CVData] Parsed! ({end - start}s)')
-        print('[CVData] Cleaning up...')
+        print(f'[CVData] Parsed! ({(end - start):.3f}s)')
         start = time.time()
         self.cleanup()
         end = time.time()
-        print(f'[CVData] Cleaned! ({end - start}s)')
+        print(f'[CVData] Done! ({(end - start):.3f}s)')
+        print(self._get_statistics())
+        
+    def _get_statistics(self):
+        data = f'[CVData] Dataset statistics:\n'
+        data += f'     |   Available modes: {", ".join(self.available_modes)}\n'
+        data += f'     |   Images: {len(self.dataframe)} | Complete entries: {len(self.dataframe)-len(self.dataframe[self.dataframe.isna().any(axis=1)])}\n'
+        if 'detection' in self.available_modes:
+            data += f'     |   Bounding box coordinate scaling option: {self.bbox_scale_option}\n'
+        if 'segmentation' in self.available_modes:
+            data += f'     |   Segmentation object coordinate scaling option: {self.seg_scale_option}\n'
+        return data.strip()
 
     def cleanup(self) -> None:
         '''
@@ -229,7 +239,6 @@ class CVData:
         self._cleanup_image_sets()
         self._cleanup_id()
         self.cleaned = True
-        print('[CVData] Done!')
 
     def _get_img_sizes(self) -> None:
         self.dataframe['IMAGE_DIM'] = [open_image(filename).size if isinstance(filename, str)
@@ -449,15 +458,18 @@ class CVData:
         dataframe = self.dataframe[[image_set in item for item in self.dataframe['IMAGE_SET_NAME']]]
         if image_set is None: dataframe = self.dataframe
         if len(dataframe) == 0: raise ValueError(f'Image set {image_set} not available.')
+        normalization = None
         if mode == 'classification': 
             dataframe = dataframe[list(CVData._classification_cols)]
             id_mapping = {k: i for i, k in enumerate(self.idx_to_class)}
         elif mode == 'detection': 
             dataframe = dataframe[list(CVData._detection_cols)]
+            normalization = self.bbox_scale_option
             id_mapping = {k: i for i, k in enumerate(self.idx_to_bbox_class)}
         elif mode == 'segmentation':
             dataframe = dataframe[list(CVData._segmentation_poly_cols if 'POLYGON' in
                                        dataframe else CVData._segmentation_img_cols)]
+            normalization = self.seg_scale_option
             id_mapping = {k: i for i, k in enumerate(self.idx_to_seg_class)}
         elif mode == 'inference':
             dataframe = dataframe[list(CVData._inference_cols)]
@@ -476,9 +488,11 @@ class CVData:
                         error = '[CVData] Found NaN values that will cause errors in row:\n'
                         error += str(dataframe.iloc[i])
                         raise ValueError(error)
+        
         if len(dataframe) == 0: raise ValueError('[CVData] After cleanup, this dataset is empty.')
         return CVDataset(dataframe, self.root, mode, id_mapping=id_mapping, transform=transform,
-                         target_transform=target_transform, resize=resize, store_dim=store_dim)
+                         target_transform=target_transform, resize=resize, store_dim=store_dim,
+                         normalize_to=normalize, normalization=normalization)
 
     def get_dataloader(
         self,

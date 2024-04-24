@@ -339,7 +339,8 @@ def expand_file_generics(path: str, dataset: dict[str, Any],
     for i, key in enumerate(root):
         # convert DataType to Generic with low priority
         if isinstance(key, DataType):
-            heapq.heappush(generics, (0, i, Generic('{}', key)))
+            heapq.heappush(generics, (0, i, key))
+            continue
 
         # priority queue push to prioritize generics with the most wildcards for disambiguation
         if isinstance(key, Generic):
@@ -366,9 +367,11 @@ def expand_file_generics(path: str, dataset: dict[str, Any],
             if name in names: continue
             if isinstance(generic, Folder) and dataset[name] == "File": continue
             if isinstance(generic, File) and dataset[name] != "File": continue
-
+            
             # attempt to match name to generic
-            status, items = generic.match(name)
+            if isinstance(generic, DataType): status, items = Generic('{}', generic).match(name)
+            else: status, items = generic.match(name)
+            
             if not status: continue
             names.add(name)
             expanded_root[Static(name, items)] = root[generic]
