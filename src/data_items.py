@@ -10,6 +10,8 @@ from typing_extensions import Self
 
 from ._utils import union
 
+_image_extensions = ['jpg', 'jpeg', 'png', 'tiff', 'jpe', 'jfif', 'j2c', 'j2k', 'jp2', 'jpc', 'jpf', 'jpx', 'apng', 'tif', 'webp']
+
 class Token:
     '''
     The Token class is an abstract class which carries important information into 
@@ -385,7 +387,7 @@ class Alias:
     def __init__(self, generics: list['Generic']):
         assert len(generics) > 0, 'Must have at least 1 generic in list.'
         self.generics = generics
-        self.patterns: list[str] = [generic.name for generic in generics]
+        self.patterns: list[str] = [generic.pattern for generic in generics]
         self.aliases: list[tuple[DataType, ...]] = [generic.data for generic in generics]
         self.desc = ''.join([token.desc for alias in self.aliases for token in alias])
 
@@ -408,12 +410,6 @@ class Alias:
             except AssertionError:
                 return False, []
         return True, result
-
-    def substitute(self, values: list[DataItem]) -> str:
-        '''
-        Given the list (in order) of items, substitute the generic to retrieve original data string.
-        '''
-        return Generic(self.patterns[0], *self.aliases[0]).substitute(values[:len(self.aliases[0])])
 
     def length(self) -> int:
         '''
@@ -447,12 +443,12 @@ class Generic:
     '''
     Represents an object with a generic name.
     '''
-    def __init__(self, name: str, *data: Union[DataType, Alias], ignore: Union[list[str], str] = []):
-        if isinstance(name, DataType):
-            data = tuple([name])
-            name = '{}'
-        assert len(data) == name.count('{}'), 'Format must have same number of wildcards'
-        self.name: str = name
+    def __init__(self, pattern: str, *data: Union[DataType, Alias], ignore: Union[list[str], str] = []):
+        if isinstance(pattern, (DataType, Alias)):
+            data = tuple([pattern])
+            pattern = '{}'
+        assert len(data) == pattern.count('{}'), 'Format must have same number of wildcards'
+        self.pattern: str = pattern
         self.data: tuple[Union[DataType, Alias], ...] = data
         self.ignore: list[str] = union(ignore)
 
@@ -466,7 +462,7 @@ class Generic:
         for ignore_pattern in self.ignore:
             ignore_pattern = '^' + ignore_pattern.replace('{}', '(.+)') + '+$'
             if re.findall(ignore_pattern, entry): return False, []
-        pattern: str = '^' + self.name.replace('{}', '(.+)') + '+$'
+        pattern: str = '^' + self.pattern.replace('{}', '(.+)') + '+$'
         matches: list[str] = re.findall(pattern, entry)
         result: list[DataItem] = []
 
@@ -485,32 +481,8 @@ class Generic:
         except AssertionError: return False, []
         return True, result
 
-    def substitute(self, values: Union[list[DataItem], DataItem]) -> str:
-        '''
-        Return the string representation of the values provided string representations for each
-        token as a list
-        
-        - values (list[str] | str): the values of the tokens to replace, in order
-        '''
-        values: list[DataItem] = union(values)
-        substitutions: list[str] = []
-        index: int = 0
-        for token in self.data:
-            if isinstance(token, Alias):
-                substitutions.append(token.substitute(values[index:]))
-                index += token.length()
-            else:
-                if isinstance(values[index].delimiter.token_type, RedundantToken):
-                    assert len(values[index].value) == 1, \
-                        'Redundant token cannot have multiple values in a generic'
-                    substitutions.append(values[index].value[0])
-                else:
-                    substitutions.append(values[index].value)
-                index += 1
-        return self.name.format(*substitutions)
-
     def __repr__(self) -> str:
-        return f'{self.name} | {self.data}'
+        return f'{self.pattern} | {self.data}'
 
 class Folder(Generic):
     '''
@@ -521,6 +493,50 @@ class File(Generic):
     '''
     Generic for files only.
     '''
+    def __init__(
+        self,
+        pattern: str,
+        *data: Union[DataType, Alias],
+        ignore: Union[list[str], str] = [],
+        extensions: Union[list[str], str] = [],
+        disable_warnings: bool = False
+    ):
+        extensions = list(map(lambda s: s.lower(), union(extensions)))
+        if isinstance(pattern, (DataType, Alias)):
+            data = tuple([pattern])
+            pattern = '{}'
+        result = re.findall('(.+)\.(.+)', pattern)
+        if not disable_warnings and result:
+            print('Warning: pattern has a . in it. If this is a file extension, omit in the \
+                pattern and include with keyword extensions. Disable this message with \
+                disable_warnings=True.')
+        self.extensions = extensions
+        super().__init__(pattern, *data, ignore=ignore)
+
+    def match(self, entry: str) -> tuple[bool, list[DataItem]]:
+        '''
+        Return a list of the tokens' string values provided an entry string which follows the 
+        pattern.
+        
+        - entry (str): the string to match to the pattern, assuming it does match
+        '''
+        result = re.findall('(.+)\.(.+)', entry)
+        if not result: return False, []
+        if self.extensions and (result[0][1].lower() not in self.extensions): return False, []
+        return super().match(result[0][0])
+
+class ImageFile(File):
+    '''
+    Generic with special matching for images.
+    '''
+    def __init__(
+        self,
+        pattern: str,
+        *data: Union[DataType, Alias],
+        ignore: Union[list[str], str] = [],
+        extensions: Union[list[str], str] = _image_extensions
+    ):
+        super().__init__(pattern, *data, ignore=ignore, extensions=extensions)
 
 class Image:
     '''

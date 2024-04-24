@@ -48,7 +48,7 @@ def _collate_classification_dim(batch):
               'dim': [label['dim'] for label in labels]}
     return torch.stack(images), labels
 
-def _collate_inference(batch):
+def _collate_default(batch):
     return list(zip(*batch))
 
 def _collate(mode: str, store_dim: bool) -> Callable:
@@ -58,8 +58,8 @@ def _collate(mode: str, store_dim: bool) -> Callable:
         return _collate_detection
     if mode == 'classification' and store_dim:
         return _collate_classification_dim
-    if mode == 'inference':
-        return _collate_inference
+    if mode == 'inference' or mode == 'diffusion':
+        return _collate_default
 
 class CVData:
     '''
@@ -77,6 +77,7 @@ class CVData:
     '''
 
     _inference_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'IMAGE_DIM'}
+    _diffusion_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'IMAGE_DIM'}
     _classification_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'CLASS_ID', 'IMAGE_DIM'}
     _detection_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'BBOX_CLASS_ID', 'BOX', 'IMAGE_DIM'}
     _segmentation_img_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'ABSOLUTE_FILE_SEG', 'IMAGE_DIM'}
@@ -131,12 +132,21 @@ class CVData:
         
     def _get_statistics(self):
         data = f'[CVData] Dataset statistics:\n'
-        data += f'     |   Available modes: {", ".join(self.available_modes)}\n'
-        data += f'     |   Images: {len(self.dataframe)} | Complete entries: {len(self.dataframe)-len(self.dataframe[self.dataframe.isna().any(axis=1)])}\n'
+        data += f'       | Available modes: {", ".join(self.available_modes)}\n'
+        data += f'       | Images: {len(self.dataframe)}\n'
+        for mode in self.available_modes:
+            if mode != 'segmentation':
+                data += f'       | Complete entries for {mode}: {len(self.dataframe)-len(self.dataframe[self.dataframe[list(getattr(self, f"_{mode}_cols"))].isna().any(axis=1)])}\n'
+                continue
+            if 'POLYGON' in self.dataframe.columns:
+                data += f'       | Complete entries for {mode}: {len(self.dataframe)-len(self.dataframe[self.dataframe[list(getattr(self, f"_{mode}_poly_cols"))].isna().any(axis=1)])}\n'
+            else:
+                data += f'       | Complete entries for {mode}: {len(self.dataframe)-len(self.dataframe[self.dataframe[list(getattr(self, f"_{mode}_img_cols"))].isna().any(axis=1)])}\n'
+            
         if 'detection' in self.available_modes:
-            data += f'     |   Bounding box coordinate scaling option: {self.bbox_scale_option}\n'
+            data += f'       | Bounding box coordinate scaling option: {self.bbox_scale_option}\n'
         if 'segmentation' in self.available_modes:
-            data += f'     |   Segmentation object coordinate scaling option: {self.seg_scale_option}\n'
+            data += f'       | Segmentation object coordinate scaling option: {self.seg_scale_option}\n'
         return data.strip()
 
     def cleanup(self) -> None:
@@ -226,6 +236,8 @@ class CVData:
         # check available columns to determine mode availability
         if CVData._inference_cols.issubset(self.dataframe.columns):
             self.available_modes.append('inference')
+        if CVData._diffusion_cols.issubset(self.dataframe.columns):
+            self.available_modes.append('diffusion')
         if CVData._classification_cols.issubset(self.dataframe.columns):
             self.available_modes.append('classification')
         if CVData._detection_cols.issubset(self.dataframe.columns):
@@ -399,6 +411,7 @@ class CVData:
             else: boxes.append([(funcs[0]((x1, x2)), funcs[1]((y1, y2)), funcs[2]((x1, x2)), funcs[3]((y1, y2)))
                                 for x1, y1, x2, y2 in zip(row[cols[0]], row[cols[1]], row[cols[2]], row[cols[3]])])
         self.dataframe['BOX'] = boxes
+        self.dataframe.drop(['X1', 'Y1', 'X2', 'Y2', 'XMIN', 'YMIN', 'XMAX', 'YMAX', 'XMID', 'YMID', 'WIDTH', 'HEIGHT'], axis=1, inplace=True, errors='ignore')
 
     def _cleanup_id(self) -> None:
         cols = ['CLASS_ID', 'IMAGE_ID']
@@ -473,6 +486,9 @@ class CVData:
             id_mapping = {k: i for i, k in enumerate(self.idx_to_seg_class)}
         elif mode == 'inference':
             dataframe = dataframe[list(CVData._inference_cols)]
+            id_mapping = None
+        elif mode == 'diffusion':
+            dataframe = dataframe[list(CVData._diffusion_cols)]
             id_mapping = None
         if remove_invalid:
             print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
@@ -966,7 +982,7 @@ class CVDataset(VisionDataset):
         image: Tensor = F.to_tensor(open_image(item.get('ABSOLUTE_FILE')).convert(self.image_type))
         if self.resize: image = F.resize(image, [self.resize[1], self.resize[0]])
         label: dict[str, Tensor]
-        if self.mode == 'inference':
+        if self.mode == 'inference' or self.mode == 'diffusion':
             if self.transform:
                 image = self.transform(image)
             return image, {'dim': item['IMAGE_DIM']}

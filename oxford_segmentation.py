@@ -16,17 +16,17 @@ if __name__ == '__main__':
     ])
     form = {
         "annotations": {
-            File("{}.txt", DataTypes.IMAGE_SET_NAME): TXTFile(
+            File("{}", DataTypes.IMAGE_SET_NAME, extensions="txt"): TXTFile(
                 GenericList(Generic(
                     "{} {} {} {}", alias, DataTypes.CLASS_ID, DataTypes.GENERIC, DataTypes.GENERIC
                 )),
                 ignore_type = '#'
             ),
             "trimaps": {
-                File("{}.png", DataTypes.IMAGE_NAME, ignore='._{}'): SegmentationImage()
+                ImageFile("{}", DataTypes.IMAGE_NAME, ignore='._{}'): SegmentationImage()
             },
             "xmls": {
-                File("{}.xml", DataTypes.IMAGE_NAME): XMLFile({
+                File("{}", DataTypes.IMAGE_NAME, extensions='xml'): XMLFile({
                     "annotation": {
                         "filename": Generic("{}.jpg", DataTypes.IMAGE_NAME),
                         "object": AmbiguousList({
@@ -42,9 +42,7 @@ if __name__ == '__main__':
                 })
             }
         },
-        "images": {
-            File("{}.jpg", alias): Image()
-        }
+        "images": {ImageFile(alias): Image()}
     }
     cvdata = CVData(root, form)
     # since the oxford pets dataset does not specify seg classes, we will have to do so manually

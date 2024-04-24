@@ -321,6 +321,7 @@ def _get_files(path: str) -> dict[str, Union[str, dict]]:
     '''Step one of the processing. Expand the dataset to fit all the files.'''
     files: dict[str, Union[str, dict]] = {}
     for file in os.listdir(path):
+        if file.startswith('.'): continue
         if os.path.isdir(os.path.join(path, file)):
             files[file] = _get_files(os.path.join(path, file))
         else:
