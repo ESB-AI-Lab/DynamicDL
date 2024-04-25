@@ -401,7 +401,7 @@ class CVData:
             funcs = (lambda x: x[0], lambda y: y[0], lambda x: x[0]+x[1], lambda y: y[0]+y[1])
         elif mode == 3:
             cols = ('XMID', 'YMID', 'WIDTH', 'HEIGHT')
-            funcs = (lambda x: x[0]-x[1]/2, lambda y: y[0]-y[1]/2, lambda x: x[0]+x[1]/2, lambda y: y[0]+y[1]/2)
+            funcs = (lambda x: round(x[0]-x[1]/2, -6), lambda y: round(y[0]-y[1]/2, -6), lambda x: round(x[0]+x[1]/2, -6), lambda y: round(y[0]+y[1]/2, -6))
         elif mode == 4:
             cols = ('XMAX', 'YMAX', 'WIDTH', 'HEIGHT')
             funcs = (lambda x: x[0]-x[1], lambda y: y[0]-y[1], lambda x: x[0], lambda y: y[0])
@@ -870,8 +870,10 @@ class CVData:
         if mode == 'segmentation':
             _, axarr = plt.subplots(ncols=2)
             axarr[0].imshow(image.permute(1, 2, 0))
-            mask = result
-            raise NotImplementedError("I haven't implemented this yet. Please ping me so we can figure it out")
+            mask = result['out'] if isinstance(result, dict) and 'out' in result else result
+            if not isinstance(mask, torch.Tensor):
+                raise ValueError('Cannot infer output mask tensor.')
+            mask = torch.argmax(mask, dim=1)
             axarr[1].imshow(mask.permute(1, 2, 0))
         else:
             plt.imshow(image.permute(1, 2, 0))
