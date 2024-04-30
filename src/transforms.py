@@ -2,17 +2,32 @@
 Adapted from torchvision: https://github.com/pytorch/vision/blob/main/torchvision/transforms/_presets.py
 '''
 
-from typing import Optional, Tuple
-from functools import partial
+from typing import Optional, Tuple, Callable
 import torch
 from torch import nn, Tensor
 from torchvision.transforms import functional as F, InterpolationMode
 
+from ._utils import Warnings
+
 class ObjectDetection(nn.Module):
+    def __init__(
+        self,
+        normalize: bool = True,
+        mean: Tuple[float, ...] = (0.485, 0.456, 0.406),
+        std: Tuple[float, ...] = (0.229, 0.224, 0.225)
+    ) -> None:
+        super().__init__()
+        self.normalize = normalize
+        self.mean = mean
+        self.std = std
+
     def forward(self, img: Tensor) -> Tensor:
         if not isinstance(img, Tensor):
             img = F.pil_to_tensor(img)
-        return F.convert_image_dtype(img, torch.float)
+        img = F.convert_image_dtype(img, torch.float)
+        if self.normalize:
+            img = F.normalize(img, mean=self.mean, std=self.std)
+        return img
 
     def __repr__(self) -> str:
         return self.__class__.__name__ + "()"
@@ -121,11 +136,28 @@ class CVTransforms:
     '''
     Standard transforms presets for computer vision. Adapted from torchvision 0.17.2
     '''
-    CLASSIFICATION = (partial(ImageClassification, crop_size=224)(), None)
+    CLASSIFICATION = (ImageClassification(crop_size=224), None)
     DETECTION = (ObjectDetection(), None)
-    SEGMENTATION = (partial(SemanticSegmentation, resize_size=520, normalize=True)(), 
-                               partial(SemanticSegmentation, resize_size=520, normalize=False)())
+    SEGMENTATION = (SemanticSegmentation(resize_size=520, normalize=True), 
+                    SemanticSegmentation(resize_size=520, normalize=False))
+    SEGMENTATION_NORESIZE = (SemanticSegmentation(resize_size=None, normalize=True), 
+                             SemanticSegmentation(resize_size=None, normalize=False))
     
-    DETECTION_NORESIZE = (ObjectDetection(), None)
-    SEGMENTATION_NORESIZE = (partial(SemanticSegmentation, resize_size=None, normalize=True)(), 
-                               partial(SemanticSegmentation, resize_size=None, normalize=False)())
+    @staticmethod
+    def get(
+        mode: str,
+        resize: bool = False,
+        normalize: bool = True,
+        mean: Tuple[float, ...] = (0.485, 0.456, 0.406),
+        std: Tuple[float, ...] = (0.229, 0.224, 0.225)
+    ) -> Tuple[Optional[Callable], ...]:
+        if mode == 'classification':
+            return (ImageClassification(crop_size=224, normalize=normalize, mean=mean, std=std), None)
+        elif mode == 'detection':
+            return (ObjectDetection(normalize=normalize, mean=mean, std=std), None)
+        elif mode == 'segmentation':
+            resize = None if resize else 520
+            return (SemanticSegmentation(resize_size=resize, normalize=normalize, mean=mean, std=std),
+                    SemanticSegmentation(resize_size=resize, normalize=False, mean=mean, std=std))
+        else:
+            return (None, None)

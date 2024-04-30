@@ -5,7 +5,7 @@ maintains the CVDataset class for PyTorch Dataset and DataLoader functionalities
 import os
 import time
 import json
-from typing import Union, Optional, Callable, Any
+from typing import Union, Optional, Callable, Iterable, Any
 from typing_extensions import Self
 from math import isnan
 from tqdm import tqdm
@@ -29,6 +29,7 @@ import matplotlib.pyplot as plt
 
 from ._utils import next_avail_id, union, Warnings
 from .processing import populate_data
+from .transforms import CVTransforms
 
 '''
 All preset collate functions defined here.
@@ -53,8 +54,7 @@ def _collate_classification_dim(batch):
     return torch.stack(images), labels
 
 def _collate_detection(batch):
-    images, labels = zip(*batch)
-    return tuple(images), tuple(labels)
+    return list(zip(*batch))
 
 def _collate_detection_dim(batch):
     images, labels = zip(*batch)
@@ -503,12 +503,51 @@ class CVData:
                 self.idx_to_image_set.update({k: str(k) for k in ids})
                 self.image_set_to_idx.update({str(k): k for k in ids})
 
+    def get_transforms(
+        self,
+        mode: str,
+        remove_invalid: bool = True,
+        resize: Optional[tuple[int, int]] = None
+    ):
+        loader = self.get_dataloader(
+            mode,
+            remove_invalid=remove_invalid,
+            image_set=None,
+            preset_transform=False,
+            transforms=CVTransforms.get(mode, resize=resize, normalize=False),
+            resize=resize,
+            batch_size=10,
+            num_workers=0,
+            shuffle=False
+        )
+
+        mean = 0.
+        std = 0.
+        for images, _ in tqdm(loader, desc='Calculating stats'):
+            if isinstance(images, Iterable):
+                for image in images:
+                    image = image.view(3, -1)
+                    mean += image.mean(1)
+                    std += image.std(1)
+            else:
+                batch_samples = images.size(0)
+                images = images.view(batch_samples, images.size(1), -1)
+                mean += images.mean(2).sum(0)
+                std += images.std(2).sum(0)
+
+        mean /= len(loader.dataset)
+        std /= len(loader.dataset)
+
+        print(f"[CVData] Got mean {mean} and std {std}")
+        return CVTransforms.get(mode, resize=resize, normalize=True, mean=mean, std=std)
+
     def get_dataset(
         self, 
         mode: str,
         remove_invalid: bool = True,
         store_dim: bool = False,
         image_set: Optional[Union[int, str]] = None,
+        preset_transform: bool = True,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
         transforms: Optional[tuple[Callable]] = None,
@@ -536,10 +575,19 @@ class CVData:
         - normalize (str, Optional): if provided, normalize bounding box/segmentation coordinates
                                      to a specific configuration. Options: 'zeroone', 'full'
         '''
-        if transforms: transform, target_transform = transforms
         if not self.cleaned: self.parse()
         if mode.lower().strip() not in self.available_modes:
             Warnings.error('mode_unavailable', mode=mode.lower().strip())
+
+        if transforms:
+            transform, target_transform = transforms
+        elif preset_transform:
+            transform, target_transform = self.get_transforms(
+                mode=mode,
+                remove_invalid=remove_invalid,
+                resize=resize
+            )
+        
         
         imgset_mode = 'name' if isinstance(image_set, str) else 'id'
         dataframe = self.dataframe[[image_set in item for item in self.dataframe[f'IMAGE_SET_{imgset_mode.upper()}']]]
@@ -565,9 +613,7 @@ class CVData:
         elif mode == 'diffusion':
             dataframe = dataframe[list(CVData._diffusion_cols)]
             id_mapping = None
-        if remove_invalid:
-            print(f'Removed {len(dataframe[dataframe.isna().any(axis=1)])} NaN entries.')
-            dataframe = dataframe.dropna()
+        if remove_invalid: dataframe = dataframe.dropna()
         else:
             replace_nan = (lambda x: ([] if isinstance(x, float) and isnan(x) else x))
             if mode == 'detection': cols = ['BBOX_CLASS_ID'] # BOX already accounted for in bbox creation
@@ -593,6 +639,7 @@ class CVData:
         num_workers: int = 1,
         remove_invalid: bool = True,
         store_dim: bool = False,
+        preset_transform: bool = True,
         image_set: Optional[Union[int, str]] = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
@@ -630,6 +677,7 @@ class CVData:
                 remove_invalid=remove_invalid,
                 store_dim=store_dim,
                 image_set=image_set,
+                preset_transform=preset_transform,
                 transform=transform,
                 target_transform=target_transform,
                 transforms=transforms,
@@ -1007,7 +1055,6 @@ class CVDataset(VisionDataset):
         self.resize = resize
         self.normalize_to = normalize_to
         self.normalization = normalization
-        print(f'Resize: {self.resize}')
         if self.mode == 'segmentation': self.default = len(self.id_mapping)
         super().__init__(root, transforms=None, transform=transform, target_transform=target_transform)
 
