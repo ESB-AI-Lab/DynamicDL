@@ -29,6 +29,7 @@ class ImageClassification(nn.Module):
         *,
         crop_size: int,
         resize_size: int = 256,
+        normalize: bool = True,
         mean: Tuple[float, ...] = (0.485, 0.456, 0.406),
         std: Tuple[float, ...] = (0.229, 0.224, 0.225),
         interpolation: InterpolationMode = InterpolationMode.BILINEAR,
@@ -37,6 +38,7 @@ class ImageClassification(nn.Module):
         super().__init__()
         self.crop_size = [crop_size]
         self.resize_size = [resize_size]
+        self.normalize = normalize
         self.mean = list(mean)
         self.std = list(std)
         self.interpolation = interpolation
@@ -48,7 +50,7 @@ class ImageClassification(nn.Module):
         if not isinstance(img, Tensor):
             img = F.pil_to_tensor(img)
         img = F.convert_image_dtype(img, torch.float)
-        img = F.normalize(img, mean=self.mean, std=self.std)
+        if self.normalize: img = F.normalize(img, mean=self.mean, std=self.std)
         return img
 
     def __repr__(self) -> str:

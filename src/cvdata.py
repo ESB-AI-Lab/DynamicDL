@@ -8,9 +8,11 @@ import json
 from typing import Union, Optional, Callable, Any
 from typing_extensions import Self
 from math import isnan
-from numpy import asarray, full_like, full, nan, int32
+from tqdm import tqdm
+import numpy as np
 import random
 import jsonpickle
+from functools import partial
 from pandas import DataFrame
 from pandas.core.series import Series
 from cv2 import imread, fillPoly, IMREAD_GRAYSCALE
@@ -25,22 +27,24 @@ from hashlib import md5
 from PIL.Image import open as open_image
 import matplotlib.pyplot as plt
 
-from ._utils import next_avail_id, union
+from ._utils import next_avail_id, union, Warnings
 from .processing import populate_data
 
-def _collate_detection(batch):
-    images, labels = zip(*batch)
-    return tuple(images), tuple(labels)
+'''
+All preset collate functions defined here.
 
-def _collate_segmentation_dim(batch):
+Need testing, but likely work:
+- _collate_classification
+- _collate_classification_dim
+- _collate_detection
+- _collate_detection_dim
+- _collate_segmentation
+- _collate_segmentation_dim
+- _collate_default
+'''
+def _collate_classification(batch):
     images, labels = zip(*batch)
-    labels = {'label': torch.stack([label['label'] for label in labels]),
-              'dim': [label['dim'] for label in labels]}
-    return torch.stack(images), labels
-
-def _collate_segmentation(batch):
-    images, labels = zip(*batch)
-    return torch.stack(images), torch.stack(labels)
+    return torch.stack(images), torch.IntTensor([label for label in labels])
 
 def _collate_classification_dim(batch):
     images, labels = zip(*batch)
@@ -48,19 +52,63 @@ def _collate_classification_dim(batch):
               'dim': [label['dim'] for label in labels]}
     return torch.stack(images), labels
 
+def _collate_detection(batch):
+    images, labels = zip(*batch)
+    return tuple(images), tuple(labels)
+
+def _collate_detection_dim(batch):
+    images, labels = zip(*batch)
+    labels = {'label': torch.IntTensor([label['label'] for label in labels]),
+              'dim': [label['dim'] for label in labels]}
+    return tuple(images), tuple(labels)
+
+def _collate_segmentation(batch):
+    images, labels = zip(*batch)
+    return torch.stack(images), torch.stack(labels)
+
+def _collate_segmentation_dim(batch):
+    images, labels = zip(*batch)
+    labels = {'label': torch.stack([label['label'] for label in labels]),
+              'dim': [label['dim'] for label in labels]}
+    return torch.stack(images), labels
+
 def _collate_default(batch):
     return list(zip(*batch))
 
 def _collate(mode: str, store_dim: bool) -> Callable:
+    '''
+    Getters for all preset collate functions.
+    '''
+    if mode == 'classification':
+        return _collate_classification_dim if store_dim else _collate_classification
     if mode == 'segmentation':
         return _collate_segmentation_dim if store_dim else _collate_segmentation
     if mode == 'detection':
-        return _collate_detection
-    if mode == 'classification' and store_dim:
-        return _collate_classification_dim
-    if mode == 'inference' or mode == 'diffusion':
-        return _collate_default
+        return _collate_detection_dim if store_dim else _collate_detection
+    return _collate_default
 
+'''
+CVData class functions.
+
+Need testing:
+- _validate_ids
+- _assign_ids
+- split_image_set
+- get_image_set
+- clear_image_sets
+- delete_image_set
+- save
+- load
+- sample_image
+
+To implement:
+- get_dataset (add calculate stats)
+- get_dataloader (add calculate stats)
+- inference (segmentation)
+- md5hash purge all duplicate images and take only the first one
+- tolerate [-1, 1] bounding box / segmentation scale
+- correct image id float conversion
+'''
 class CVData:
     '''
     Main dataset class. Accepts root directory path and dictionary form of the structure.
@@ -82,6 +130,43 @@ class CVData:
     _detection_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'BBOX_CLASS_ID', 'BOX', 'IMAGE_DIM'}
     _segmentation_img_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'ABSOLUTE_FILE_SEG', 'IMAGE_DIM'}
     _segmentation_poly_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'POLYGON', 'SEG_CLASS_ID', 'IMAGE_DIM'}
+    
+    _BBOX_MODES = [
+        (
+            {'X1', 'X2', 'Y1', 'Y2'},
+            ('X1', 'Y1', 'X2', 'Y2'),
+            (lambda x: round(min(x[0], x[1]), 6), lambda y: round(min(y[0], y[1]), 6),
+             lambda x: round(max(x[0], x[1]), 6), lambda y: round(max(y[0], y[1]), 6))
+        ),
+        (
+            {'XMIN', 'YMIN', 'XMAX', 'YMAX'},
+            ('XMIN', 'YMIN', 'XMAX', 'YMAX'),
+            (lambda x: round(x[0], 6), lambda y: round(y[0], 6),
+             lambda x: round(x[1], 6), lambda y: round(y[1], 6))
+        ),
+        (
+            {'XMIN', 'YMIN', 'WIDTH', 'HEIGHT'},
+            ('XMIN', 'YMIN', 'WIDTH', 'HEIGHT'),
+            (lambda x: round(x[0], 6), lambda y: round(y[0], 6),
+             lambda x: round(x[0]+x[1], 6), lambda y: round(y[0]+y[1], 6))
+        ),
+        (
+            {'XMID', 'YMID', 'WIDTH', 'HEIGHT'},
+            ('XMID', 'YMID', 'WIDTH', 'HEIGHT'),
+            (lambda x: round(x[0]-x[1]/2, 6), lambda y: round(y[0]-y[1]/2, 6),
+             lambda x: round(x[0]+x[1]/2, 6), lambda y: round(y[0]+y[1]/2, 6))
+        ),
+        (
+            {'XMAX', 'YMAX', 'WIDTH', 'HEIGHT'},
+            ('XMAX', 'YMAX', 'WIDTH', 'HEIGHT'),
+            (lambda x: round(x[0]-x[1], 6), lambda y: round(y[0]-y[1], 6),
+             lambda x: round(x[0], 6), lambda y: round(y[0], 6))
+        )
+    ]
+    _BBOX_COLS = {'X1', 'X2', 'Y1', 'Y2', 'XMIN', 'XMAX', 'YMIN', 'YMAX', 'XMID', 'YMID', 'WIDTH',
+                  'HEIGHT', 'BBOX_CLASS_ID', 'BBOX_CLASS_NAME'}
+    
+    _scale_options = ('zeroone', 'full')
 
     def __init__(
         self, 
@@ -99,9 +184,10 @@ class CVData:
         self.idx_to_seg_class = {}
         self.bbox_class_to_idx = {}
         self.idx_to_bbox_class = {}
+        self.class_to_idx = {}
+        self.idx_to_class = {}
         self.available_modes = []
         self.cleaned = False
-        self.get_img_dim = True
         self.get_md5_hashes = get_md5_hashes
         self.bbox_scale_option = bbox_scale_option
         self.seg_scale_option = seg_scale_option
@@ -118,18 +204,79 @@ class CVData:
         print('[CVData] Parsing data...')
         start = time.time()
         if self.cleaned and not override:
-            raise ValueError('Dataset has already been parsed. Use override=True to override')
+            Warnings.error('already_parsed')
         data = populate_data(self.root, self.form)
         entries = [{key: val.value for key, val in item.data.items()} for item in data]
         self.dataframe = DataFrame(entries)
         end = time.time()
         print(f'[CVData] Parsed! ({(end - start):.3f}s)')
         start = time.time()
-        self.cleanup()
+        self._cleanup()
         end = time.time()
-        print(f'[CVData] Done! ({(end - start):.3f}s)')
+        print(f'[CVData] Cleaned! ({(end - start):.3f}s)')
         print(self._get_statistics())
+
+    def _cleanup(self) -> None:
+        '''
+        Run cleanup and sanity checks on all data. Assigns IDs to name-only values.
+        '''
+        print('[CVData] Cleaning up data...')
+
+        # sort by image id first to prevent randomness
+        if 'IMAGE_ID' in self.dataframe:
+            self.dataframe.sort_values('IMAGE_ID', ignore_index=True, inplace=True)
+        else:
+            self.dataframe.sort_values('IMAGE_NAME', ignore_index=True, inplace=True)
+            self.dataframe['IMAGE_ID'] = self.dataframe.index
+
+        # get image sizes
+        self._get_img_sizes()
+
+        # get md5 hashes
+        if self.get_md5_hashes: self._get_md5_hashes()
+
+        # drop generic as it is useless data
+        self.dataframe.drop(columns='GENERIC', inplace=True, errors='ignore')
+
+        # convert bounding boxes into proper format and store under 'BOX'
+        self._convert_bbox()
+
+        if 'BOX' in self.dataframe:
+            self._get_box_scale()
+            self._convert_box_scale()
         
+        if 'POLYGON' in self.dataframe:
+            self._get_seg_scale()
+            self._convert_seg_scale()
+
+        # assign ids
+        self._process_ids('CLASS', redundant=False)
+        self._process_ids('SEG_CLASS', redundant=True)
+        self._process_ids('BBOX_CLASS', redundant=True)
+
+        # check available columns to determine mode availability
+        self.available_modes = CVData._get_modes(self.dataframe)
+
+        # cleanup image sets
+        self._cleanup_image_sets()
+        self.cleaned = True
+
+    @staticmethod
+    def _get_modes(df: DataFrame) -> list:
+        modes = []
+        if CVData._inference_cols.issubset(df.columns):
+            modes.append('inference')
+        if CVData._diffusion_cols.issubset(df.columns):
+            modes.append('diffusion')
+        if CVData._classification_cols.issubset(df.columns):
+            modes.append('classification')
+        if CVData._detection_cols.issubset(df.columns):
+            modes.append('detection')
+        if CVData._segmentation_img_cols.issubset(df.columns) or \
+            CVData._segmentation_poly_cols.issubset(df.columns):
+            modes.append('segmentation')
+        return modes
+
     def _get_statistics(self):
         data = f'[CVData] Dataset statistics:\n'
         data += f'       | Available modes: {", ".join(self.available_modes)}\n'
@@ -149,153 +296,70 @@ class CVData:
             data += f'       | Segmentation object coordinate scaling option: {self.seg_scale_option}\n'
         return data.strip()
 
-    def cleanup(self) -> None:
-        '''
-        Run cleanup and sanity checks on all data. Assigns IDs to name-only values.
-        '''
-        print('[CVData] Cleaning up data...')
-
-        # sort by image id first to prevent randomness
-        if 'IMAGE_ID' in self.dataframe:
-            self.dataframe.sort_values('IMAGE_ID', ignore_index=True, inplace=True)
-        else:
-            self.dataframe.sort_values('IMAGE_NAME', ignore_index=True, inplace=True)
-            self.dataframe['IMAGE_ID'] = self.dataframe.index
-
-        # get image sizes
-        if self.get_img_dim: self._get_img_sizes()
-
-        # get md5 hashes
-        if self.get_md5_hashes: self._get_md5_hashes()
-
-        # convert bounding boxes into proper format and store under 'BOX'
-        if {'X1', 'X2', 'Y1', 'Y2'}.issubset(self.dataframe.columns):
-            self._convert_bbox(0)
-        elif {'XMIN', 'YMIN', 'XMAX', 'YMAX'}.issubset(self.dataframe.columns):
-            self._convert_bbox(1)
-        elif {'XMIN', 'YMIN', 'WIDTH', 'HEIGHT'}.issubset(self.dataframe.columns):
-            self._convert_bbox(2)
-        elif {'XMID', 'YMID', 'WIDTH', 'HEIGHT'}.issubset(self.dataframe.columns):
-            self._convert_bbox(3)
-        elif {'XMAX', 'YMAX', 'WIDTH', 'HEIGHT'}.issubset(self.dataframe.columns):
-            self._convert_bbox(4)
-
-        if 'BOX' in self.dataframe:
-            self._get_box_scale()
-            self._convert_box_scale()
-        
-        if 'POLYGON' in self.dataframe:
-            self._get_seg_scale()
-            self._convert_seg_scale()
-
-        # assign class ids
-        if 'CLASS_NAME' in self.dataframe:
-            if 'CLASS_ID' not in self.dataframe: call = self._assign_ids
-            else: call = self._validate_ids
-            result = call('CLASS', redundant=False)
-            self.class_to_idx, self.idx_to_class = result
-        elif 'CLASS_ID' in self.dataframe:
-            self.idx_to_class = {i: str(i) for item in self.dataframe['CLASS_ID']
-                                 if not isinstance(item, float) for i in item}
-            self.class_to_idx = {str(i): i for item in self.dataframe['CLASS_ID']
-                                 if not isinstance(item, float) for i in item}
-            names = [str(i) if not isinstance(i, float)
-                     else nan for i in self.dataframe['CLASS_ID']]
-            self.dataframe['CLASS_NAME'] = names
-
-        # assign seg ids
-        if 'SEG_CLASS_NAME' in self.dataframe:
-            if 'SEG_CLASS_ID' not in self.dataframe: call = self._assign_ids
-            else: call = self._validate_ids
-            result = call('SEG_CLASS', redundant=True)
-            self.seg_class_to_idx, self.idx_to_seg_class = result
-        elif 'SEG_CLASS_ID' in self.dataframe:
-            self.idx_to_seg_class = {i: str(i) for item in self.dataframe['SEG_CLASS_ID']
-                                     if isinstance(item, list) for i in item}
-            self.seg_class_to_idx = {str(i): i for item in self.dataframe['SEG_CLASS_ID']
-                                     if isinstance(item, list) for i in item}
-            names = [list(map(lambda x: self.idx_to_bbox_class[x], i)) if isinstance(i, list)
-                     else [] for i in self.dataframe['SEG_CLASS_ID']]
-            self.dataframe['SEG_CLASS_NAME'] = names
-
-        # assign bbox ids
-        if 'BBOX_CLASS_NAME' in self.dataframe:
-            if 'BBOX_CLASS_ID' not in self.dataframe: call = self._assign_ids
-            else: call = self._validate_ids
-            result = call('BBOX_CLASS', redundant=True)
-            self.bbox_class_to_idx, self.idx_to_bbox_class = result
-        elif 'BBOX_CLASS_ID' in self.dataframe:
-            self.idx_to_bbox_class = {i: str(i) for item in self.dataframe['BBOX_CLASS_ID']
-                                      if isinstance(item, list) for i in item}
-            self.bbox_class_to_idx = {str(i): i for item in self.dataframe['BBOX_CLASS_ID']
-                                      if isinstance(item, list) for i in item}
-            names = [list(map(lambda x: self.idx_to_bbox_class[x], i)) if isinstance(i, list)
-                     else [] for i in self.dataframe['BBOX_CLASS_ID']]
-            self.dataframe['BBOX_CLASS_NAME'] = names
-
-        # check available columns to determine mode availability
-        if CVData._inference_cols.issubset(self.dataframe.columns):
-            self.available_modes.append('inference')
-        if CVData._diffusion_cols.issubset(self.dataframe.columns):
-            self.available_modes.append('diffusion')
-        if CVData._classification_cols.issubset(self.dataframe.columns):
-            self.available_modes.append('classification')
-        if CVData._detection_cols.issubset(self.dataframe.columns):
-            self.available_modes.append('detection')
-        if CVData._segmentation_img_cols.issubset(self.dataframe.columns) or \
-            CVData._segmentation_poly_cols.issubset(self.dataframe.columns):
-            self.available_modes.append('segmentation')
-        
-        # cleanup image sets
-        self.dataframe.drop(columns='GENERIC', inplace=True, errors='ignore')
-        self._cleanup_image_sets()
-        self._cleanup_id()
-        self.cleaned = True
+    def _process_ids(self, name: str, redundant: bool = False) -> None:
+        if f'{name}_NAME' in self.dataframe:
+            if f'{name}_ID' not in self.dataframe: call = partial(self._assign_ids, redundant=redundant)
+            else: call = partial(self._validate_ids, redundant=redundant)
+            result = call(f'{name}')
+            setattr(self, f'{name.lower()}_to_idx', result[0])
+            setattr(self, f'idx_to_{name.lower()}', result[1])
+        elif f'{name}_ID' in self.dataframe:
+            setattr(self, f'idx_to_{name.lower()}',
+                    {i: str(i) for item in self.dataframe[f'{name}_ID']
+                     if isinstance(item, list) for i in item})
+            setattr(self, f'{name.lower()}_to_idx', 
+                    {str(i): i for item in self.dataframe[f'{name}_ID']
+                     if isinstance(item, list) for i in item})
+            names = [list(map(lambda x: getattr(self, f'idx_to_{name.lower()}')[x], i))
+                     if isinstance(i, list) else [] for i in self.dataframe[f'{name}_ID']]
+            self.dataframe[f'{name}_NAME'] = names
 
     def _get_img_sizes(self) -> None:
         self.dataframe['IMAGE_DIM'] = [open_image(filename).size if isinstance(filename, str)
-                                       else nan for filename in self.dataframe['ABSOLUTE_FILE']]
+                                       else np.nan for filename in self.dataframe['ABSOLUTE_FILE']]
 
     def _get_md5_hashes(self) -> None:
-        hashes = [md5(open_image(item).tobytes()) for item in self.dataframe['ABSOLUTE_FILE']]
+        hashes = [md5(open_image(item).tobytes()).hexdigest() for item in
+                  tqdm(self.dataframe['ABSOLUTE_FILE'],desc='[CVData] Calculating md5 hashes')]
         counter = {}
         for i, md5hash in enumerate(hashes):
             counter[md5hash] = counter.get(md5hash, []) + [i]
         duplicates = (locs for locs in counter.values() if len(locs) > 1)
-        for locs in duplicates:
-            raise ValueError(f'Found equivalent md5-hash images in the dataset at indices {locs}')
+        if duplicates:
+            duplicates = "".join([f'\n{i}: {", ".join([self.dataframe["IMAGE_NAME"].iloc[loc] for loc in locs])}' for i, locs in enumerate(duplicates)])
+            Warnings.error('duplicate_images', duplicates=duplicates)
         self.dataframe['MD5'] = hashes
 
     def _get_box_scale(self) -> None:
         if self.bbox_scale_option == 'auto':
-            for boxes in self.dataframe['BOX']:
+            for i, boxes in enumerate(self.dataframe['BOX']):
                 if any(coord > 1 for box in boxes for coord in box):
                     self.bbox_scale_option = 'full'
-                    print('[CVData] Detected full size bounding box scale option')
-                    return
                 if any(coord < 0 for box in boxes for coord in box):
-                    raise ValueError('[CVData] Detected unknown bounding box scale option')
-        print('[CVData] Detected [0, 1] bounding box scale option')
-        self.bbox_scale_option = 'zeroone'
-        return
+                    Warnings.error('invalid_scale_data_bbox', id=i)
+            if self.bbox_scale_option == 'full':
+                print('[CVData] Detected full size bounding box scale option')
+                return
+            print('[CVData] Detected [0, 1] bounding box scale option to be converted to full size')
+            self.bbox_scale_option = 'zeroone'
+        if self.bbox_scale_option not in CVData._scale_options:
+            Warnings.error('invalid_scale', scale=self.bbox_scale_option)
 
     def _get_seg_scale(self) -> None:
         if self.seg_scale_option == 'auto':
-            for shapes in self.dataframe['POLYGON']:
+            for i, shapes in enumerate(self.dataframe['POLYGON']):
                 if any(val > 1 for shape in shapes for coord in shape for val in coord):
                     self.seg_scale_option = 'full'
-                    print('[CVData] Detected full size bounding box scale option')
+                    print('[CVData] Detected full size segmentation scale option')
                     return
                 if any(coord < 0 for shape in shapes for coord in shape):
-                    raise ValueError('[CVData] Detected unknown bounding box scale option')
-        print('[CVData] Detected [0, 1] bounding box scale option')
-        self.seg_scale_option = 'zeroone'
-        return
+                    Warnings.error('invalid_scale_data', id=i)
+            print('[CVData] Detected [0, 1] segmentation scale option to be converted to full size')
+            self.seg_scale_option = 'zeroone'
+        if self.seg_scale_option not in CVData._scale_options:
+            Warnings.error('invalid_scale', scale=self.seg_scale_option)
 
     def _convert_box_scale(self) -> None:
-        if not self.get_img_dim:
-            self.get_img_dim = True
-            self._get_img_sizes()
         if self.bbox_scale_option == 'zeroone':
             boxes_list = []
             for _, row in self.dataframe[['BOX', 'IMAGE_DIM']].iterrows():
@@ -308,9 +372,6 @@ class CVData:
             self.dataframe['BOX'] = boxes_list
     
     def _convert_seg_scale(self) -> None:
-        if not self.get_img_dim:
-            self.get_img_dim = True
-            self._get_img_sizes()
         if self.seg_scale_option == 'zeroone':
             shapes_list = []
             for _, row in self.dataframe[['POLYGON', 'IMAGE_DIM']].iterrows():
@@ -327,17 +388,33 @@ class CVData:
             if isnan(i) or (isinstance(v, float) and isnan(v)): return
             i = int(i)
             if v in name_to_idx and name_to_idx[v] != i:
-                raise ValueError(f'Invalid {name} id {i} assigned to name {v}')
-            else: name_to_idx[v] = i
-        # validate all values and populate name_to_idx if assign is off=
+                Warnings.error(
+                    'invalid_id_map',
+                    name=name,
+                    i=i,
+                    v=v,
+                    expect=name_to_idx[v]
+                )
+            else:
+                name_to_idx[v] = i
+
         name_to_idx = {}
         for i, (ids, vals) in self.dataframe[[f'{name}_ID', f'{name}_NAME']].iterrows():
             if (isinstance(ids, float) and isnan(ids)) or (isinstance(vals, float) and isnan(vals)):
                 continue
             if redundant:
-                if len(ids) != len(vals): raise ValueError(f'ID/name mismatch at row {i}')
-                for i, v in zip(ids, vals): check(i, v, name_to_idx)
-            else: check(ids, vals, name_to_idx)
+                if len(ids) != len(vals):
+                    Warnings.error(
+                        'row_mismatch',
+                        name1=f'{name}_ID',
+                        name2=f'{name}_NAME',
+                        len1=len(ids),
+                        len2=len(vals)
+                    )
+                for i, v in zip(ids, vals):
+                    check(i, v, name_to_idx)
+            else:
+                check(ids, vals, name_to_idx)
         return name_to_idx, {v: k for k, v in name_to_idx.items()}
 
     def _assign_ids(self, name: str, default=False, redundant=False) -> \
@@ -355,69 +432,49 @@ class CVData:
         name_to_idx = {v: i for i, v in enumerate(sets)}
         idx_to_name = {v: k for k, v in name_to_idx.items()}
         if redundant:
-            self.dataframe[f'{name}_ID'] = self.dataframe[f'{name}_NAME'].apply(
-                lambda x: nan if isinstance(x, float) else list(map(lambda y: name_to_idx[y], x)))
+            self.dataframe[f'{name}_ID'] = self.dataframe[f'{name}_NAME'].apply(lambda x:
+                np.nan if isinstance(x, float) else list(map(lambda y: name_to_idx[y], x)))
         else:
-            self.dataframe[f'{name}_ID'] = self.dataframe[f'{name}_NAME'].apply(
-                lambda x: nan if isinstance(x, float) else name_to_idx[x])
+            self.dataframe[f'{name}_ID'] = self.dataframe[f'{name}_NAME'].apply(lambda x:
+                np.nan if isinstance(x, float) else name_to_idx[x])
         return name_to_idx, idx_to_name
 
-    def _patch_ids(self, name: str, name_to_idx: dict, idx_to_name: dict, redundant=False) -> None:
-        '''Patch nan values of ids/vals accordingly.'''
-        if not redundant:
-            for i, (ids, vals) in self.dataframe[[f'{name}_ID', f'{name}_NAME']].iterrows():
-                if isnan(ids) and isinstance(vals, float) and isnan(vals): 
-                    print(f'Found missing {name} id/name at row {i}')
-                    continue
-                if isnan(ids): self.dataframe.at[i, f'{name}_ID'] = name_to_idx[vals]
-                if isinstance(vals, float) and isnan(vals):
-                    self.dataframe.at[i, f'{name}_NAME'] = idx_to_name[ids]
+    def _convert_bbox(self) -> None:
+        cols, funcs = None, None
+        for colset, key_cols, key_funcs in CVData._BBOX_MODES:
+            if colset.issubset(self.dataframe.columns):
+                cols, funcs = key_cols, key_funcs
+        if cols is None or funcs is None:
+            if any(col in self.dataframe for col in CVData._BBOX_COLS):
+                Warnings.error('incomplete_bbox', columns=CVData._BBOX_COLS.intersection(self.dataframe.columns))
             return
-        for i, (ids, vals) in self.dataframe[[f'{name}_ID', f'{name}_NAME']].iterrows():
-            for index, (k, v) in enumerate(zip(ids, vals)):
-                print(f'Found missing {name} id/name at row {i}')
-                if isnan(k) and isinstance(v, float) and isnan(v):
-                    print(f'Found missing {name} id/name at row {i}')
-                    continue
-                if isnan(k): self.dataframe.at[i, f'{name}_ID'][index] = name_to_idx[v]
-                if isinstance(v, float) and isnan(v):
-                    self.dataframe.at[i, f'{name}_NAME'][index] = idx_to_name[v]
 
-    def _convert_bbox(self, mode: int) -> None:
-        boxes = []
-        def execute_checks(i: int, row: Series, cols: tuple):
+        def execute_checks(row: Series, cols: tuple):
             if any(isinstance(row[cols[i]], float) for i in range(4)): return False
-            if not all(len(row[x]) == len(row[cols[0]]) for x in cols):
-                raise ValueError(f'Length of bbox lists at index {i} does not match ({len(row[cols[0]])}, {len(row[cols[1]])}, {len(row[cols[2]])}, {len(row[cols[3]])})')
+            for x in cols:
+                if len(row[x]) != len(row[cols[0]]):
+                    Warnings.error(
+                        'row_mismatch',
+                        name1=cols[0],
+                        name2=x,
+                        len1=len(row[x]),
+                        len2=len(row[cols[0]])
+                    )
             return True
-        if mode == 0:
-            cols = ('X1', 'Y1', 'X2', 'Y2')
-            funcs = (min, min, max, max)
-        elif mode == 1:
-            cols = ('XMIN', 'YMIN', 'XMAX', 'YMAX')
-            funcs = (lambda x: x[0], lambda y: y[0], lambda x: x[1], lambda y: y[1])
-        elif mode == 2:
-            cols = ('XMIN', 'YMIN', 'WIDTH', 'HEIGHT')
-            funcs = (lambda x: x[0], lambda y: y[0], lambda x: x[0]+x[1], lambda y: y[0]+y[1])
-        elif mode == 3:
-            cols = ('XMID', 'YMID', 'WIDTH', 'HEIGHT')
-            funcs = (lambda x: round(x[0]-x[1]/2, -6), lambda y: round(y[0]-y[1]/2, -6), lambda x: round(x[0]+x[1]/2, -6), lambda y: round(y[0]+y[1]/2, -6))
-        elif mode == 4:
-            cols = ('XMAX', 'YMAX', 'WIDTH', 'HEIGHT')
-            funcs = (lambda x: x[0]-x[1], lambda y: y[0]-y[1], lambda x: x[0], lambda y: y[0])
-        for i, row in self.dataframe.iterrows():
-            if not execute_checks(i, row, cols):
-                boxes.append([])
-            else: boxes.append([(funcs[0]((x1, x2)), funcs[1]((y1, y2)), funcs[2]((x1, x2)), funcs[3]((y1, y2)))
-                                for x1, y1, x2, y2 in zip(row[cols[0]], row[cols[1]], row[cols[2]], row[cols[3]])])
-        self.dataframe['BOX'] = boxes
-        self.dataframe.drop(['X1', 'Y1', 'X2', 'Y2', 'XMIN', 'YMIN', 'XMAX', 'YMAX', 'XMID', 'YMID', 'WIDTH', 'HEIGHT'], axis=1, inplace=True, errors='ignore')
 
-    def _cleanup_id(self) -> None:
-        cols = ['CLASS_ID', 'IMAGE_ID']
-        for col in cols:
-            if col not in self.dataframe: continue
-            self.dataframe[col] = self.dataframe[col].astype('Int64')
+        boxes = []
+        for i, row in self.dataframe.iterrows():
+            if not execute_checks(row, cols):
+                boxes.append([])
+            else:
+                box = []
+                for x1, y1, x2, y2 in zip(*[row[cols[i]] for i in range(4)]):
+                    box.append((funcs[0]((x1, x2)), funcs[1]((y1, y2)),
+                                funcs[2]((x1, x2)), funcs[3]((y1, y2))))
+                boxes.append(box)
+        self.dataframe['BOX'] = boxes
+        self.dataframe.drop(CVData._BBOX_COLS.difference({'BBOX_CLASS_ID', 'BBOX_CLASS_NAME'}),
+                            axis=1, inplace=True, errors='ignore')
 
     def _cleanup_image_sets(self) -> None:
         if 'IMAGE_SET_NAME' in self.dataframe:
@@ -438,7 +495,7 @@ class CVData:
         mode: str,
         remove_invalid: bool = True,
         store_dim: bool = False,
-        image_set: Optional[str] = None,
+        image_set: Optional[Union[int, str]] = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
         transforms: Optional[tuple[Callable]] = None,
@@ -454,6 +511,9 @@ class CVData:
                                  pertaining to the relevant mode. In the False case, either NaN
                                  values are substituted with empty values or an error is thrown,
                                  depending on the mode selected.
+        - store_dim (bool): if set to True, the labels in the dataset will return a dict with two
+                            keys. 'label' contains the standard PyTorch labels and 'dim' contains
+                            the image's former dimensions.
         - image_set (str, Optional): the image set to pull from. Default: all images.
         - transform (Callable, Optional): the transform operation to apply to the images.
         - target_transform (Callable, Optional): the transform operation on the labels.
@@ -463,14 +523,16 @@ class CVData:
         - normalize (str, Optional): if provided, normalize bounding box/segmentation coordinates
                                      to a specific configuration. Options: 'zeroone', 'full'
         '''
-            
         if transforms: transform, target_transform = transforms
         if not self.cleaned: self.parse()
-        assert mode.lower().strip() in self.available_modes, 'Desired mode not available.'
+        if mode.lower().strip() not in self.available_modes:
+            Warnings.error('mode_unavailable', mode=mode.lower().strip())
         
-        dataframe = self.dataframe[[image_set in item for item in self.dataframe['IMAGE_SET_NAME']]]
+        imgset_mode = 'name' if isinstance(image_set, str) else 'id'
+        dataframe = self.dataframe[[image_set in item for item in self.dataframe[f'IMAGE_SET_{imgset_mode.upper()}']]]
         if image_set is None: dataframe = self.dataframe
-        if len(dataframe) == 0: raise ValueError(f'Image set {image_set} not available.')
+        if len(dataframe) == 0: 
+            Warnings.error('image_set_missing', name=imgset_mode, image_set=image_set)
         normalization = None
         if mode == 'classification': 
             dataframe = dataframe[list(CVData._classification_cols)]
@@ -501,14 +563,14 @@ class CVData:
             for i, row in dataframe.iterrows():
                 for val in row.values:
                     if isinstance(val, float) and isnan(val):
-                        error = '[CVData] Found NaN values that will cause errors in row:\n'
-                        error += str(dataframe.iloc[i])
-                        raise ValueError(error)
+                        row = str(dataframe.iloc[i])
+                        Warnings.error('nan_exists', row=row)
         
-        if len(dataframe) == 0: raise ValueError('[CVData] After cleanup, this dataset is empty.')
+        if len(dataframe) == 0:
+            Warnings.error('image_set_empty', image_set=image_set)
         return CVDataset(dataframe, self.root, mode, id_mapping=id_mapping, transform=transform,
-                         target_transform=target_transform, resize=resize, store_dim=store_dim,
-                         normalize_to=normalize, normalization=normalization)
+                        target_transform=target_transform, resize=resize, store_dim=store_dim,
+                        normalize_to=normalize, normalization=normalization)
 
     def get_dataloader(
         self,
@@ -537,6 +599,9 @@ class CVData:
                                  pertaining to the relevant mode. In the False case, either NaN
                                  values are substituted with empty values or an error is thrown,
                                  depending on the mode selected.
+        - store_dim (bool): if set to True, the labels in the dataset will return a dict with two
+                            keys. 'label' contains the standard PyTorch labels and 'dim' contains
+                            the image's former dimensions.
         - image_set (str, Optional): the image set to pull from. Default: all images.
         - transform (Callable, Optional): the transform operation to apply to the images.
         - target_transform (Callable, Optional): the transform operation on the labels.
@@ -588,20 +653,18 @@ class CVData:
         '''
         # checks before splitting
         mode = 'name' if isinstance(image_set, str) else 'id'
-        if mode == 'name' and image_set not in self.image_set_to_idx: 
-            raise ValueError("Image set doesn't exist!")
-        if mode == 'name' and any(new_set[0] in self.image_set_to_idx for new_set in new_sets): 
-            raise ValueError(f'New set name already exists!')
-        if mode == 'id' and image_set not in self.idx_to_image_set: 
-            raise ValueError("Image set ID doesn't exist!")
-        if mode == 'id' and any(new_set[0] in self.idx_to_image_set for new_set in new_sets): 
-            raise ValueError(f'New set ID already exists!')
+        check_set = self.image_set_to_idx if mode == 'name' else self.idx_to_image_set
+        if image_set not in check_set:
+            Warnings.error('image_set_missing', name=mode, image_set=image_set)
+        for new_set in new_sets:
+            if new_set[0] in check_set:
+                Warnings.error('new_exists', type=mode, name=new_set[0])
 
         tot_frac = sum(new_set[1] for new_set in new_sets)
         if not inplace and tot_frac != 1:
-            raise ValueError(f'Split fraction invalid, not equal to 1')
+            Warnings.error('split_invalid', desc='not equal to')
         if inplace and tot_frac > 1:
-            raise ValueError(f'Split fraction invalid, greater than 1')
+            Warnings.error('split_invalid', desc='greater than')
 
         # assemble new sets
         new_sets: list = list(new_sets)
@@ -691,12 +754,12 @@ class CVData:
         using_id: bool = isinstance(image_set, int)
         if using_id:
             if image_set not in self.idx_to_image_set: 
-                raise KeyError(f'Invalid ID: {image_set}')
+                Warnings.error('image_set_missing', name='ID', image_set=image_set)
             idx = image_set
             name = self.idx_to_image_set[idx]
         else:
             if image_set not in self.image_set_to_idx: 
-                raise KeyError(f'Invalid name: {image_set}')
+                Warnings.error('image_set_missing', name='name', image_set=image_set)
             name = image_set
             idx = self.image_set_to_idx[name]
 
@@ -743,7 +806,6 @@ class CVData:
             'idx_to_seg_class': self.idx_to_seg_class,
             'bbox_class_to_idx': self.bbox_class_to_idx,
             'idx_to_bbox_class': self.idx_to_bbox_class,
-            'get_img_dim': self.get_img_dim,
             'get_md5_hashes': self.get_md5_hashes,
             'bbox_scale_option': self.bbox_scale_option,
             'seg_scale_option': self.seg_scale_option,
@@ -751,7 +813,7 @@ class CVData:
             'cleaned': self.cleaned,
         }
         if os.path.exists(filename) and not overwrite:
-            raise ValueError(f'File already exists: {filename}')
+            Warnings.error('file_exists', filename=filename)
         with open(filename, 'w') as f:
             f.write(json.dumps(this))
 
@@ -773,8 +835,6 @@ class CVData:
             this: CVData = cls(
                 data['root'],
                 jsonpickle.decode(data['form'], keys=True),
-                remove_invalid=data['remove_invalid'],
-                get_img_dim=data['get_img_dim'],
                 get_md5_hashes=data['get_md5_hashes'],
                 bbox_scale_option=data['bbox_scale_option'],
                 seg_scale_option=data['seg_scale_option']
@@ -801,12 +861,12 @@ class CVData:
         mode: Optional[str] = None,
         idx: Optional[int] = None
     ) -> None:
-        if not self.cleaned: raise ValueError('Run parse() to populate data first!')
+        if not self.cleaned: self.parse()
         if mode is not None: 
             mode = union(mode)
             for try_mode in mode:
-                if try_mode not in self.available_modes: 
-                    raise ValueError(f'Mode {try_mode} not available.')
+                if try_mode not in self.available_modes:
+                    Warnings.error('mode_unavailable', mode=try_mode)
         else: mode = self.available_modes
         item = self.dataframe.iloc[idx] if idx is not None else self.dataframe.sample().iloc[0]
         transform = transforms.Compose([
@@ -834,12 +894,12 @@ class CVData:
             else:
                 assert len(item['POLYGON']) == len(item['SEG_CLASS_ID']), \
                     'SEG_CLASS_ID and POLYGON len mismatch'
-                mask = asarray(imread(item['ABSOLUTE_FILE'], IMREAD_GRAYSCALE), dtype=int32)
-                mask = full_like(mask, next_avail_id(self.idx_to_seg_class))
+                mask = np.asarray(imread(item['ABSOLUTE_FILE'], IMREAD_GRAYSCALE), dtype=np.int32)
+                mask = np.full_like(mask, next_avail_id(self.idx_to_seg_class))
                 for class_id, polygon in zip(item['SEG_CLASS_ID'], item['POLYGON']):
-                    mask = fillPoly(mask, pts=[asarray(polygon, dtype=int32)],
+                    mask = fillPoly(mask, pts=[np.asarray(polygon, dtype=np.int32)],
                                     color=class_id)
-                mask = torch.from_numpy(asarray(mask))
+                mask = torch.from_numpy(np.asarray(mask))
                 axarr[1].imshow(mask)
         else:
             plt.imshow(image.permute(1, 2, 0))
@@ -852,10 +912,11 @@ class CVData:
         dpi: float = 1200,
         mode: str = None
     ) -> None:
-        if not self.cleaned: raise ValueError('Run parse() to populate data first!')
-        if mode is None: raise ValueError('Must specify a valid mode.')
+        if not self.cleaned: self.parse()
+        if mode is None: 
+            Warnings.error('is_none', desc='Mode')
         if mode not in self.available_modes: 
-            raise ValueError(f'Mode {mode} not available.')
+            Warnings.error('mode_unavailable', mode=mode)
         plt.figure(dpi=dpi)
         if mode == 'classification':
             _, pred = torch.max(result, dim=1)
@@ -878,6 +939,17 @@ class CVData:
         else:
             plt.imshow(image.permute(1, 2, 0))
 
+'''
+CVDataset class functions.
+
+Need testing:
+- __init__
+- __len__
+- _get_class_labels
+- _get_bbox_labels
+- _get_seg_labels
+- __getitem__
+'''
 class CVDataset(VisionDataset):
     '''
     Dataset implementation for the CVData environment.
@@ -950,7 +1022,10 @@ class CVDataset(VisionDataset):
                                   p[3] * factor_resize[1] / factor_norm[1])
         bbox_tensors = [FloatTensor(apply_resize(box)) for box in boxes]
         if self.store_dim:
-            return {'boxes': torch.stack(bbox_tensors), 'labels': LongTensor(class_ids), 'dim': item['IMAGE_DIM']}
+            return {
+                'label': {'boxes': torch.stack(bbox_tensors), 'labels': LongTensor(class_ids)},
+                'dim': item['IMAGE_DIM']
+            }
         else:
             return {'boxes': torch.stack(bbox_tensors), 'labels': LongTensor(class_ids)}
 
@@ -963,10 +1038,10 @@ class CVDataset(VisionDataset):
         assert len(item['POLYGON']) == len(item['SEG_CLASS_ID']), \
             'SEG_CLASS_ID and POLYGON len mismatch'
         if self.resize is not None:
-            mask = full(self.resize, self.default, dtype=int32)
+            mask = np.full(self.resize, self.default, dtype=np.int32)
             factor_resize = self.resize
         else:
-            mask = full(item['IMAGE_DIM'], self.default, dtype=int32)
+            mask = np.full(item['IMAGE_DIM'], self.default, dtype=np.int32)
             factor_resize = (1, 1)
         if self.normalization == 'full': factor_norm = item['IMAGE_DIM']
         else: factor_norm = (1, 1)
@@ -974,9 +1049,9 @@ class CVDataset(VisionDataset):
                                   p[1] * factor_resize[1] / factor_norm[1])
         for class_id, polygon in zip(item['SEG_CLASS_ID'], item['POLYGON']):
             if self.resize is not None: polygon = list(map(apply_resize, polygon))
-            mask = fillPoly(mask, pts=[asarray(polygon, dtype=int32)],
+            mask = fillPoly(mask, pts=[np.asarray(polygon, dtype=np.int32)],
                             color=self.id_mapping[class_id])
-        mask = torch.from_numpy(asarray(mask)).unsqueeze(-1).permute(2, 0, 1)
+        mask = torch.from_numpy(np.asarray(mask)).unsqueeze(-1).permute(2, 0, 1)
         return mask
 
     def __getitem__(self, idx):

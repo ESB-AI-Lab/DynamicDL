@@ -1,5 +1,6 @@
 import torch
 from trainer import DetectionTrainer
+from src import DataTypes as DT
 from src import *
 
 if __name__ == '__main__':
@@ -9,31 +10,31 @@ if __name__ == '__main__':
 
     root = '/Users/atong/Documents/Datasets/OxfordPets'
     alias = Alias([
-        Generic(DataTypes.IMAGE_NAME),
-        Generic("{}_{}", DataTypes.CLASS_NAME, DataTypes.GENERIC)
+        Generic(DT.IMAGE_NAME),
+        Generic("{}_{}", DT.CLASS_NAME, DT.GENERIC)
     ])
     form = {
         "annotations": {
-            File("{}", DataTypes.IMAGE_SET_NAME, extensions="txt"): TXTFile(
+            File("{}", DT.IMAGE_SET_NAME, extensions="txt"): TXTFile(
                 GenericList(Generic(
-                    "{} {} {} {}", alias, DataTypes.CLASS_ID, DataTypes.GENERIC, DataTypes.GENERIC
+                    "{} {} {} {}", alias, DT.CLASS_ID, DT.GENERIC, DT.GENERIC
                 )),
                 ignore_type = '#'
             ),
             "trimaps": {
-                ImageFile("{}", DataTypes.IMAGE_NAME, ignore='._{}'): SegmentationImage()
+                ImageFile("{}", DT.IMAGE_NAME, ignore='._{}'): SegmentationImage()
             },
             "xmls": {
-                File("{}", DataTypes.IMAGE_NAME, extensions='xml'): XMLFile({
+                File("{}", DT.IMAGE_NAME, extensions='xml'): XMLFile({
                     "annotation": {
-                        "filename": Generic("{}.jpg", DataTypes.IMAGE_NAME),
+                        "filename": Generic("{}.jpg", DT.IMAGE_NAME),
                         "object": AmbiguousList({
-                            "name": DataTypes.BBOX_CLASS_NAME,
+                            "name": DT.BBOX_CLASS_NAME,
                             "bndbox": {
-                                "xmin": DataTypes.XMIN,
-                                "ymin": DataTypes.YMIN,
-                                "xmax": DataTypes.XMAX,
-                                "ymax": DataTypes.YMAX
+                                "xmin": DT.XMIN,
+                                "ymin": DT.YMIN,
+                                "xmax": DT.XMAX,
+                                "ymax": DT.YMAX
                             }
                         })
                     }
@@ -51,6 +52,7 @@ if __name__ == '__main__':
         resize=(512, 512),
         image_set='train',
         batch_size=batch_size,
+        store_dim=False,
         transforms=CVTransforms.DETECTION_NORESIZE
     )
     valloader = cvdata.get_dataloader(
@@ -58,6 +60,7 @@ if __name__ == '__main__':
         resize=(512, 512),
         image_set='val',
         batch_size=batch_size,
+        store_dim=False,
         transforms=CVTransforms.DETECTION_NORESIZE
     )
     testloader = cvdata.get_dataloader(
@@ -65,6 +68,7 @@ if __name__ == '__main__':
         resize=(512, 512),
         image_set='test',
         batch_size=batch_size,
+        store_dim=False,
         transforms=CVTransforms.DETECTION_NORESIZE
     )
 

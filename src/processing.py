@@ -9,7 +9,7 @@ import yaml
 from typing import Any, Union
 from abc import ABC, abstractmethod
 
-from ._utils import union, check_map
+from ._utils import union, check_map, Warnings
 from .data_items import DataTypes, DataItem, Generic, Static, DataType, DataEntry, RedundantToken, \
                         Folder, File, Image, SegmentationImage, UniqueToken
 
@@ -20,7 +20,7 @@ class GenericList:
     def __init__(self, form: Union[list[Any], Any]):
         self.form = union(form)
 
-    def expand(self, dataset: list[Any]) -> dict[Static, Any]:
+    def expand(self, dataset: list[Any]) -> tuple[dict[Static, Any], list]:
         '''
         Expand list into dict of statics.
         '''
@@ -30,7 +30,8 @@ class GenericList:
         item: list[Static | dict] = []
         pairings = []
         for index, entry in enumerate(dataset):
-            result, pairings = expand_generics(entry, self.form[index % len(self.form)])
+            result, pairing = expand_generics(entry, self.form[index % len(self.form)])
+            pairings += pairing
             item.append(result)
             if (index + 1) % len(self.form) == 0:
                 item_list.append({i: v for i, v in enumerate(item)})
@@ -45,21 +46,55 @@ class SegmentationObject:
         if isinstance(form, list): form = GenericList(form)
         self.form = form
 
-    def expand(self, dataset: list[Any]) -> dict[Static, Any]:
+    @staticmethod
+    def _merge(data: Union[dict[Union[Static, int], Any], Static]) -> DataEntry:
+        '''
+        Recursive process for merging data in segmentation object. Differs from main merge algorithm
+        because it can only process within unique values.
+        '''
+        # base cases
+        if isinstance(data, Static): return DataEntry(data.data)
+        recursive = []
+
+        # get result
+        for key, val in data.items():
+            result = SegmentationObject._merge(val)
+            # unique entry result
+            if isinstance(result, DataEntry):
+                if isinstance(key, Static): result = DataEntry.merge(DataEntry(key.data), result)
+                if result.unique: recursive.append([result])
+                else: recursive.append(result)
+                continue
+            # list entry result
+            if isinstance(key, Static):
+                for item in result: item.apply_tokens(key.data)
+            recursive.append(result)
+
+        # if inside unique loop, either can merge all together or result has multiple entries
+        result = DataEntry([])
+        for item in recursive:
+            result = DataEntry.merge(item, result)
+        return result
+
+    def expand(self, dataset: list[Any]) -> tuple[dict[Static, Any], list]:
         '''
         Expand object into dict of statics.
         '''
         item_dict, _ = self.form.expand(dataset)
-        x = []
-        y = []
-        for item in item_dict.values(): # need to future-proof for ordered dict implementations
-            for i in item.values():
-                assert isinstance(i, Static), f'Unknown item {item} found in segmentation object'
-                for data in i.data:
-                    if data.delimiter == DataTypes.X: x.append(data.value)
-                    elif data.delimiter == DataTypes.Y: y.append(data.value)
-                    else: raise ValueError('Unknown item found in segmentation object')
-        assert len(x) == len(y), 'Mismatch X and Y coordinates'
+        entry = self._merge(item_dict)
+        
+        x = entry.data.get('X').value
+        y = entry.data.get('Y').value
+        if x is None or y is None or len(entry.data) != 2:
+            Warnings.error( 'invalid_seg_object', keys=", ".join(list(entry.data.keys())))
+        if len(x) != len(y):
+            Warnings.error(
+                'row_mismatch',
+                name1='X',
+                name2='Y',
+                len1=len(x),
+                len2=len(y)
+            )
         return Static('SegObject', DataItem(DataTypes.POLYGON, list(zip(x, y)))), []
 
 class AmbiguousList:
@@ -250,7 +285,8 @@ def expand_generics(dataset: Union[dict[str, Any], Any],
         root = Generic('{}', root)
     if isinstance(root, Generic):
         success, tokens = root.match(str(dataset))
-        if not success: raise ValueError(f'Failed to match: {dataset} to {root}')
+        if not success:
+            Warnings.error('fail_generic_match', dataset=dataset, root=root)
         return Static(str(dataset), tokens), []
     expanded_root: dict[Static, Any] = {}
     generics: list[Generic] = []
@@ -275,7 +311,7 @@ def expand_generics(dataset: Union[dict[str, Any], Any],
             names.add(key.name)
             expanded_root[key] = val
             continue
-        raise ValueError(f'Static value {key} not found in dataset')
+        Warnings.error('static_missing', value=key)
 
      # expand Generics 
     while len(generics) != 0:
@@ -313,7 +349,7 @@ def expand_generics(dataset: Union[dict[str, Any], Any],
             pairings.append(value)
             to_pop.append(key)
         else:
-            raise ValueError(f'Inappropriate value {value}')
+            Warnings.error('inappropriate_type', value=value)
     for item in to_pop: expanded_root.pop(item)
     return expanded_root, pairings
 
@@ -357,7 +393,7 @@ def expand_file_generics(path: str, dataset: dict[str, Any],
             names.add(key.name)
             expanded_root[key] = val
             continue
-        raise ValueError(f'Static value {key} not found in dataset')
+        Warnings.error('static_missing', value=key)
 
     # expand Generics 
     while len(generics) != 0:
@@ -397,8 +433,8 @@ def expand_file_generics(path: str, dataset: dict[str, Any],
         elif isinstance(value, Pairing):
             to_pop.append(key)
             value.find_pairings(dataset[key.name], in_file=False)
-        else: 
-            raise ValueError(f'Unknown value found in format: {value}')
+        else:
+            Warnings.error('inappropriate_type', value=value)
     for item in to_pop: expanded_root.pop(item)
     return expanded_root, pairings
 
@@ -412,8 +448,8 @@ def _add_to_hashmap(hashmaps: dict[str, dict[str, DataEntry]], entry: DataEntry,
         if not value: continue
         if value.value in hashmaps[id_try.desc]:
             result = hashmaps[id_try.desc][value.value].merge_inplace(entry)
-            if not result: raise ValueError(f'Found conflicting information when merging \
-                {hashmaps[id_try.desc][value.value]} and {entry}')
+            if not result:
+                Warnings.error('merge_conflict', first=hashmaps[id_try.desc][value.value], second=entry)
             for id_update in unique_identifiers:
                 value_update = entry.data.get(id_update.desc)
                 if id_update == id_try or not value_update: continue
@@ -485,6 +521,8 @@ def _merge(data: Union[dict[Union[Static, int], Any], Static]) -> \
             result = DataEntry.merge(item, result)
         return result
 
+    # if there are non unique entries then the data will naturally fall through as pairings are
+    # meant to catch the nonunique data
     uniques: list[DataEntry] = []
     others: list[DataEntry] = []
     for item in tokens:
@@ -495,7 +533,6 @@ def _merge(data: Union[dict[Union[Static, int], Any], Static]) -> \
 def populate_data(root, form) -> list[DataEntry]:
     dataset = _get_files(root)
     data, pairings = expand_file_generics(root, dataset, form)
-    # print(get_str(data))
     data = _merge(data)
     for pairing in pairings:
         for entry in data:

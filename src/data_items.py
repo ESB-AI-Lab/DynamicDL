@@ -8,9 +8,10 @@ from copy import copy
 from typing import Any, Union
 from typing_extensions import Self
 
-from ._utils import union
+from ._utils import union, Warnings
 
-_image_extensions = ['jpg', 'jpeg', 'png', 'tiff', 'jpe', 'jfif', 'j2c', 'j2k', 'jp2', 'jpc', 'jpf', 'jpx', 'apng', 'tif', 'webp']
+_image_extensions = ['jpg', 'jpeg', 'png', 'tiff', 'jpe', 'jfif', 'j2c', 'j2k', 'jp2', 'jpc', 'jpf',
+                     'jpx', 'apng', 'tif', 'webp']
 
 class Token:
     '''
@@ -206,8 +207,8 @@ class DataTypes:
     HEIGHT = DataType('HEIGHT', RedundantQuantityToken())
     SEG_CLASS_NAME = DataType('SEG_CLASS_NAME', RedundantToken())
     SEG_CLASS_ID = DataType('SEG_CLASS_ID', RedundantIDToken())
-    X = DataType('X', QuantityToken())
-    Y = DataType('Y', QuantityToken())
+    X = DataType('X', RedundantQuantityToken())
+    Y = DataType('Y', RedundantQuantityToken())
     NAME = DataType('NAME', WildcardToken())
     GENERIC = DataType('GENERIC', WildcardToken())
     POLYGON = DataType('POLYGON', RedundantObjectToken())
@@ -263,7 +264,8 @@ class DataEntry:
         {'IMAGE_SET_ID', 'IMAGE_SET_NAME'},
         {'XMIN', 'XMAX', 'YMIN', 'YMAX', 'XMID', 'YMID', 'X1', 'X2', 'Y1', 'Y2', 'WIDTH', 'HEIGHT',
          'BBOX_CLASS_ID', 'BBOX_CLASS_NAME'},
-        {'POLYGON', 'SEG_CLASS_ID', 'SEG_CLASS_NAME'}
+        {'POLYGON', 'SEG_CLASS_ID', 'SEG_CLASS_NAME'},
+        {'X', 'Y'}
     ]
     def __init__(self, items: Union[list[DataItem], DataItem]):
         items: list[DataItem] = union(items)
@@ -292,7 +294,7 @@ class DataEntry:
                     redundant_overlap.add(desc)
                 continue
             if desc in merged.data and merged.data[desc] != second.data[desc]:
-                raise ValueError(f'Conflicting information found while merging two entries: {first} and {second}')
+                Warnings.error('merge_conflict', first=first, second=second)
         allocated = False
         for group in DataEntry._valid_sets:
             if redundant_overlap.issubset(group):
@@ -300,7 +302,7 @@ class DataEntry:
                 allocated = True
                 break
         if not allocated:
-            raise ValueError(f'Illegal differences ({redundant_overlap}) in more than one redundant group: \n{first}\n{second}')
+            Warnings.error('merge_redundant_conflict', overlap=redundant_overlap, first=first, second=second)
         for desc in redundant_overlap:
             if desc in merged.data and desc in second.data:
                 merged.data[desc].add(second.data[desc])
@@ -327,7 +329,7 @@ class DataEntry:
                     redundant_overlap.add(desc)
                 continue
             if desc in self.data and self.data[desc] != other.data[desc]:
-                raise ValueError(f'Conflicting information found while merging two entries: {self} and {other}')
+                Warnings.error('merge_conflict', first=self, second=other)
         allocated = False
         for group in DataEntry._valid_sets:
             if redundant_overlap.issubset(group):
@@ -335,7 +337,7 @@ class DataEntry:
                 allocated = True
                 break
         if not allocated:
-            raise ValueError(f'Illegal differences ({redundant_overlap}) in more than one redundant group: \n{self}\n{other}')
+            Warnings.error('merge_redundant_conflict', overlap=redundant_overlap, first=self, second=other)
         for desc in redundant_overlap:
             if desc in self.data and desc in other.data:
                 self.data[desc].add(other.data[desc])
@@ -507,9 +509,7 @@ class File(Generic):
             pattern = '{}'
         result = re.findall('(.+)\.(.+)', pattern)
         if not disable_warnings and result:
-            print('Warning: pattern has a . in it. If this is a file extension, omit in the \
-                pattern and include with keyword extensions. Disable this message with \
-                disable_warnings=True.')
+            Warnings.warn('file_ext')
         self.extensions = extensions
         super().__init__(pattern, *data, ignore=ignore)
 

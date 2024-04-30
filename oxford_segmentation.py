@@ -1,41 +1,40 @@
 import torch
 from trainer import SegmentationTrainer
+from src import DataTypes as DT
 from src import *
 
 if __name__ == '__main__':
-    image_channels: int = 3
-    mask_channels: int = 1
-    batch_size: int = 1
+    batch_size: int = 4
     learning_rate: float = 2.5e-4
     epochs: int = 4
 
     root = '/Users/atong/Documents/Datasets/OxfordPets'
     alias = Alias([
-        Generic(DataTypes.IMAGE_NAME),
-        Generic("{}_{}", DataTypes.CLASS_NAME, DataTypes.GENERIC)
+        Generic(DT.IMAGE_NAME),
+        Generic("{}_{}", DT.CLASS_NAME, DT.GENERIC)
     ])
     form = {
         "annotations": {
-            File("{}", DataTypes.IMAGE_SET_NAME, extensions="txt"): TXTFile(
+            File("{}", DT.IMAGE_SET_NAME, extensions="txt"): TXTFile(
                 GenericList(Generic(
-                    "{} {} {} {}", alias, DataTypes.CLASS_ID, DataTypes.GENERIC, DataTypes.GENERIC
+                    "{} {} {} {}", alias, DT.CLASS_ID, DT.GENERIC, DT.GENERIC
                 )),
                 ignore_type = '#'
             ),
             "trimaps": {
-                ImageFile("{}", DataTypes.IMAGE_NAME, ignore='._{}'): SegmentationImage()
+                ImageFile("{}", DT.IMAGE_NAME, ignore='._{}'): SegmentationImage()
             },
             "xmls": {
-                File("{}", DataTypes.IMAGE_NAME, extensions='xml'): XMLFile({
+                File("{}", DT.IMAGE_NAME, extensions='xml'): XMLFile({
                     "annotation": {
-                        "filename": Generic("{}.jpg", DataTypes.IMAGE_NAME),
+                        "filename": Generic("{}.jpg", DT.IMAGE_NAME),
                         "object": AmbiguousList({
-                            "name": DataTypes.BBOX_CLASS_NAME,
+                            "name": DT.BBOX_CLASS_NAME,
                             "bndbox": {
-                                "xmin": DataTypes.XMIN,
-                                "ymin": DataTypes.YMIN,
-                                "xmax": DataTypes.XMAX,
-                                "ymax": DataTypes.YMAX
+                                "xmin": DT.XMIN,
+                                "ymin": DT.YMIN,
+                                "xmax": DT.XMAX,
+                                "ymax": DT.YMAX
                             }
                         })
                     }
@@ -55,21 +54,24 @@ if __name__ == '__main__':
         resize=(512, 512),
         image_set='train',
         batch_size=batch_size,
-        transforms=CVTransforms.DETECTION_NORESIZE
+        store_dim=False,
+        transforms=CVTransforms.SEGMENTATION_NORESIZE
     )
     valloader = cvdata.get_dataloader(
         'segmentation',
         resize=(512, 512),
         image_set='val',
         batch_size=batch_size,
-        transforms=CVTransforms.DETECTION_NORESIZE
+        store_dim=False,
+        transforms=CVTransforms.SEGMENTATION_NORESIZE
     )
     testloader = cvdata.get_dataloader(
         'segmentation',
         resize=(512, 512),
         image_set='test',
         batch_size=batch_size,
-        transforms=CVTransforms.DETECTION_NORESIZE
+        store_dim=False,
+        transforms=CVTransforms.SEGMENTATION_NORESIZE
     )
 
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
