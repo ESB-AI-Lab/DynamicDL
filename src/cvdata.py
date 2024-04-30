@@ -116,12 +116,16 @@ class CVData:
     Args:
     - root (str): the root directory to access the dataset.
     - form (dict): the form of the dataset. See documentation for further details on valid forms.
-    - get_md5_hashes (bool): when set to True, create a new column which finds md5 hashes for each
-                             image available, and makes sure there are no duplicates. Default: False
     - bbox_scale_option (str): choose from either 'auto', 'zeroone', or 'full' scale options to
                                define, or leave empty for automatic. Default: 'auto'
     - seg_scale_option (str): choose from either 'auto', 'zeroone', or 'full' scale options to
                               define, or leave empty for automatic. Default: 'auto'
+    - get_md5_hashes (bool): when set to True, create a new column which finds md5 hashes for each
+                             image available, and makes sure there are no duplicates. Default: False
+    - purge_duplicates (Optional[bool]): when set to True, remove all duplicate image entries.
+                                         Duplicate images are defined by having the same md5 hash,
+                                         so this has no effect when get_md5_hashes is False. When
+                                         set to False, do not purge duplicates. Default: None
     '''
 
     _inference_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'IMAGE_DIM'}
@@ -172,9 +176,10 @@ class CVData:
         self, 
         root: str, 
         form: dict,
-        get_md5_hashes: bool = False,
         bbox_scale_option: str = 'auto',
-        seg_scale_option: str = 'auto'
+        seg_scale_option: str = 'auto',
+        get_md5_hashes: bool = False,
+        purge_duplicates: Optional[bool] = None
     ) -> None:
         self.root = root
         self.form = form
@@ -189,6 +194,7 @@ class CVData:
         self.available_modes = []
         self.cleaned = False
         self.get_md5_hashes = get_md5_hashes
+        self.purge_duplicates = purge_duplicates
         self.bbox_scale_option = bbox_scale_option
         self.seg_scale_option = seg_scale_option
 
@@ -325,10 +331,17 @@ class CVData:
         for i, md5hash in enumerate(hashes):
             counter[md5hash] = counter.get(md5hash, []) + [i]
         duplicates = (locs for locs in counter.values() if len(locs) > 1)
-        if duplicates:
-            duplicates = "".join([f'\n{i}: {", ".join([self.dataframe["IMAGE_NAME"].iloc[loc] for loc in locs])}' for i, locs in enumerate(duplicates)])
-            Warnings.error('duplicate_images', duplicates=duplicates)
         self.dataframe['MD5'] = hashes
+        if duplicates:
+            if self.purge_duplicates is None:
+                duplicates = "".join([f'\n{i}: {", ".join([self.dataframe["IMAGE_NAME"].iloc[loc] for loc in locs])}' for i, locs in enumerate(duplicates)])
+                Warnings.error('duplicate_images', duplicates=duplicates)
+            if self.purge_duplicates:
+                dupes = []
+                for locs in duplicates:
+                    dupes += locs[1:]
+                self.dataframe.drop(dupes, inplace=True)
+        
 
     def _get_box_scale(self) -> None:
         if self.bbox_scale_option == 'auto':
@@ -580,7 +593,7 @@ class CVData:
         num_workers: int = 1,
         remove_invalid: bool = True,
         store_dim: bool = False,
-        image_set: Optional[str] = None,
+        image_set: Optional[Union[int, str]] = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
         transforms: Optional[tuple[Callable]] = None,
