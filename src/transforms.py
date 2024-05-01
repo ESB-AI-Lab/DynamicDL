@@ -1,5 +1,6 @@
 '''
-Adapted from torchvision: https://github.com/pytorch/vision/blob/main/torchvision/transforms/_presets.py
+Adapted from torchvision:
+https://github.com/pytorch/vision/blob/main/torchvision/transforms/_presets.py
 '''
 
 from typing import Optional, Tuple, Callable
@@ -7,7 +8,6 @@ import torch
 from torch import nn, Tensor
 from torchvision.transforms import functional as F, InterpolationMode
 
-from ._utils import Warnings
 
 class ObjectDetection(nn.Module):
     def __init__(
@@ -34,8 +34,8 @@ class ObjectDetection(nn.Module):
 
     def describe(self) -> str:
         return (
-            "Accepts ``PIL.Image``, batched ``(B, C, H, W)`` and single ``(C, H, W)`` image ``torch.Tensor`` objects. "
-            "The images are rescaled to ``[0.0, 1.0]``."
+            "Accepts ``PIL.Image``, batched ``(B, C, H, W)`` and single ``(C, H, W)`` image "
+            "``torch.Tensor`` objects. The images are rescaled to ``[0.0, 1.0]``."
         )
 
 class ImageClassification(nn.Module):
@@ -65,7 +65,8 @@ class ImageClassification(nn.Module):
         if not isinstance(img, Tensor):
             img = F.pil_to_tensor(img)
         img = F.convert_image_dtype(img, torch.float)
-        if self.normalize: img = F.normalize(img, mean=self.mean, std=self.std)
+        if self.normalize:
+            img = F.normalize(img, mean=self.mean, std=self.std)
         return img
 
     def __repr__(self) -> str:
@@ -80,10 +81,12 @@ class ImageClassification(nn.Module):
 
     def describe(self) -> str:
         return (
-            "Accepts ``PIL.Image``, batched ``(B, C, H, W)`` and single ``(C, H, W)`` image ``torch.Tensor`` objects. "
-            f"The images are resized to ``resize_size={self.resize_size}`` using ``interpolation={self.interpolation}``, "
-            f"followed by a central crop of ``crop_size={self.crop_size}``. Finally the values are first rescaled to "
-            f"``[0.0, 1.0]`` and then normalized using ``mean={self.mean}`` and ``std={self.std}``."
+            "Accepts ``PIL.Image``, batched ``(B, C, H, W)`` and single ``(C, H, W)`` image "
+            "``torch.Tensor`` objects. The images are resized to "
+            f"``resize_size={self.resize_size}`` using ``interpolation={self.interpolation}``, "
+            f"followed by a central crop of ``crop_size={self.crop_size}``. Finally the values are "
+            f"first rescaled to ``[0.0, 1.0]`` and then normalized using ``mean={self.mean}`` and "
+            f"``std={self.std}``."
         )
 
 class SemanticSegmentation(nn.Module):
@@ -107,7 +110,12 @@ class SemanticSegmentation(nn.Module):
 
     def forward(self, img: Tensor) -> Tensor:
         if isinstance(self.resize_size, list):
-            img = F.resize(img, self.resize_size, interpolation=self.interpolation, antialias=self.antialias)
+            img = F.resize(
+                img,
+                self.resize_size,
+                interpolation=self.interpolation,
+                antialias=self.antialias
+            )
         if not isinstance(img, Tensor):
             img = F.pil_to_tensor(img)
         img = F.convert_image_dtype(img, torch.float)
@@ -126,10 +134,11 @@ class SemanticSegmentation(nn.Module):
 
     def describe(self) -> str:
         return (
-            "Accepts ``PIL.Image``, batched ``(B, C, H, W)`` and single ``(C, H, W)`` image ``torch.Tensor`` objects. "
-            f"The images are resized to ``resize_size={self.resize_size}`` using ``interpolation={self.interpolation}``. "
-            f"Finally the values are first rescaled to ``[0.0, 1.0]`` and then normalized using ``mean={self.mean}`` and "
-            f"``std={self.std}``."
+            "Accepts ``PIL.Image``, batched ``(B, C, H, W)`` and single ``(C, H, W)`` image "
+            "``torch.Tensor`` objects. The images are resized to "
+            f"``resize_size={self.resize_size}`` using ``interpolation={self.interpolation}``. "
+            f"Finally the values are first rescaled to ``[0.0, 1.0]`` and then normalized using "
+            f"``mean={self.mean}`` and ``std={self.std}``."
         )
 
 class CVTransforms:
@@ -142,7 +151,7 @@ class CVTransforms:
                     SemanticSegmentation(resize_size=520, normalize=False))
     SEGMENTATION_NORESIZE = (SemanticSegmentation(resize_size=None, normalize=True), 
                              SemanticSegmentation(resize_size=None, normalize=False))
-    
+
     @staticmethod
     def get(
         mode: str,
@@ -151,13 +160,29 @@ class CVTransforms:
         mean: Tuple[float, ...] = (0.485, 0.456, 0.406),
         std: Tuple[float, ...] = (0.229, 0.224, 0.225)
     ) -> Tuple[Optional[Callable], ...]:
+        '''
+        Retrieve the standard transforms for classification, detection, and segmentation.
+        
+        - `mode` (`str`): choose between classification, detection, and segmentation.
+        - `resize` (`bool`): True if planning to resize. Default: False.
+        - `normalize` (`bool`): True for normalized transforms according to mean and std, False
+            otherwise. Default: True.
+        - `mean` (`Tuple[float, ...]`): the mean to use for normalization. Has no effect when
+            normalize is false. Default is ImageNet dataset statistics.
+        - `std` (`Tuple[float, ...]`): the std to use for normalization. Has no effect when
+            normalize is false. Default is ImageNet dataset statistics.
+        '''
         if mode == 'classification':
-            return (ImageClassification(crop_size=224, normalize=normalize, mean=mean, std=std), None)
-        elif mode == 'detection':
+            return (
+                ImageClassification(crop_size=224, normalize=normalize, mean=mean, std=std),
+                None
+            )
+        if mode == 'detection':
             return (ObjectDetection(normalize=normalize, mean=mean, std=std), None)
-        elif mode == 'segmentation':
+        if mode == 'segmentation':
             resize = None if resize else 520
-            return (SemanticSegmentation(resize_size=resize, normalize=normalize, mean=mean, std=std),
-                    SemanticSegmentation(resize_size=resize, normalize=False, mean=mean, std=std))
-        else:
-            return (None, None)
+            return (
+                SemanticSegmentation(resize_size=resize, normalize=normalize, mean=mean, std=std),
+                SemanticSegmentation(resize_size=resize, normalize=False, mean=mean, std=std)
+            )
+        return (None, None)
