@@ -5,17 +5,18 @@ maintains the CVDataset class for PyTorch Dataset and DataLoader functionalities
 import os
 import time
 import json
-from typing import Union, Optional, Callable, Iterable, Any
 from hashlib import md5
 from functools import partial
 from math import isnan
 import random
+from typing import Union, Optional, Callable, Iterable, Any
+
+import cv2
 from tqdm import tqdm
 import numpy as np
 import jsonpickle
 from pandas import DataFrame
 from pandas.core.series import Series
-import cv2
 from torch.utils.data import Dataset, DataLoader
 from torch import Tensor, LongTensor, FloatTensor
 import torch

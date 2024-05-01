@@ -222,11 +222,11 @@ class TXTFile(DataFile):
         '''
         Initialize the constructor.
         
-        - line_format (list[Generic] | Generic): the structure to parse, repetitively, with data.
-        - offset (int): number of items to skip from the top of the file.
-        - ignore_type (list[Generic | str] | Generic | str): ignore the list of
+        - `line_format` (`list[Generic] | Generic`): the structure to parse, repetitively.
+        - `offset` (`int`): number of items to skip from the top of the file.
+        - `ignore_type` (`list[Generic | str] | Generic | str`): ignore the list of
             formats or lines beginning with str when parsing.
-        - by_line (bool): true if parsing is to be done per line, rather than continuously.
+        - `by_line` (`bool`): true if parsing is to be done per line, rather than continuously.
         '''
         self.line_format = line_format
         self.offset: int = offset

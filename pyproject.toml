@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.poetry]
+name = "cvdata"
+version = "0.1.0-alpha.1"
+description = "A PyTorch-based dynamic dataloading library"
+authors = ["Anthony Tong <atong28.usa@gmail.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/atong28/CVData"
+repository = "https://github.com/atong28/CVData"
+
+[tool.poetry.dependencies]
+python = ">=3.9"
+opencv-python = { version = ">=4.6.0,<=4.9.0.80" }
+Pillow = { version = ">=8.0.0,<=10.3.0" }
+PyYAML = { version = ">=5.4.0,<=6.0.1" }
+tqdm = { version = ">=4.1.0,<=4.66.2" }
+numpy = { version = ">=1.18.0,<2.0.0" }
+pandas = { version = ">=1.0.0,<=2.2.2" }
+torch = { version = ">=2.0.0,<=2.3.0" }
+torchvision = { version = ">=0.15.1,<=0.18.0" }
+typing-extensions = { version = ">=4.0.0,<=4.11.0" }
+xmltodict = { version = ">=0.12.0,<=0.13.0" }
+jsonpickle = { version = ">=3.0.0,<=3.1.0" }
+matplotlib = { version = ">=3.6.0,<=3.8.4" }
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
