@@ -371,6 +371,8 @@ def expand_generics(dataset: Union[dict[str, Any], Any],
     '''
     Expand all generics and set to statics.
     '''
+    if isinstance(root, list):
+        root = GenericList(root)
     if isinstance(root, (GenericList, SegmentationObject)):
         return root.expand(dataset)
     if isinstance(root, DataType):
@@ -429,6 +431,8 @@ def expand_generics(dataset: Union[dict[str, Any], Any],
     to_pop = []
 
     for key, value in expanded_root.items():
+        if isinstance(value, list):
+            value = GenericList(value)
         if isinstance(value, (dict, Generic)):
             uniques, pairing = expand_generics(dataset[key.name], value)
             expanded_root[key] = uniques

@@ -899,6 +899,8 @@ class CVData:
             'dataframe': self.dataframe.to_json(),
             'image_set_to_idx': self.image_set_to_idx,
             'idx_to_image_set': self.idx_to_image_set,
+            'class_to_idx': self.class_to_idx,
+            'idx_to_class': self.idx_to_class,
             'seg_class_to_idx': self.seg_class_to_idx,
             'idx_to_seg_class': self.idx_to_seg_class,
             'bbox_class_to_idx': self.bbox_class_to_idx,
@@ -939,12 +941,17 @@ class CVData:
                 seg_scale_option=data['seg_scale_option']
             )
             this.dataframe = DataFrame.from_dict(json.loads(data['dataframe']))
-            this.image_set_to_idx = data['image_set_to_idx']
-            this.idx_to_image_set = data['idx_to_image_set']
-            this.seg_class_to_idx = data['seg_class_to_idx']
-            this.idx_to_seg_class = data['idx_to_seg_class']
-            this.bbox_class_to_idx = data['bbox_class_to_idx']
-            this.idx_to_bbox_class = data['idx_to_bbox_class']
+            for name in ('image_set', 'class', 'bbox_class', 'seg_class'):
+                setattr(
+                    this,
+                    f'{name}_to_idx',
+                    data[f'{name}_to_idx']
+                )
+                setattr(
+                    this,
+                    f'idx_to_{name}',
+                    {int(i): v for i, v in data[f'idx_to_{name}'].items()}
+                )
             this.available_modes = data['available_modes']
             this.cleaned = data['cleaned']
             end = time.time()

@@ -1,9 +1,27 @@
 # CVData
-Making computer vision accessible to all, one step at a time. Step 1: Data
+
+## Introduction
+
+In recent days computer vision has become a hot topic in the field of AI and computer science. Advances in hardware and computational power has enabled deep learning to become pervasive in everyday life, and computer vision architectures serve many purposes in today's world. Yet a high barrier of entry remains in dataloading. While deep learning architectures are a "plug and chug", requiring users to possess near-zero knowledge about its inner works, dataloading still remains a barrier to most seeking to test their custom datasets. CVData is a library to counteract that, containing code to dynamically process datasets.
+
+## Tutorials found [here!](./tutorial.md) 
+## Docs found [here!](./docs.md)
+
+## Installation
+
+Building from dev branch, navigate to the clone and run
 
 ```
-This repo is a WIP! Stay tuned for a beta and further documentation.
+$ pip install .
 ```
+
+From PyPI:
+
+```
+$ pip install cvdata
+```
+
+For server versions use `cvdata-headless` instead of `cvdata`.
 
 ```python
 import torch

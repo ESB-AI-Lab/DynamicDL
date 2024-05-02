@@ -20,7 +20,7 @@ setup(
         "pandas>=1.0.0,<=2.2.2",
         "torch>=2.0.0,<=2.3.0",
         "torchvision>=0.15.1,<=0.18.0",
-        "typing_extensions>=4.0.0,<=4.11.0",
+        "typing-extensions>=4.0.0,<=4.11.0",
         "xmltodict>=0.12.0,<=0.13.0",
         "jsonpickle>=3.0.0,<=3.1.0",
         "matplotlib>=3.6.0,<=3.8.4"

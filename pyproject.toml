@@ -13,7 +13,7 @@ homepage = "https://github.com/atong28/CVData"
 repository = "https://github.com/atong28/CVData"
 
 [tool.poetry.dependencies]
-python = ">=3.9"
+python = ">=3.6"
 opencv-python = { version = ">=4.6.0,<=4.9.0.80" }
 Pillow = { version = ">=8.0.0,<=10.3.0" }
 PyYAML = { version = ">=5.4.0,<=6.0.1" }
