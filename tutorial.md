@@ -177,8 +177,8 @@ form = {
     }
 }
 
-cvdata = CVData(root, form)
-cvdata.parse()
+my_data = cvd.CVData(root, form)
+my_data.parse()
 ```
 
 Voila! We have a fully functional COCO Dataset parser. Notice how straightforward it was - the JSONFile parsing almost exactly matches the syntax of the json file itself. The only exception is the `Pairing` class, which is a wrapper class to tell `cvdata` that two datatypes are generally associated together but are not tied to any specific images. This is to avoid confusion and some problems that may arise during parsing.
@@ -186,7 +186,13 @@ Voila! We have a fully functional COCO Dataset parser. Notice how straightforwar
 How does it work? Well, `cvdata` uses a hierarchy-based algorithm to merge data together. It starts at the deepest levels and merges data tokens together into `DataEntry` items and gradually works its way up to the surface level. Data entries are merged if they share the same unique identifier (i.e. image name, filename, image id, etc.), and bubbled up to the top. Then we can view our data in a Pandas dataframe:
 
 ```python
-cvdata.dataframe
+my_data.dataframe
 ```
 
-And done! Of course, there are other functions, and a lot of functions behind the scenes to clean up the (potentially) messy data and address inconsistencies. 
+And done! Of course, there are other functions, and a lot of functions behind the scenes to clean up the (potentially) messy data and address inconsistencies. We can now access our dataloader with the following:
+
+```python
+dataloader = my_data.get_dataloader('detection')
+```
+
+See the [docs](./docs.md) for more details on options you can use!s

@@ -54,7 +54,7 @@ class GenericList:
     '''
     Generic list item. Items inside the list are expected to repeat mod `len(form)`.
     
-    - `form` (`list[Any] | Any`): the form to stick to. Each entry in `form` must be some valid form
+     - `form` (`list[Any] | Any`): the form to stick to. Each entry in `form` must be some valid form
         following the syntax of `CVData` forms.
     '''
     def __init__(
@@ -93,7 +93,7 @@ class SegmentationObject:
     the purpose of being a wrapper class for `GenericList` and should be instantiated when the only
     contents inside are `DataTypes.X` and `DataTypes.Y` items as well as non-data items.
     
-    - `form` (`GenericList | list`): either a GenericList object or a list which will create a GL.
+     - `form` (`GenericList | list`): either a GenericList object or a list which will create a GL.
     '''
     def __init__(
         self,
@@ -111,7 +111,7 @@ class SegmentationObject:
         Recursive process for merging data in segmentation object. Differs from main merge algorithm
         because it can only process within unique values.
         
-        - `data` (`dict[Static | int, Any] | Static`): the data to merge, from the expand call.
+         - `data` (`dict[Static | int, Any] | Static`): the data to merge, from the expand call.
         '''
         # base cases
         if isinstance(data, Static):
@@ -144,7 +144,7 @@ class SegmentationObject:
         Evaluate object by expanding and merging, and extracting the corresponding X, Y values
         which define the SegmentationObject.
         
-        - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `CVData`
+         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `CVData`
             data.
         '''
         item_dict, _ = self.form.expand(dataset)
@@ -169,7 +169,7 @@ class AmbiguousList:
     Ambiguous List. Used to represent when an item could either be in a list, or a solo item.
     This is primarily used for XML files.
     
-    - `form` (`GenericList | list | Any`): effectively wrapper for GenericList. Either provide with
+     - `form` (`GenericList | list | Any`): effectively wrapper for GenericList. Either provide with
         GenericList instantiation values or provide a GenericList.
     '''
     def __init__(self, form: Union[GenericList, list, Any]):
@@ -212,22 +212,23 @@ class JSONFile(DataFile):
 class TXTFile(DataFile):
     '''
     Utility functions for parsing txt files.
+    
+     - `line_format` (`GenericList | Pairing | Any`): the structure to parse, repetitively. If
+        neither a GenericList nor Pairing is passed then structure is assumed to be the args in
+        the constructor of a GenericList.
+     - `offset` (`int`): number of items to skip from the top of the file.
+     - `ignore_type` (`list[Generic | str] | Generic | str`): ignore the list of formats or lines 
+        beginning with str when parsing.
+     - `by_line` (`bool`): true if parsing is to be done per line, rather than continuously.
     '''
     def __init__(
         self,
-        line_format: Union[GenericList, 'Pairing'],
+        line_format: Union[GenericList, 'Pairing', Any],
         offset: int = 0,
         ignore_type: Union[list[Union[Generic, str]], Generic, str] = None
     ) -> None:
-        '''
-        Initialize the constructor.
-        
-        - `line_format` (`list[Generic] | Generic`): the structure to parse, repetitively.
-        - `offset` (`int`): number of items to skip from the top of the file.
-        - `ignore_type` (`list[Generic | str] | Generic | str`): ignore the list of
-            formats or lines beginning with str when parsing.
-        - `by_line` (`bool`): true if parsing is to be done per line, rather than continuously.
-        '''
+        if not isinstance(line_format, (GenericList, Pairing)):
+            line_format = GenericList(line_format)
         self.line_format = line_format
         self.offset: int = offset
         self.ignore_type: list[Generic] = []
@@ -283,6 +284,9 @@ class Pairing:
     '''
     Used to specify when two nonunique datatypes should be associated together. Most commonly used
     to pair ID and name together.
+     - `form` (`Any`): Whatever follows the CVData specified form as required. Pairing is a wrapper
+        class so let it behave as it should
+     - `paired` (`DataType`): Items which should be associated together. 
     '''
     def __init__(self, form: Any, *paired: DataType) -> None:
         if len(paired) <= 1:
@@ -291,12 +295,16 @@ class Pairing:
         self.paired_desc = {pair.desc for pair in paired}
         self.form = form
         self.redundant = isinstance(paired[0].token_type, RedundantToken)
+        if (not all(isinstance(pair.token_type, RedundantToken) for pair in self.paired)
+            if self.redundant else
+            all(not isinstance(pair.token_type, RedundantToken) for pair in self.paired)):
+            Warnings.error('invalid_pairing', paired=', '.join(map(str, paired)))
 
     def update_pairing(self, entry: DataEntry) -> None:
         '''
         Update a data entry with pairing values, and does nothing if the pairing does not aplpy.
         
-        `entry` (`DataEntry`): the entry to apply this pairing
+         - `entry` (`DataEntry`): the entry to apply this pairing
         '''
         entry_vals = set(entry.data.keys())
         overlap = entry_vals.intersection(self.paired_desc)

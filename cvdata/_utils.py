@@ -106,6 +106,8 @@ class Warnings:
                            '({length2})', LengthMismatchError)
     invalid_dataset = ('This may not be a valid CVDataset, or the dataset is too old.', ValueError)
     pairings_missing = ('Must have at least 2 pairing datatypes.', ValueError)
+    invalid_pairing = ('Pairings are not of the same type, either must all be redundant or none'
+                       'redundant. Given: {paired}', MergeError)
 
     @staticmethod
     def warn(name: str, **kwargs: str) -> None:
