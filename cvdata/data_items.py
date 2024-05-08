@@ -4,17 +4,17 @@ Module `data_items`
 Module with main data items for dataset parsing.
 
 Token (pseudo-private) classes:
-- `Token`
-  - `RedundantToken`
-    - `RedundantQuantityToken` (also extends `QuantityToken`)
-    - `RedundantIDToken` (also extends `IDToken`)
-    - `RedundantObjectToken`
-  - `UniqueToken`
-    - `FilenameToken`
-    - `UniqueIDToken`
-  - `WildcardToken`
-  - `IDToken`
-  - `QuantityToken`
+ - `Token`
+ - `RedundantToken`
+ - `RedundantQuantityToken`
+ - `RedundantIDToken`
+ - `RedundantObjectToken`
+ - `UniqueToken`
+ - `FilenameToken`
+ - `UniqueIDToken`
+ - `WildcardToken`
+ - `IDToken`
+ - `QuantityToken`
 
 Other classes:
  - `DataType` (data types, psuedo-private)

@@ -284,9 +284,10 @@ class Pairing:
     '''
     Used to specify when two nonunique datatypes should be associated together. Most commonly used
     to pair ID and name together.
-     - `form` (`Any`): Whatever follows the CVData specified form as required. Pairing is a wrapper
-        class so let it behave as it should
-     - `paired` (`DataType`): Items which should be associated together. 
+    - `form` (`Any`): Whatever follows the CVData specified form as required. Pairing is a wrapper
+    class so let it behave as it should
+    - `paired` (`DataType`): Items which should be associated together.
+    
     '''
     def __init__(self, form: Any, *paired: DataType) -> None:
         if len(paired) <= 1:

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>transforms module &mdash; CVData 0.1.0-alpha.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=90c6d82f"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="processing module" href="processing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            CVData
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">cvdata</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cvdata.html">cvdata module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_items.html">data_items module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="processing.html">processing module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">transforms module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#transforms.CVTransforms"><code class="docutils literal notranslate"><span class="pre">CVTransforms</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#transforms.CVTransforms.CLASSIFICATION"><code class="docutils literal notranslate"><span class="pre">CVTransforms.CLASSIFICATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#transforms.CVTransforms.DETECTION"><code class="docutils literal notranslate"><span class="pre">CVTransforms.DETECTION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#transforms.CVTransforms.SEGMENTATION"><code class="docutils literal notranslate"><span class="pre">CVTransforms.SEGMENTATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#transforms.CVTransforms.SEGMENTATION_NORESIZE"><code class="docutils literal notranslate"><span class="pre">CVTransforms.SEGMENTATION_NORESIZE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#transforms.CVTransforms.get"><code class="docutils literal notranslate"><span class="pre">CVTransforms.get()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#transforms.ImageClassification"><code class="docutils literal notranslate"><span class="pre">ImageClassification</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#transforms.ImageClassification.describe"><code class="docutils literal notranslate"><span class="pre">ImageClassification.describe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#transforms.ImageClassification.forward"><code class="docutils literal notranslate"><span class="pre">ImageClassification.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#transforms.ObjectDetection"><code class="docutils literal notranslate"><span class="pre">ObjectDetection</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#transforms.ObjectDetection.describe"><code class="docutils literal notranslate"><span class="pre">ObjectDetection.describe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#transforms.ObjectDetection.forward"><code class="docutils literal notranslate"><span class="pre">ObjectDetection.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#transforms.SemanticSegmentation"><code class="docutils literal notranslate"><span class="pre">SemanticSegmentation</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#transforms.SemanticSegmentation.describe"><code class="docutils literal notranslate"><span class="pre">SemanticSegmentation.describe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#transforms.SemanticSegmentation.forward"><code class="docutils literal notranslate"><span class="pre">SemanticSegmentation.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CVData</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">cvdata</a></li>
+      <li class="breadcrumb-item active">transforms module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/transforms.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-transforms">
+<span id="transforms-module"></span><h1>transforms module<a class="headerlink" href="#module-transforms" title="Link to this heading"></a></h1>
+<p>Adapted from torchvision:
+<a class="reference external" href="https://github.com/pytorch/vision/blob/main/torchvision/transforms/_presets.py">https://github.com/pytorch/vision/blob/main/torchvision/transforms/_presets.py</a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="transforms.CVTransforms">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">transforms.</span></span><span class="sig-name descname"><span class="pre">CVTransforms</span></span><a class="reference internal" href="_modules/transforms.html#CVTransforms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#transforms.CVTransforms" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Standard transforms presets for computer vision. Adapted from torchvision 0.17.2</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="transforms.CVTransforms.CLASSIFICATION">
+<span class="sig-name descname"><span class="pre">CLASSIFICATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(ImageClassification(</span>&#160;&#160;&#160;&#160; <span class="pre">crop_size=[224]</span>&#160;&#160;&#160;&#160; <span class="pre">resize_size=[256]</span>&#160;&#160;&#160;&#160; <span class="pre">mean=[0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406]</span>&#160;&#160;&#160;&#160; <span class="pre">std=[0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225]</span>&#160;&#160;&#160;&#160; <span class="pre">interpolation=InterpolationMode.BILINEAR</span> <span class="pre">),</span> <span class="pre">None)</span></em><a class="headerlink" href="#transforms.CVTransforms.CLASSIFICATION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="transforms.CVTransforms.DETECTION">
+<span class="sig-name descname"><span class="pre">DETECTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(ObjectDetection(),</span> <span class="pre">None)</span></em><a class="headerlink" href="#transforms.CVTransforms.DETECTION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="transforms.CVTransforms.SEGMENTATION">
+<span class="sig-name descname"><span class="pre">SEGMENTATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(SemanticSegmentation(</span>&#160;&#160;&#160;&#160; <span class="pre">resize_size=[520]</span>&#160;&#160;&#160;&#160; <span class="pre">mean=[0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406]</span>&#160;&#160;&#160;&#160; <span class="pre">std=[0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225]</span>&#160;&#160;&#160;&#160; <span class="pre">interpolation=InterpolationMode.BILINEAR</span> <span class="pre">),</span> <span class="pre">SemanticSegmentation(</span>&#160;&#160;&#160;&#160; <span class="pre">resize_size=[520]</span>&#160;&#160;&#160;&#160; <span class="pre">mean=[0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406]</span>&#160;&#160;&#160;&#160; <span class="pre">std=[0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225]</span>&#160;&#160;&#160;&#160; <span class="pre">interpolation=InterpolationMode.BILINEAR</span> <span class="pre">))</span></em><a class="headerlink" href="#transforms.CVTransforms.SEGMENTATION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="transforms.CVTransforms.SEGMENTATION_NORESIZE">
+<span class="sig-name descname"><span class="pre">SEGMENTATION_NORESIZE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(SemanticSegmentation(</span>&#160;&#160;&#160;&#160; <span class="pre">resize_size=None</span>&#160;&#160;&#160;&#160; <span class="pre">mean=[0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406]</span>&#160;&#160;&#160;&#160; <span class="pre">std=[0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225]</span>&#160;&#160;&#160;&#160; <span class="pre">interpolation=InterpolationMode.BILINEAR</span> <span class="pre">),</span> <span class="pre">SemanticSegmentation(</span>&#160;&#160;&#160;&#160; <span class="pre">resize_size=None</span>&#160;&#160;&#160;&#160; <span class="pre">mean=[0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406]</span>&#160;&#160;&#160;&#160; <span class="pre">std=[0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225]</span>&#160;&#160;&#160;&#160; <span class="pre">interpolation=InterpolationMode.BILINEAR</span> <span class="pre">))</span></em><a class="headerlink" href="#transforms.CVTransforms.SEGMENTATION_NORESIZE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transforms.CVTransforms.get">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/transforms.html#CVTransforms.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#transforms.CVTransforms.get" title="Link to this definition"></a></dt>
+<dd><p>Retrieve the standard transforms for classification, detection, and segmentation.</p>
+<ul class="simple">
+<li><p><cite>mode</cite> (<cite>str</cite>): choose between classification, detection, and segmentation.</p></li>
+<li><p><cite>resize</cite> (<cite>bool</cite>): True if planning to resize. Default: False.</p></li>
+<li><dl class="simple">
+<dt><cite>normalize</cite> (<cite>bool</cite>): True for normalized transforms according to mean and std, False</dt><dd><p>otherwise. Default: True.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><cite>mean</cite> (<cite>Tuple[float, …]</cite>): the mean to use for normalization. Has no effect when</dt><dd><p>normalize is false. Default is ImageNet dataset statistics.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><cite>std</cite> (<cite>Tuple[float, …]</cite>): the std to use for normalization. Has no effect when</dt><dd><p>normalize is false. Default is ImageNet dataset statistics.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="transforms.ImageClassification">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">transforms.</span></span><span class="sig-name descname"><span class="pre">ImageClassification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">InterpolationMode</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">InterpolationMode.BILINEAR</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">antialias</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transforms.html#ImageClassification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#transforms.ImageClassification" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="transforms.ImageClassification.describe">
+<span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/transforms.html#ImageClassification.describe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#transforms.ImageClassification.describe" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transforms.ImageClassification.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/transforms.html#ImageClassification.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#transforms.ImageClassification.forward" title="Link to this definition"></a></dt>
+<dd><p>Define the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="transforms.ObjectDetection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">transforms.</span></span><span class="sig-name descname"><span class="pre">ObjectDetection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transforms.html#ObjectDetection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#transforms.ObjectDetection" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="transforms.ObjectDetection.describe">
+<span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/transforms.html#ObjectDetection.describe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#transforms.ObjectDetection.describe" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transforms.ObjectDetection.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/transforms.html#ObjectDetection.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#transforms.ObjectDetection.forward" title="Link to this definition"></a></dt>
+<dd><p>Define the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="transforms.SemanticSegmentation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">transforms.</span></span><span class="sig-name descname"><span class="pre">SemanticSegmentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">InterpolationMode</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">InterpolationMode.BILINEAR</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">antialias</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transforms.html#SemanticSegmentation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#transforms.SemanticSegmentation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="transforms.SemanticSegmentation.describe">
+<span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/transforms.html#SemanticSegmentation.describe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#transforms.SemanticSegmentation.describe" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transforms.SemanticSegmentation.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/transforms.html#SemanticSegmentation.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#transforms.SemanticSegmentation.forward" title="Link to this definition"></a></dt>
+<dd><p>Define the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="processing.html" class="btn btn-neutral float-left" title="processing module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Anthony Tong.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

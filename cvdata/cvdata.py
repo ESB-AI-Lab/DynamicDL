@@ -593,7 +593,7 @@ class CVData:
         normalize: bool = True,
         remove_invalid: bool = True,
         resize: Optional[tuple[int, int]] = None
-    ):
+    ) -> Tuple[Optional[Callable], ...]:
         '''
         Retrieve the default standard image/label transforms for specified mode.
         
@@ -1218,14 +1218,14 @@ class CVDataset(VisionDataset):
     - `root` (`str`): the root of the dataset folder.
     - `mode` (`str`): the mode of the data to retrieve, i.e. classification, segmentation, etc.
     - `id_mapping` (`dict[int, int]`): the id mapping from the dataframe to retrieve class names.
-        This is used primarily as a safety feature in order to make sure that used IDs are provided
-        in order starting from 0 without holes so that training works properly.
+    This is used primarily as a safety feature in order to make sure that used IDs are provided
+    in order starting from 0 without holes so that training works properly.
     - `image_type` (`str`): the type of the image to export, to convert PIL images to.
-        Default: 'RGB'. Also accepts 'L' and 'CMYK'.
+    Default: 'RGB'. Also accepts 'L' and 'CMYK'.
     - `normalization` (`str`): the type of normalization that the dataset currently is formatted in,
-        for box and polygon items. Accepts 'full' or 'zeroone'.
+    for box and polygon items. Accepts 'full' or 'zeroone'.
     - `normalize_to` (`str`): the type of normalization that the dataset is to be resized to, for
-        box and polygon items. Accepts 'full' or 'zeroone'.
+    box and polygon items. Accepts 'full' or 'zeroone'.
     - `transform` (`Optional[Callable]`): the transform operation to apply to the images.
     - `target_transform` (`Optional[Callable]`): the transform operation on the labels.
     '''
