@@ -4,7 +4,7 @@ CVData
 .. toctree::
    :maxdepth: 4
 
-   cvdata
+   cvdataloading
 
 Indices and tables
 ******************

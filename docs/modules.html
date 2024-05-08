@@ -21,7 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cvdata package" href="cvdata.html" />
+    <link rel="next" title="cvdataloading package" href="cvdataloading.html" />
     <link rel="prev" title="CVData Tutorial" href="tutorial.html" /> 
 </head>
 
@@ -49,7 +49,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">CVData Tutorial</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">CVData</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cvdata.html">cvdata package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cvdataloading.html">cvdataloading package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 </li>
@@ -83,158 +83,155 @@
 <h1>CVData<a class="headerlink" href="#cvdata" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="cvdata.html">cvdata package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cvdata.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cvdata.html#module-cvdata.cvdata">cvdata.cvdata module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.cvdata.CVData"><code class="docutils literal notranslate"><span class="pre">CVData</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.cvdata.CVData.clear_image_sets"><code class="docutils literal notranslate"><span class="pre">CVData.clear_image_sets()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.cvdata.CVData.delete_image_set"><code class="docutils literal notranslate"><span class="pre">CVData.delete_image_set()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.cvdata.CVData.get_dataloader"><code class="docutils literal notranslate"><span class="pre">CVData.get_dataloader()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.cvdata.CVData.get_dataset"><code class="docutils literal notranslate"><span class="pre">CVData.get_dataset()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.cvdata.CVData.get_image_set"><code class="docutils literal notranslate"><span class="pre">CVData.get_image_set()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.cvdata.CVData.get_transforms"><code class="docutils literal notranslate"><span class="pre">CVData.get_transforms()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.cvdata.CVData.inference"><code class="docutils literal notranslate"><span class="pre">CVData.inference()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.cvdata.CVData.load"><code class="docutils literal notranslate"><span class="pre">CVData.load()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.cvdata.CVData.parse"><code class="docutils literal notranslate"><span class="pre">CVData.parse()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.cvdata.CVData.sample_image"><code class="docutils literal notranslate"><span class="pre">CVData.sample_image()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.cvdata.CVData.save"><code class="docutils literal notranslate"><span class="pre">CVData.save()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.cvdata.CVData.split_image_set"><code class="docutils literal notranslate"><span class="pre">CVData.split_image_set()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="cvdataloading.html">cvdataloading package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cvdataloading.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cvdataloading.html#module-cvdataloading.cvdata">cvdataloading.cvdata module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.cvdata.CVData"><code class="docutils literal notranslate"><span class="pre">CVData</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.cvdata.CVData.clear_image_sets"><code class="docutils literal notranslate"><span class="pre">CVData.clear_image_sets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.cvdata.CVData.delete_image_set"><code class="docutils literal notranslate"><span class="pre">CVData.delete_image_set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.cvdata.CVData.get_dataloader"><code class="docutils literal notranslate"><span class="pre">CVData.get_dataloader()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.cvdata.CVData.get_dataset"><code class="docutils literal notranslate"><span class="pre">CVData.get_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.cvdata.CVData.get_image_set"><code class="docutils literal notranslate"><span class="pre">CVData.get_image_set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.cvdata.CVData.get_transforms"><code class="docutils literal notranslate"><span class="pre">CVData.get_transforms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.cvdata.CVData.inference"><code class="docutils literal notranslate"><span class="pre">CVData.inference()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.cvdata.CVData.load"><code class="docutils literal notranslate"><span class="pre">CVData.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.cvdata.CVData.parse"><code class="docutils literal notranslate"><span class="pre">CVData.parse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.cvdata.CVData.sample_image"><code class="docutils literal notranslate"><span class="pre">CVData.sample_image()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.cvdata.CVData.save"><code class="docutils literal notranslate"><span class="pre">CVData.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.cvdata.CVData.split_image_set"><code class="docutils literal notranslate"><span class="pre">CVData.split_image_set()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.cvdata.CVDataset"><code class="docutils literal notranslate"><span class="pre">CVDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.cvdata.CVDataset"><code class="docutils literal notranslate"><span class="pre">CVDataset</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cvdata.html#module-cvdata.data_items">cvdata.data_items module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.data_items.Alias"><code class="docutils literal notranslate"><span class="pre">Alias</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.Alias.match"><code class="docutils literal notranslate"><span class="pre">Alias.match()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cvdataloading.html#module-cvdataloading.data_items">cvdataloading.data_items module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.Alias"><code class="docutils literal notranslate"><span class="pre">Alias</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.Alias.match"><code class="docutils literal notranslate"><span class="pre">Alias.match()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataEntry"><code class="docutils literal notranslate"><span class="pre">DataEntry</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataEntry.apply_tokens"><code class="docutils literal notranslate"><span class="pre">DataEntry.apply_tokens()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataEntry.merge"><code class="docutils literal notranslate"><span class="pre">DataEntry.merge()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataEntry.merge_inplace"><code class="docutils literal notranslate"><span class="pre">DataEntry.merge_inplace()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataEntry"><code class="docutils literal notranslate"><span class="pre">DataEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataEntry.apply_tokens"><code class="docutils literal notranslate"><span class="pre">DataEntry.apply_tokens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataEntry.merge"><code class="docutils literal notranslate"><span class="pre">DataEntry.merge()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataEntry.merge_inplace"><code class="docutils literal notranslate"><span class="pre">DataEntry.merge_inplace()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataItem"><code class="docutils literal notranslate"><span class="pre">DataItem</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataItem.add"><code class="docutils literal notranslate"><span class="pre">DataItem.add()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataItem.copy"><code class="docutils literal notranslate"><span class="pre">DataItem.copy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataItem"><code class="docutils literal notranslate"><span class="pre">DataItem</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataItem.add"><code class="docutils literal notranslate"><span class="pre">DataItem.add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataItem.copy"><code class="docutils literal notranslate"><span class="pre">DataItem.copy()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes"><code class="docutils literal notranslate"><span class="pre">DataTypes</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.ABSOLUTE_FILE"><code class="docutils literal notranslate"><span class="pre">DataTypes.ABSOLUTE_FILE</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.ABSOLUTE_FILE_SEG"><code class="docutils literal notranslate"><span class="pre">DataTypes.ABSOLUTE_FILE_SEG</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.BBOX_CLASS_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.BBOX_CLASS_ID</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.BBOX_CLASS_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.BBOX_CLASS_NAME</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.CLASS_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.CLASS_ID</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.CLASS_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.CLASS_NAME</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.GENERIC"><code class="docutils literal notranslate"><span class="pre">DataTypes.GENERIC</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.HEIGHT"><code class="docutils literal notranslate"><span class="pre">DataTypes.HEIGHT</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.IMAGE_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_ID</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.IMAGE_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_NAME</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.IMAGE_SET_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_SET_ID</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.IMAGE_SET_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_SET_NAME</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.POLYGON"><code class="docutils literal notranslate"><span class="pre">DataTypes.POLYGON</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.SEG_CLASS_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.SEG_CLASS_ID</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.SEG_CLASS_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.SEG_CLASS_NAME</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.WIDTH"><code class="docutils literal notranslate"><span class="pre">DataTypes.WIDTH</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.X"><code class="docutils literal notranslate"><span class="pre">DataTypes.X</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.X1"><code class="docutils literal notranslate"><span class="pre">DataTypes.X1</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.X2"><code class="docutils literal notranslate"><span class="pre">DataTypes.X2</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.XMAX"><code class="docutils literal notranslate"><span class="pre">DataTypes.XMAX</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.XMID"><code class="docutils literal notranslate"><span class="pre">DataTypes.XMID</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.XMIN"><code class="docutils literal notranslate"><span class="pre">DataTypes.XMIN</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.Y"><code class="docutils literal notranslate"><span class="pre">DataTypes.Y</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.Y1"><code class="docutils literal notranslate"><span class="pre">DataTypes.Y1</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.Y2"><code class="docutils literal notranslate"><span class="pre">DataTypes.Y2</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.YMAX"><code class="docutils literal notranslate"><span class="pre">DataTypes.YMAX</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.YMID"><code class="docutils literal notranslate"><span class="pre">DataTypes.YMID</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.DataTypes.YMIN"><code class="docutils literal notranslate"><span class="pre">DataTypes.YMIN</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes"><code class="docutils literal notranslate"><span class="pre">DataTypes</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.ABSOLUTE_FILE"><code class="docutils literal notranslate"><span class="pre">DataTypes.ABSOLUTE_FILE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.ABSOLUTE_FILE_SEG"><code class="docutils literal notranslate"><span class="pre">DataTypes.ABSOLUTE_FILE_SEG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.BBOX_CLASS_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.BBOX_CLASS_ID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.BBOX_CLASS_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.BBOX_CLASS_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.CLASS_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.CLASS_ID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.CLASS_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.CLASS_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.GENERIC"><code class="docutils literal notranslate"><span class="pre">DataTypes.GENERIC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.HEIGHT"><code class="docutils literal notranslate"><span class="pre">DataTypes.HEIGHT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.IMAGE_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_ID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.IMAGE_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.IMAGE_SET_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_SET_ID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.IMAGE_SET_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_SET_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.POLYGON"><code class="docutils literal notranslate"><span class="pre">DataTypes.POLYGON</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.SEG_CLASS_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.SEG_CLASS_ID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.SEG_CLASS_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.SEG_CLASS_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.WIDTH"><code class="docutils literal notranslate"><span class="pre">DataTypes.WIDTH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.X"><code class="docutils literal notranslate"><span class="pre">DataTypes.X</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.X1"><code class="docutils literal notranslate"><span class="pre">DataTypes.X1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.X2"><code class="docutils literal notranslate"><span class="pre">DataTypes.X2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.XMAX"><code class="docutils literal notranslate"><span class="pre">DataTypes.XMAX</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.XMID"><code class="docutils literal notranslate"><span class="pre">DataTypes.XMID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.XMIN"><code class="docutils literal notranslate"><span class="pre">DataTypes.XMIN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.Y"><code class="docutils literal notranslate"><span class="pre">DataTypes.Y</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.Y1"><code class="docutils literal notranslate"><span class="pre">DataTypes.Y1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.Y2"><code class="docutils literal notranslate"><span class="pre">DataTypes.Y2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.YMAX"><code class="docutils literal notranslate"><span class="pre">DataTypes.YMAX</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.YMID"><code class="docutils literal notranslate"><span class="pre">DataTypes.YMID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes.YMIN"><code class="docutils literal notranslate"><span class="pre">DataTypes.YMIN</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.data_items.File"><code class="docutils literal notranslate"><span class="pre">File</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.File.match"><code class="docutils literal notranslate"><span class="pre">File.match()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.File"><code class="docutils literal notranslate"><span class="pre">File</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.File.match"><code class="docutils literal notranslate"><span class="pre">File.match()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.data_items.Folder"><code class="docutils literal notranslate"><span class="pre">Folder</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.data_items.Generic"><code class="docutils literal notranslate"><span class="pre">Generic</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.Generic.match"><code class="docutils literal notranslate"><span class="pre">Generic.match()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.Folder"><code class="docutils literal notranslate"><span class="pre">Folder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.Generic"><code class="docutils literal notranslate"><span class="pre">Generic</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.Generic.match"><code class="docutils literal notranslate"><span class="pre">Generic.match()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.data_items.Image"><code class="docutils literal notranslate"><span class="pre">Image</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.data_items.ImageFile"><code class="docutils literal notranslate"><span class="pre">ImageFile</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.data_items.SegmentationImage"><code class="docutils literal notranslate"><span class="pre">SegmentationImage</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.data_items.Static"><code class="docutils literal notranslate"><span class="pre">Static</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.data_items.Static.match"><code class="docutils literal notranslate"><span class="pre">Static.match()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="cvdata.html#module-cvdata.processing">cvdata.processing module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.processing.AmbiguousList"><code class="docutils literal notranslate"><span class="pre">AmbiguousList</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.processing.AmbiguousList.expand"><code class="docutils literal notranslate"><span class="pre">AmbiguousList.expand()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.processing.GenericList"><code class="docutils literal notranslate"><span class="pre">GenericList</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.processing.GenericList.expand"><code class="docutils literal notranslate"><span class="pre">GenericList.expand()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.processing.JSONFile"><code class="docutils literal notranslate"><span class="pre">JSONFile</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.processing.JSONFile.parse"><code class="docutils literal notranslate"><span class="pre">JSONFile.parse()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.processing.Pairing"><code class="docutils literal notranslate"><span class="pre">Pairing</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.processing.Pairing.find_pairings"><code class="docutils literal notranslate"><span class="pre">Pairing.find_pairings()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.processing.Pairing.update_pairing"><code class="docutils literal notranslate"><span class="pre">Pairing.update_pairing()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.processing.SegmentationObject"><code class="docutils literal notranslate"><span class="pre">SegmentationObject</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.processing.SegmentationObject.expand"><code class="docutils literal notranslate"><span class="pre">SegmentationObject.expand()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.processing.TXTFile"><code class="docutils literal notranslate"><span class="pre">TXTFile</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.processing.TXTFile.parse"><code class="docutils literal notranslate"><span class="pre">TXTFile.parse()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.processing.XMLFile"><code class="docutils literal notranslate"><span class="pre">XMLFile</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.processing.XMLFile.parse"><code class="docutils literal notranslate"><span class="pre">XMLFile.parse()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.processing.YAMLFile"><code class="docutils literal notranslate"><span class="pre">YAMLFile</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.processing.YAMLFile.parse"><code class="docutils literal notranslate"><span class="pre">YAMLFile.parse()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.Image"><code class="docutils literal notranslate"><span class="pre">Image</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.ImageFile"><code class="docutils literal notranslate"><span class="pre">ImageFile</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.SegmentationImage"><code class="docutils literal notranslate"><span class="pre">SegmentationImage</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.Static"><code class="docutils literal notranslate"><span class="pre">Static</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.Static.match"><code class="docutils literal notranslate"><span class="pre">Static.match()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cvdata.html#module-cvdata.transforms">cvdata.transforms module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.transforms.CVTransforms"><code class="docutils literal notranslate"><span class="pre">CVTransforms</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.transforms.CVTransforms.CLASSIFICATION"><code class="docutils literal notranslate"><span class="pre">CVTransforms.CLASSIFICATION</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.transforms.CVTransforms.DETECTION"><code class="docutils literal notranslate"><span class="pre">CVTransforms.DETECTION</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.transforms.CVTransforms.SEGMENTATION"><code class="docutils literal notranslate"><span class="pre">CVTransforms.SEGMENTATION</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.transforms.CVTransforms.SEGMENTATION_NORESIZE"><code class="docutils literal notranslate"><span class="pre">CVTransforms.SEGMENTATION_NORESIZE</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.transforms.CVTransforms.get"><code class="docutils literal notranslate"><span class="pre">CVTransforms.get()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="cvdataloading.html#module-cvdataloading.processing">cvdataloading.processing module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.AmbiguousList"><code class="docutils literal notranslate"><span class="pre">AmbiguousList</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.AmbiguousList.expand"><code class="docutils literal notranslate"><span class="pre">AmbiguousList.expand()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.transforms.ImageClassification"><code class="docutils literal notranslate"><span class="pre">ImageClassification</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.transforms.ImageClassification.describe"><code class="docutils literal notranslate"><span class="pre">ImageClassification.describe()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.transforms.ImageClassification.forward"><code class="docutils literal notranslate"><span class="pre">ImageClassification.forward()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.GenericList"><code class="docutils literal notranslate"><span class="pre">GenericList</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.GenericList.expand"><code class="docutils literal notranslate"><span class="pre">GenericList.expand()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.transforms.ObjectDetection"><code class="docutils literal notranslate"><span class="pre">ObjectDetection</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.transforms.ObjectDetection.describe"><code class="docutils literal notranslate"><span class="pre">ObjectDetection.describe()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.transforms.ObjectDetection.forward"><code class="docutils literal notranslate"><span class="pre">ObjectDetection.forward()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.JSONFile"><code class="docutils literal notranslate"><span class="pre">JSONFile</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.JSONFile.parse"><code class="docutils literal notranslate"><span class="pre">JSONFile.parse()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#cvdata.transforms.SemanticSegmentation"><code class="docutils literal notranslate"><span class="pre">SemanticSegmentation</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.transforms.SemanticSegmentation.describe"><code class="docutils literal notranslate"><span class="pre">SemanticSegmentation.describe()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdata.html#cvdata.transforms.SemanticSegmentation.forward"><code class="docutils literal notranslate"><span class="pre">SemanticSegmentation.forward()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.Pairing"><code class="docutils literal notranslate"><span class="pre">Pairing</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.Pairing.find_pairings"><code class="docutils literal notranslate"><span class="pre">Pairing.find_pairings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.Pairing.update_pairing"><code class="docutils literal notranslate"><span class="pre">Pairing.update_pairing()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.SegmentationObject"><code class="docutils literal notranslate"><span class="pre">SegmentationObject</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.SegmentationObject.expand"><code class="docutils literal notranslate"><span class="pre">SegmentationObject.expand()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.TXTFile"><code class="docutils literal notranslate"><span class="pre">TXTFile</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.TXTFile.parse"><code class="docutils literal notranslate"><span class="pre">TXTFile.parse()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.XMLFile"><code class="docutils literal notranslate"><span class="pre">XMLFile</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.XMLFile.parse"><code class="docutils literal notranslate"><span class="pre">XMLFile.parse()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.YAMLFile"><code class="docutils literal notranslate"><span class="pre">YAMLFile</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.YAMLFile.parse"><code class="docutils literal notranslate"><span class="pre">YAMLFile.parse()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="cvdata.html#module-cvdata">Module contents</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cvdata.html#indices-and-tables">Indices and tables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cvdataloading.html#module-cvdataloading.transforms">cvdataloading.transforms module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.CVTransforms"><code class="docutils literal notranslate"><span class="pre">CVTransforms</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.CVTransforms.CLASSIFICATION"><code class="docutils literal notranslate"><span class="pre">CVTransforms.CLASSIFICATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.CVTransforms.DETECTION"><code class="docutils literal notranslate"><span class="pre">CVTransforms.DETECTION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.CVTransforms.SEGMENTATION"><code class="docutils literal notranslate"><span class="pre">CVTransforms.SEGMENTATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.CVTransforms.SEGMENTATION_NORESIZE"><code class="docutils literal notranslate"><span class="pre">CVTransforms.SEGMENTATION_NORESIZE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.CVTransforms.get"><code class="docutils literal notranslate"><span class="pre">CVTransforms.get()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.ImageClassification"><code class="docutils literal notranslate"><span class="pre">ImageClassification</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.ImageClassification.describe"><code class="docutils literal notranslate"><span class="pre">ImageClassification.describe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.ImageClassification.forward"><code class="docutils literal notranslate"><span class="pre">ImageClassification.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.ObjectDetection"><code class="docutils literal notranslate"><span class="pre">ObjectDetection</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.ObjectDetection.describe"><code class="docutils literal notranslate"><span class="pre">ObjectDetection.describe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.ObjectDetection.forward"><code class="docutils literal notranslate"><span class="pre">ObjectDetection.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.SemanticSegmentation"><code class="docutils literal notranslate"><span class="pre">SemanticSegmentation</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.SemanticSegmentation.describe"><code class="docutils literal notranslate"><span class="pre">SemanticSegmentation.describe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.SemanticSegmentation.forward"><code class="docutils literal notranslate"><span class="pre">SemanticSegmentation.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cvdataloading.html#module-cvdataloading">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -254,7 +251,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="tutorial.html" class="btn btn-neutral float-left" title="CVData Tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cvdata.html" class="btn btn-neutral float-right" title="cvdata package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cvdataloading.html" class="btn btn-neutral float-right" title="cvdataloading package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
