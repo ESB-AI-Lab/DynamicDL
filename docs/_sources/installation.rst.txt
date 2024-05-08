@@ -11,3 +11,10 @@ Currently CVData is in alpha stage, meaning it is highly volatile. We recommend 
     (venv) $ pip install .
 
 PyPI installation coming soon!
+
+Indices and tables
+******************
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

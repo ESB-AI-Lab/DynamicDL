@@ -71,9 +71,6 @@ The `DataTypes` class introduces a solution: in the class we have many preset to
 
 Much better. But now we need to find out what is inside the JSON file! The syntax remains nearly the same. For a COCO dataset, here's what it looks like inside:
 
-annotations.json
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 .. code-block:: json
 
     {
@@ -198,3 +195,10 @@ And done! Of course, there are other functions, and a lot of functions behind th
     dataloader = my_data.get_dataloader('detection')
 
 See the `docs <https://atong28.github.io/CVData>`_ for more details on options you can use!
+
+Indices and tables
+******************
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

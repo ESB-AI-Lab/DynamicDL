@@ -5,3 +5,10 @@ CVData
    :maxdepth: 4
 
    cvdata
+
+Indices and tables
+******************
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
