@@ -1,0 +1,13 @@
+Installation
+============
+
+Currently CVData is in alpha stage, meaning it is highly volatile. We recommend using some sort of environment manager to maintain your versions.
+
+.. code-block:: shell
+
+    $ python -m venv .venv
+    $ source .venv/bin/activate
+    (venv) $ git clone https://github.com/atong28/CVData.git
+    (venv) $ pip install .
+
+PyPI installation coming soon!
