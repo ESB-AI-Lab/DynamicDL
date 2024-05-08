@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.poetry]
 name = "cvdataloading"
-version = "0.1.0-alpha.1"
+version = "0.1.0-alpha.2"
 description = "A PyTorch-based dynamic dataloading library"
 authors = ["Anthony Tong <atong28.usa@gmail.com>"]
 license = "Apache-2.0"

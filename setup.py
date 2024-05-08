@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='cvdataloading',
-    version='0.1.0a1',
+    version='0.1.0a2',
     packages=find_packages(),
     license='Apache License 2.0',
     author='Anthony Tong',
