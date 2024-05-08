@@ -1,5 +1,5 @@
 '''
-Utilities for CVData.
+Private utility functions for CVData.
 '''
 import json
 from typing import Union, NoReturn

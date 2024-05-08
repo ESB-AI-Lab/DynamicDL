@@ -68,7 +68,7 @@ class Token:
         '''
         Checks whether the token is in valid format in accordance with the identifier. 
         
-        - `token`: the token to check
+         - `token`: the token to check
         '''
         return token != ''
 
@@ -76,7 +76,7 @@ class Token:
         '''
         Transform the token from a string value to token type.
         
-        - `token`: the token to transform
+         - `token`: the token to transform
         '''
         return token
 
@@ -180,8 +180,8 @@ class DataType:
     '''
     All possible data types. Container class for Token objects with specific purposes.
 
-    - `desc` (`str`): the purpose of the DataType. This should be unique for every new object.
-    - `token_type` (`Token`): the token type of the DataType.
+     - `desc` (`str`): the purpose of the DataType. This should be unique for every new object.
+     - `token_type` (`Token`): the token type of the DataType.
     '''
 
     def __init__(self, desc: str, token_type: Token) -> None:
@@ -254,8 +254,8 @@ class DataItem:
     '''
     Base class for representing a data item. Contains a DataType and a value associated with it.
 
-    - `delimiter` (`DataType`): the type of the DataItem.
-    - `value` (`Any`): the value associated with the DataType, must be compatible.
+     - `delimiter` (`DataType`): the type of the DataItem.
+     - `value` (`Any`): the value associated with the DataType, must be compatible.
     '''
     def __init__(self, delimiter: DataType, value: Any) -> None:
         value = delimiter.token_type.transform(value)
@@ -276,7 +276,7 @@ class DataItem:
         '''
         Add an item to current data if it is redundant.
         
-        - `item` (`Self`): an item to add to itself.
+         - `item` (`Self`): an item to add to itself.
         
         Throws `ValueError` if either `self` or `item` are not redundant.
         '''
@@ -290,7 +290,7 @@ class DataItem:
         '''
         Shallow copy self's data into new instance.
         
-        - `first` (`Self`): item to copy.
+         - `first` (`Self`): item to copy.
         '''
         return cls(first.delimiter, copy(first.value))
 
@@ -298,8 +298,7 @@ class DataEntry:
     '''
     Contains all items required for an entry in the dataset, which contains DataItem objects.
     
-    - `unique` (`bool`): true if this entry contains unique data, paired data otherwise.
-    - `data` (`list[DataItem]`): list of data items to associate together.
+     - `items` (`list[DataItem] | DataItem`): a (list of) data items which are to be batched together
     '''
 
     _valid_sets = [
@@ -323,9 +322,9 @@ class DataEntry:
         Merge two data entries together, storing it in a new instance. For inplace operations see
         `merge_inplace`.
         
-        - `first` (`DataEntry`): the first data entry to merge.
-        - `second` (`DataEntry`): the second data entry to merge.
-        - `overlap` (`bool`): whether to allow nonunique item overlapping. Default: True.
+         - `first` (`DataEntry`): the first data entry to merge.
+         - `second` (`DataEntry`): the second data entry to merge.
+         - `overlap` (`bool`): whether to allow nonunique item overlapping. Default: True.
         '''
         merged = cls(list(first.data.values()))
         redundant_overlap = set()
@@ -364,8 +363,8 @@ class DataEntry:
         '''
         Merge two data entries together, storing it in this instance.
         
-        - `other` (`DataEntry`): the other data entry to merge into this instance.
-        - `overlap` (`bool`): whether to allow nonunique item overlapping. Default: True.
+         - `other` (`DataEntry`): the other data entry to merge into this instance.
+         - `overlap` (`bool`): whether to allow nonunique item overlapping. Default: True.
         '''
         redundant_overlap = set()
         for desc, item in other.data.items():
@@ -402,7 +401,8 @@ class DataEntry:
         '''
         Apply new tokens to the item.
         
-        - `items` (`list[DataItem] | DataItem`): additional items to associate with this data entry.
+         - `items` (`list[DataItem] | DataItem`): additional items to associate with this data
+            entry.
         '''
         items: list[DataItem] = [DataItem.copy(item) for item in union(items)]
         # execute checks first
@@ -455,7 +455,7 @@ class Alias:
     IMAGE_NAME also contains CLASS_NAME and IMAGE_ID, we can extract all 3 tokens out using
     PatternAlias. Counts for a single wildcard token (`{}`).
     
-    - `generics` (`list[Generic | DataType]`): the list of Generic type objects which can be used
+     - `generics` (`list[Generic | DataType]`): the list of Generic type objects which can be used
         for alias parsing.
     '''
     def __init__(self, generics: list[Union['Generic', DataType]]) -> None:
@@ -496,8 +496,8 @@ class Static:
     '''
     Represents an object with a static name. Can contain data.
     
-    - `name` (`str`): the value associated with the Static.
-    - `data` (`DataItem | list[DataItem]`): the data item(s) associated with the name.
+     - `name` (`str`): the value associated with the Static.
+     - `data` (`DataItem | list[DataItem]`): the data item(s) associated with the name.
     '''
     def __init__(
         self,
@@ -513,7 +513,7 @@ class Static:
         '''
         Checks if the entry string matches this static item.
         
-        - `entry` (`str`): the entry string to check for equality
+         - `entry` (`str`): the entry string to check for equality
         '''
         matched: bool = entry == self.name
         data: list[DataItem] = self.data if matched else []
@@ -526,12 +526,12 @@ class Generic:
     '''
     Represents an object with a generic name and datatypes fitted into wildcards.
     
-    - `pattern` (`str | DataType | Alias`): the pattern with which to match to, containing wildcards
-        of the `{}` format. It is assumed that the generic should be matched to the entire string.
-        Regex expressions compatible with the `re` module are allowed except capture groups such as 
-        `(.+)`, which will throw an error.
-    - `data` (`DataType | Alias`): tokens that correspond to data types which each `{}` matches to.
-    - `ignore` (`list[str] | str`): values that begin with any item in `ignore` are not matched.
+     - `pattern` (`str | DataType | Alias`): the pattern with which to match to, containing
+        wildcards of the `{}` format. It is assumed that the generic should be matched to the entire
+        string. Regex expressions compatible with the `re` module are allowed except capture groups
+        such as `(.+)`, which will throw an error.
+     - `data` (`DataType | Alias`): tokens that correspond to data types which each `{}` matches to.
+     - `ignore` (`list[str] | str`): values that begin with any item in `ignore` are not matched.
     '''
     def __init__(
         self,
@@ -564,7 +564,7 @@ class Generic:
         Return a list of the tokens' string values provided an entry string which follows the 
         pattern.
         
-        - `entry` (`str`): the string to match to the pattern, assuming it does match
+         - `entry` (`str`): the string to match to the pattern, assuming it does match
         '''
         for ignore_pattern in self.ignore:
             if re.findall(ignore_pattern, entry):
@@ -602,16 +602,17 @@ class File(Generic):
     '''
     Generic for files only.
     
-    - `pattern` (`str | DataType | Alias`): the pattern with which to match to, containing wildcards
-        of the `{}` format. It is assumed that the generic should be matched to the entire string.
-        Regex expressions compatible with the `re` module are allowed except capture groups such as 
-        `(.+)`, which will throw an error.
-    - `data` (`DataType | Alias`): tokens that correspond to data types which each `{}` matches to.
-    - `ignore` (`list[str] | str`): values that begin with any item in `ignore` are not matched.
+     - `pattern` (`str | DataType | Alias`): the pattern with which to match to, containing
+        wildcards of the `{}` format. It is assumed that the generic should be matched to the entire
+        string. Regex expressions compatible with the `re` module are allowed except capture groups
+        such as `(.+)`, which will throw an error.
+     - `data` (`DataType | Alias`): tokens that correspond to data types which each `{}` matches to.
+     - `ignore` (`list[str] | str`): values that begin with any item in `ignore` are not matched.
         For filenames, this should not include the file extension.
-    - `extensions` (`list[str] | str`): valid extensions to match to. This will be whatever is after
-        the `.`, i.e. `txt`. Files without extensions are not allowed, but can be used as a Generic.
-    - `disable_warnings` (`bool`): disables the warnings that incur when `pattern` includes `.` in
+     - `extensions` (`list[str] | str`): valid extensions to match to. This will be whatever is
+        after the `.`, i.e. `txt`. Files without extensions are not allowed, but can be used as a
+        Generic.
+     - `disable_warnings` (`bool`): disables the warnings that incur when `pattern` includes `.` in
         it. This may be useful when the filenames do indeed include `.` without it being the ext.
     '''
     def __init__(
@@ -637,7 +638,7 @@ class File(Generic):
         Return a list of the tokens' string values provided an entry string which follows the 
         pattern.
         
-        - `entry` (`str`): the string to match to the pattern, assuming it does match
+         - `entry` (`str`): the string to match to the pattern, assuming it does match
         '''
         result = re.findall('(.+)\.(.+)', entry)
         if not result:

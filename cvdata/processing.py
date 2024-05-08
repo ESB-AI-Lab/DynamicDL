@@ -70,7 +70,7 @@ class GenericList:
         '''
         Expand list into dict of statics.
         
-        - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `CVData`
+         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `CVData`
             data.
         '''
         if len(dataset) % len(self.form) != 0:
@@ -179,7 +179,7 @@ class AmbiguousList:
         '''
         Expand potential list into dict of statics.
         
-        - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `CVData`
+         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `CVData`
             data.
         '''
         dataset = union(dataset)
@@ -194,7 +194,7 @@ class DataFile(ABC):
         '''
         Parses a file.
         
-        - `path` (`str`): the path to the file.
+         - `path` (`str`): the path to the file.
         '''
 
 class JSONFile(DataFile):
@@ -357,8 +357,9 @@ class Pairing:
         Similar to other processes' `expand` function. Finds the pairing values and stores
         the data internally.
         
-        `dataset` (`Any`): the dataset data, which should follow the syntax of `CVData` data.
-        `in_file` (`bool`)
+         - `dataset` (`Any`): the dataset data, which should follow the syntax of `CVData` data.
+         - `in_file` (`bool`): distinguisher to check usage of either `expand_generics`
+            or `expand_file_generics`.
         '''
         if in_file:
             expanded, _ = expand_generics(dataset, self.form)
@@ -374,10 +375,14 @@ class Pairing:
                               for desc in self.paired}
         self.idx_to_paired = pairs
 
-def expand_generics(dataset: Union[dict[str, Any], Any],
-                     root: Union[dict[Any], DataType, Generic]) -> Union[dict, Static]:
+def expand_generics(
+    dataset: Any,
+    root: Any
+) -> Union[dict, Static]:
     '''
-    Expand all generics and set to statics.
+    Expand all generics and replace with statics, inplace.
+     - `dataset` (`Any`): the dataset true values, in nested blocks containing values
+     - `root` (`Any`): the format of the dataset, in accordance with valid CVData syntax
     '''
     if isinstance(root, list):
         root = GenericList(root)
@@ -475,9 +480,18 @@ def _get_files(path: str) -> dict[str, Union[str, dict]]:
             files[file] = "File"
     return files
 
-def expand_file_generics(path: str, dataset: dict[str, Any],
-                     root: dict[Union[str, Static, Generic, DataType], Any]) -> dict:
-    '''Expand all generics and set to statics within filestructure.'''
+def expand_file_generics(
+    path: str,
+    dataset: dict[str, Any],
+    root: dict[Union[str, Static, Generic, DataType], Any]
+) -> dict:
+    '''
+    Variant of the expand_generics function above. Also contains path tracking.'
+    
+     - `path` (`str`): the absolute filepath up to the root/dataset provided
+     - `dataset` (`Any`): the dataset true values, in nested blocks containing values
+     - `root` (`Any`): the format of the dataset, in accordance with valid CVData syntax
+    '''
     expanded_root: dict[Static, Any] = {}
     generics: list[Generic] = []
     names: set[Static] = set()
@@ -566,9 +580,6 @@ def expand_file_generics(path: str, dataset: dict[str, Any],
 
 def _add_to_hashmap(hashmaps: dict[str, dict[str, DataEntry]], entry: DataEntry,
                     unique_identifiers: list[DataType]) -> None:
-    '''
-    Helper method for _merge_lists(), adds an item to all corresponding hashmaps and handles merge.
-    '''
     for id_try in unique_identifiers:
         value = entry.data.get(id_try.desc)
         if not value:
@@ -584,9 +595,6 @@ def _add_to_hashmap(hashmaps: dict[str, dict[str, DataEntry]], entry: DataEntry,
         hashmaps[id_try.desc][value.value] = entry
 
 def _merge_lists(lists: list[list[DataEntry]]) -> list[DataEntry]:
-    '''
-    Merge two DataEntry lists.
-    '''
     if len(lists) == 0:
         return []
 
@@ -608,10 +616,6 @@ def _merge_lists(lists: list[list[DataEntry]]) -> list[DataEntry]:
 
 def _merge(data: Union[dict[Union[Static, int], Any], Static]) -> \
         Union[DataEntry, list[DataEntry]]:
-    '''
-    Recursive process for merging unique data. 
-    Returns DataEntry if within unique item, list otherwise.
-    '''
     # base cases
     if isinstance(data, Static):
         return DataEntry(data.data)
@@ -676,6 +680,9 @@ def _merge(data: Union[dict[Union[Static, int], Any], Static]) -> \
 def populate_data(root: str, form: dict) -> list[DataEntry]:
     '''
     Parent process for parsing algorithm.
+    
+     - `root` (`str`): the file path of the root of the data
+     - `form` (`dict`): the form of the data, in accordance with CVData syntax.
     '''
     with tqdm(total=4, desc="Getting files", unit="step") as pbar:
         dataset = _get_files(root)

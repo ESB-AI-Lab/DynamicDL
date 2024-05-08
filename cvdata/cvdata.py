@@ -1,6 +1,24 @@
 '''
 Main module for processing datasets. Collects all parsed objects into the CVData object, and
 maintains the CVDataset class for PyTorch Dataset and DataLoader functionalities.
+
+Collate functions (pseudo-private)
+
+CVData main class public functions:
+ - parse()
+ - get_transforms()
+ - get_dataset()
+ - get_dataloader()
+ - get_image_set()
+ - split_image_set()
+ - clear_image_sets()
+ - delete_image_set()
+ - save()
+ - load()
+ - sample_image()
+ - inference()
+
+CVDataset class (VisionDataset extension)
 '''
 import os
 import time
@@ -9,7 +27,7 @@ from hashlib import md5
 from functools import partial
 from math import isnan
 import random
-from typing import Union, Optional, Callable, Iterable, Any
+from typing import Union, Optional, Callable, Iterable, Tuple, Any
 
 import cv2
 from tqdm import tqdm
@@ -32,18 +50,6 @@ from ._utils import next_avail_id, union, Warnings
 from .processing import populate_data
 from .transforms import CVTransforms
 
-'''
-All preset collate functions defined here.
-
-Need testing, but likely work:
-- _collate_classification
-- _collate_classification_dim
-- _collate_detection
-- _collate_detection_dim
-- _collate_segmentation
-- _collate_segmentation_dim
-- _collate_default
-'''
 def _collate_classification(batch):
     images, labels = zip(*batch)
     try:
@@ -204,7 +210,7 @@ class CVData:
         
         Args:
          - `override` (`bool`): whether to overwrite existing data if it has already been parsed and
-                           cleaned. Default: False
+            cleaned. Default: False
         '''
         print('[CVData] Parsing data...')
         start = time.time()
@@ -581,15 +587,41 @@ class CVData:
     def get_transforms(
         self,
         mode: str,
+        calculate_stats: bool = True,
+        mean: Tuple[float, ...] = (0.485, 0.456, 0.406),
+        std: Tuple[float, ...] = (0.229, 0.224, 0.225),
+        normalize: bool = True,
         remove_invalid: bool = True,
-        resize: Optional[tuple[int, int]] = None,
-        calculate_stats: bool = True
+        resize: Optional[tuple[int, int]] = None
     ):
         '''
-        Add doc
+        Retrieve the default standard image/label transforms for specified mode.
+        
+        Args:
+         - `mode` (`str`): choose a mode out of available modes for the transforms. Each mode has
+            slightly altered standard transforms.
+         - `calculate_stats` (`bool`): when set to True, calculate the statistics for the entire
+            dataset, overriding default mean/std kwarg (defaults from ImageNet). Use this feature
+            when dataset mean/std is unknown and differs significantly from ImageNet. Default: True.
+         - `mean` (`Tuple[float, ...]`): default mean statistics for the dataset. Has no effect when
+            `calculate_stats = True`. Default: ImageNet values.
+         - `std` (`Tuple[float, ...]`): default mean statistics for the dataset. Has no effect when
+            `calculate_stats = True`. Default: ImageNet values.
+         - `normalize` (`bool`): when set to True, normalize the dataset according to some
+            mean/std values, either from calculated stats or ImageNet default. This statement is
+            overriden when `calculate_stats` is set to True. Default: True.
+         - `remove_invalid` (`bool`): remove invalid entries when calculating the statistics,
+            assuming `calculate_stats` is set to True. If `calculate_stats` is False, this value
+            has no effect. Default: True.
+         - `resize` (`Optional[tuple[int, int]]`): resize to specific tuple dimensions before
+            calculating statistics, only when `calculate_stats` is set to True, just like
+            `remove_invalid`. Default: None.
+        
         '''
         if not calculate_stats:
-            return CVTransforms.get(mode, resize=resize)
+            return CVTransforms.get(mode, resize=resize, normalize=normalize, mean=mean, std=std)
+        if mode not in self.available_modes or mode in ('inference', 'diffusion'):
+            return (None, None)
         loader = self.get_dataloader(
             mode,
             remove_invalid=remove_invalid,
@@ -620,7 +652,7 @@ class CVData:
         std /= len(loader.dataset)
 
         print(f"[CVData] Got mean {mean} and std {std}")
-        return CVTransforms.get(mode, resize=resize, mean=mean, std=std)
+        return CVTransforms.get(mode, resize=resize, mean=mean, std=std, normalize=True)
 
     def get_dataset(
         self,
@@ -629,12 +661,15 @@ class CVData:
         store_dim: bool = False,
         preset_transform: bool = True,
         calculate_stats: bool = True,
+        mean: Tuple[float, ...] = (0.485, 0.456, 0.406),
+        std: Tuple[float, ...] = (0.229, 0.224, 0.225),
+        normalize: bool = True,
         image_set: Optional[Union[int, str]] = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
         transforms: Optional[tuple[Callable]] = None,
         resize: Optional[tuple[int, int]] = None,
-        normalize: Optional[str] = None
+        normalize_to: Optional[str] = None
     ) -> 'CVDataset':
         '''
         Retrieve the PyTorch dataset (torch.utils.data.Dataset) of a specific mode and image set.
@@ -652,7 +687,15 @@ class CVData:
             normalization with either calculated mean of the dataset about to be used or standard
             ImageNet statistics depending on `calculate_stats`. Default: True
          - `calculate_stats` (`bool`): whether to calculate mean and std for this dataset to be used
-            in normalization transforms. If False, uses ImageNet default weights. Default: True
+            in normalization transforms. If False, uses ImageNet default weights. Only has effect
+            when `preset_transform` is set to True. Default: True
+         - `mean` (`Tuple[float, ...]`): default mean statistics for the dataset. Has no effect when
+            `calculate_stats = True`. Default: ImageNet values.
+         - `std` (`Tuple[float, ...]`): default mean statistics for the dataset. Has no effect when
+            `calculate_stats = True`. Default: ImageNet values.
+         - `normalize` (`bool`): when set to True, normalize the dataset according to some
+            mean/std values, either from calculated stats or ImageNet default. This statement is
+            overriden when `calculate_stats` is set to True. Default: True.
          - `image_set` (`Optional[str]`): the image set to pull from. Default: all images.
          - `transform` (`Optional[Callable]`): the transform operation to apply to the images.
          - `target_transform` (`Optional[Callable]`): the transform operation on the labels.
@@ -661,7 +704,7 @@ class CVData:
             CVTransforms class.
          - `resize` (`Optional[tuple[int, int]]`): if provided, resize all images to exact
             configuration.
-         - `normalize` (`Optional[str]`): if provided, normalize bounding box/segmentation
+         - `normalize_to` (`Optional[str]`): if provided, normalize bounding box/segmentation
             coordinates to a specific configuration. Options: 'zeroone', 'full'
         '''
         if not self.cleaned:
@@ -676,7 +719,10 @@ class CVData:
                 mode=mode,
                 remove_invalid=remove_invalid,
                 resize=resize,
-                calculate_stats=calculate_stats
+                calculate_stats=calculate_stats,
+                mean=mean,
+                std=std,
+                normalize=normalize
             )
 
         imgset_mode = 'name' if isinstance(image_set, str) else 'id'
@@ -730,7 +776,7 @@ class CVData:
             Warnings.error('image_set_empty', image_set=image_set)
         return CVDataset(dataframe, self.root, mode, id_mapping=id_mapping, transform=transform,
                         target_transform=target_transform, resize=resize, store_dim=store_dim,
-                        normalize_to=normalize, normalization=normalization)
+                        normalize_to=normalize_to, normalization=normalization)
 
     def get_dataloader(
         self,
@@ -741,12 +787,16 @@ class CVData:
         remove_invalid: bool = True,
         store_dim: bool = False,
         preset_transform: bool = True,
+        calculate_stats: bool = True,
+        mean: Tuple[float, ...] = (0.485, 0.456, 0.406),
+        std: Tuple[float, ...] = (0.229, 0.224, 0.225),
+        normalize: bool = True,
         image_set: Optional[Union[int, str]] = None,
         transform: Optional[Callable] = None,
         target_transform: Optional[Callable] = None,
         transforms: Optional[tuple[Callable]] = None,
         resize: Optional[tuple[int, int]] = None,
-        normalize: Optional[str] = None
+        normalize_to: Optional[str] = None
     ) -> DataLoader:
         '''
         Retrieve the PyTorch dataloader (torch.utils.data.DataLoader) for this dataset.
@@ -767,7 +817,15 @@ class CVData:
             normalization with either calculated mean of the dataset about to be used or standard
             ImageNet statistics depending on `calculate_stats`. Default: True
          - `calculate_stats` (`bool`): whether to calculate mean and std for this dataset to be used
-            in normalization transforms. If False, uses ImageNet default weights. Default: True
+            in normalization transforms. If False, uses ImageNet default weights. Only has effect
+            when `preset_transform` is set to True. Default: True
+         - `mean` (`Tuple[float, ...]`): default mean statistics for the dataset. Has no effect when
+            `calculate_stats = True`. Default: ImageNet values.
+         - `std` (`Tuple[float, ...]`): default mean statistics for the dataset. Has no effect when
+            `calculate_stats = True`. Default: ImageNet values.
+         - `normalize` (`bool`): when set to True, normalize the dataset according to some
+            mean/std values, either from calculated stats or ImageNet default. This statement is
+            overriden when `calculate_stats` is set to True. Default: True.
          - `image_set` (`Optional[str]`): the image set to pull from. Default: all images.
          - `transform` (`Optional[Callable]`): the transform operation to apply to the images.
          - `target_transform` (`Optional[Callable]`): the transform operation on the labels.
@@ -776,7 +834,7 @@ class CVData:
             CVTransforms class.
          - `resize` (`Optional[tuple[int, int]]`): if provided, resize all images to exact
             configuration.
-         - `normalize` (`Optional[str]`): if provided, normalize bounding box/segmentation
+         - `normalize_to` (`Optional[str]`): if provided, normalize bounding box/segmentation
             coordinates to a specific configuration. Options: 'zeroone', 'full'
         '''
         return DataLoader(
@@ -786,11 +844,15 @@ class CVData:
                 store_dim=store_dim,
                 image_set=image_set,
                 preset_transform=preset_transform,
+                calculate_stats=calculate_stats,
+                mean=mean,
+                std=std,
+                normalize=normalize,
                 transform=transform,
                 target_transform=target_transform,
                 transforms=transforms,
                 resize=resize,
-                normalize=normalize),
+                normalize_to=normalize_to),
             batch_size=batch_size,
             shuffle=shuffle,
             num_workers=num_workers,
@@ -883,7 +945,7 @@ class CVData:
         Retrieve the sub-DataFrame which contains all images in a specific image set.
         
         Args:
-        - image_set (str, int): the image set. Accepts both string and int.
+         - image_set (str, int): the image set. Accepts both string and int.
         '''
         if isinstance(image_set, str):
             return self.dataframe[self.dataframe['IMAGE_SET_NAME'].apply(lambda x: image_set in x)]
@@ -897,8 +959,8 @@ class CVData:
         Clear image sets from the dict if they contain no elements.
         
         Args:
-        - sets (list[str | int], Optional): If defined, only scan the provided list, otherwise
-                                                  scan all sets. Default: None.
+         - sets (list[str | int], Optional): If defined, only scan the provided list, otherwise
+            scan all sets. Default: None.
         '''
         to_pop = []
         if sets is None:
@@ -924,7 +986,7 @@ class CVData:
         default dataset.
         
         Args:
-        - image_set (str, int): the image set to delete. Accepts both name and ID.
+         - image_set (str, int): the image set to delete. Accepts both name and ID.
         '''
         using_id: bool = isinstance(image_set, int)
         if using_id:
@@ -965,9 +1027,9 @@ class CVData:
         Save the dataset into CVData json format.
         
         Args:
-        - filename (str): the filename to save the dataset.
-        - overwrite (bool): whether to overwrite the file if it already exists. Default: False.
-        - safe (bool): if True, do not encode `form` with jsonpickle. Then dataset cannot be
+         - filename (str): the filename to save the dataset.
+         - overwrite (bool): whether to overwrite the file if it already exists. Default: False.
+         - safe (bool): if True, do not encode `form` with jsonpickle. Then dataset cannot be
             re-parsed, but is no longer subject to arbitrary code injection upon load.
         '''
         if not safe:
@@ -1004,7 +1066,7 @@ class CVData:
         code execution.
         
         Args:
-        - filename (str): the filename to load the data from.
+         - filename (str): the filename to load the data from.
         '''
         try:
             print('[CVData] Loading dataset...')
@@ -1044,11 +1106,17 @@ class CVData:
     def sample_image(
         self,
         dpi: float = 1200,
-        mode: Optional[str] = None,
+        mode: Optional[str | list[str]] = None,
         idx: Optional[int] = None
     ) -> None:
         '''
-        Sample an image.
+        Sample an image from the dataset.
+        
+        Args:
+         - `dpi` (`float`): the image display size, if not in segmentation mode.
+         - `mode` (`Optional[str | list[str]]`): pick from any of the available modes, or supply a
+            list of modes. Default: all modes.
+         - `idx` (`Optional[int]`): use a specific idx from the dataset. Default: a random image.
         '''
         if not self.cleaned:
             self.parse()
@@ -1069,11 +1137,13 @@ class CVData:
             print(f'[CVData] Image Class ID/Name: {item["CLASS_ID"]}/{item["CLASS_NAME"]}')
         if 'detection' in mode:
             if len(item['BOX']) != 0:
-                image = draw_bounding_boxes(image,
-                                            torch.stack([FloatTensor(box) for box in item['BOX']]),
-                                            width=3,
-                                            labels=item['BBOX_CLASS_NAME'],
-                                            colors='red')
+                image = draw_bounding_boxes(
+                    image,
+                    torch.stack([FloatTensor(box) for box in item['BOX']]),
+                    width=3,
+                    labels=item['BBOX_CLASS_NAME'],
+                    colors='red'
+                )
             else: print('[CVData] Warning: Image has no bounding boxes.')
         if 'segmentation' in mode:
             _, axarr = plt.subplots(ncols=2)
@@ -1104,7 +1174,7 @@ class CVData:
         mode: str = None
     ) -> None:
         '''
-        Plot an image output.
+        Plot an image output. Not implemented yet
         '''
         if not self.cleaned:
             self.parse()
@@ -1144,21 +1214,20 @@ class CVDataset(VisionDataset):
     Dataset implementation for the CVData environment.
     
     Args:
-    - df (DataFrame): the dataframe from CVData.
-    - root (str): the root of the dataset folder.
-    - mode (str): the mode of the data to retrieve, i.e. classification, segmentation, detection.
-    - id_mapping (dict[int, int]): the id mapping from the dataframe to retrieve class names.
-                                   this is used primarily as a safety feature in order to make sure
-                                   that used IDs are provided in order starting from 0 without holes
-                                   so that training works properly.
-    - image_type (str): the type of the image to export, to convert PIL images to. Default: 'RGB'.
-                        Also accepts 'L' and 'CMYK'.
-    - normalization (str): the type of normalization that the dataset currently is formatted in,
-                           for box and polygon items. Accepts 'full' or 'zeroone'.
-    - normalize_to (str): the type of normalization that the dataset is to be resized to, for box
-                          and polygon items. Accepts 'full' or 'zeroone'.
-    - transform (Callable, Optional): the transform operation to apply to the images.
-    - target_transform (Callable, Optional): the transform operation on the labels.
+    - `df` (`DataFrame`): the dataframe from CVData.
+    - `root` (`str`): the root of the dataset folder.
+    - `mode` (`str`): the mode of the data to retrieve, i.e. classification, segmentation, etc.
+    - `id_mapping` (`dict[int, int]`): the id mapping from the dataframe to retrieve class names.
+        This is used primarily as a safety feature in order to make sure that used IDs are provided
+        in order starting from 0 without holes so that training works properly.
+    - `image_type` (`str`): the type of the image to export, to convert PIL images to.
+        Default: 'RGB'. Also accepts 'L' and 'CMYK'.
+    - `normalization` (`str`): the type of normalization that the dataset currently is formatted in,
+        for box and polygon items. Accepts 'full' or 'zeroone'.
+    - `normalize_to` (`str`): the type of normalization that the dataset is to be resized to, for
+        box and polygon items. Accepts 'full' or 'zeroone'.
+    - `transform` (`Optional[Callable]`): the transform operation to apply to the images.
+    - `target_transform` (`Optional[Callable]`): the transform operation on the labels.
     '''
     def __init__(
         self,
