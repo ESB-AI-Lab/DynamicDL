@@ -166,3 +166,4 @@ models
 logs
 datasets.py
 .docs
+build.sh

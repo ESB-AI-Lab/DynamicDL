@@ -4,13 +4,15 @@ Installation
 Currently CVDataloading is in alpha stage, meaning it is highly volatile. We recommend using some sort of environment manager to maintain your versions.
 
 pip install:
+
 .. code-block:: shell
 
     $ python -m venv .venv
     $ source .venv/bin/activate
-    $ pip install cvdataloading
+    (venv) $ pip install cvdataloading
 
 Building from source:
+
 .. code-block:: shell
 
     $ python -m venv .venv
