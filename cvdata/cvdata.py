@@ -25,7 +25,6 @@ import time
 import json
 from hashlib import md5
 from functools import partial
-from math import isnan
 import random
 from typing import Union, Optional, Callable, Iterable, Tuple, Any
 
@@ -34,6 +33,7 @@ from tqdm import tqdm
 import numpy as np
 import jsonpickle
 from pandas import DataFrame
+from pandas import isna
 from pandas.core.series import Series
 from torch.utils.data import DataLoader
 from torch import Tensor, LongTensor, FloatTensor
@@ -262,6 +262,7 @@ class CVData:
             self._convert_seg_scale()
 
         # assign ids
+        self._cleanup_id()
         self._process_ids('CLASS', redundant=False)
         self._process_ids('SEG_CLASS', redundant=True)
         self._process_ids('BBOX_CLASS', redundant=True)
@@ -420,7 +421,7 @@ class CVData:
     def _validate_ids(self, name: str, redundant=False) -> tuple[dict[str, int], dict[int, str]]:
         def check(i: int, v: str, name_to_idx: dict[str, int]) -> None:
             '''Check whether a value is corrupted/mismatch, and update dict accordingly'''
-            if isnan(i) or (isinstance(v, float) and isnan(v)):
+            if isna(i) or (isinstance(v, float) and isna(v)):
                 return
             i = int(i)
             if v in name_to_idx and name_to_idx[v] != i:
@@ -436,7 +437,7 @@ class CVData:
 
         name_to_idx = {}
         for i, (ids, vals) in self.dataframe[[f'{name}_ID', f'{name}_NAME']].iterrows():
-            if (isinstance(ids, float) and isnan(ids)) or (isinstance(vals, float) and isnan(vals)):
+            if (isinstance(ids, float) and isna(ids)) or (isinstance(vals, float) and isna(vals)):
                 continue
             if redundant:
                 if len(ids) != len(vals):
@@ -465,14 +466,14 @@ class CVData:
         ctr = 0
         if not redundant:
             for i, (ids, vals) in self.dataframe[[f'{name}_ID', f'{name}_NAME']].iterrows():
-                if isnan(ids) and isinstance(vals, float) and isnan(vals):
+                if isna(ids) and isinstance(vals, float) and isna(vals):
                     ctr += 1
                     if verbose:
                         print(f'Found missing {name} id/name at row {i}')
                     continue
-                if isnan(ids):
+                if isna(ids):
                     self.dataframe.at[i, f'{name}_ID'] = name_to_idx[vals]
-                if isinstance(vals, float) and isnan(vals):
+                if isinstance(vals, float) and isna(vals):
                     self.dataframe.at[i, f'{name}_NAME'] = idx_to_name[ids]
             if ctr:
                 print(f'[CVData] Patched {ctr} id/name pairs for {name}.')
@@ -583,6 +584,13 @@ class CVData:
             for ids in self.dataframe['IMAGE_SET_ID']:
                 self.idx_to_image_set.update({k: str(k) for k in ids})
                 self.image_set_to_idx.update({str(k): k for k in ids})
+
+    def _cleanup_id(self) -> None:
+        cols = ['CLASS_ID', 'IMAGE_ID']
+        for col in cols:
+            if col not in self.dataframe:
+                continue
+            self.dataframe[col] = self.dataframe[col].astype('Int64')
 
     def get_transforms(
         self,
@@ -759,7 +767,7 @@ class CVData:
                 end = len(dataframe)
                 print(f'[CVData] Removed {start - end} empty entries from data.')
         else:
-            replace_nan = (lambda x: ([] if isinstance(x, float) and isnan(x) else x))
+            replace_nan = (lambda x: ([] if isinstance(x, float) and isna(x) else x))
             if mode == 'detection':
                 cols = ['BBOX_CLASS_ID'] # BOX already accounted for in bbox creation
             elif mode == 'segmentation':
@@ -768,7 +776,7 @@ class CVData:
                 dataframe[col] = dataframe[col].apply(replace_nan)
             for i, row in dataframe.iterrows():
                 for val in row.values:
-                    if isinstance(val, float) and isnan(val):
+                    if isinstance(val, float) and isna(val):
                         row = str(dataframe.iloc[i])
                         Warnings.error('nan_exists', row=row)
 
