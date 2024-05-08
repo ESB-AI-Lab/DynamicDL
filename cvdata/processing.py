@@ -54,8 +54,8 @@ class GenericList:
     '''
     Generic list item. Items inside the list are expected to repeat mod `len(form)`.
     
-     - `form` (`list[Any] | Any`): the form to stick to. Each entry in `form` must be some valid form
-        following the syntax of `CVData` forms.
+     - `form` (`list[Any] | Any`): the form to stick to. Each entry in `form` must be some valid
+        form following the syntax of `CVData` forms.
     '''
     def __init__(
         self,

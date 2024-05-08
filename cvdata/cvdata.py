@@ -17,7 +17,7 @@ import numpy as np
 import jsonpickle
 from pandas import DataFrame
 from pandas.core.series import Series
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader
 from torch import Tensor, LongTensor, FloatTensor
 import torch
 from torchvision.datasets.vision import VisionDataset
@@ -46,13 +46,23 @@ Need testing, but likely work:
 '''
 def _collate_classification(batch):
     images, labels = zip(*batch)
-    return torch.stack(images), torch.IntTensor(list(labels))
+    try:
+        return torch.stack(images), torch.IntTensor(list(labels))
+    except RuntimeError as e:
+        if 'stack expects each tensor to be equal size, but got' in str(e):
+            Warnings.error('invalid_shape', mode='classification')
+        raise
 
 def _collate_classification_dim(batch):
     images, labels = zip(*batch)
     labels = {'label': torch.IntTensor([label['label'] for label in labels]),
               'dim': [label['dim'] for label in labels]}
-    return torch.stack(images), labels
+    try:
+        return torch.stack(images), labels
+    except RuntimeError as e:
+        if 'stack expects each tensor to be equal size, but got' in str(e):
+            Warnings.error('invalid_shape', mode='classification')
+        raise
 
 def _collate_detection(batch):
     return list(zip(*batch))
@@ -65,13 +75,23 @@ def _collate_detection_dim(batch):
 
 def _collate_segmentation(batch):
     images, labels = zip(*batch)
-    return torch.stack(images), torch.stack(labels)
+    try:
+        return torch.stack(images), torch.stack(labels)
+    except RuntimeError as e:
+        if 'stack expects each tensor to be equal size, but got' in str(e):
+            Warnings.error('invalid_shape', mode='segmentation')
+        raise
 
 def _collate_segmentation_dim(batch):
     images, labels = zip(*batch)
     labels = {'label': torch.stack([label['label'] for label in labels]),
               'dim': [label['dim'] for label in labels]}
-    return torch.stack(images), labels
+    try:
+        return torch.stack(images), labels
+    except RuntimeError as e:
+        if 'stack expects each tensor to be equal size, but got' in str(e):
+            Warnings.error('invalid_shape', mode='segmentation')
+        raise
 
 def _collate_default(batch):
     return list(zip(*batch))
@@ -88,28 +108,6 @@ def _collate(mode: str, store_dim: bool) -> Callable:
         return _collate_detection_dim if store_dim else _collate_detection
     return _collate_default
 
-'''
-CVData class functions.
-
-Need testing:
-- _validate_ids
-- _assign_ids
-- split_image_set
-- get_image_set
-- clear_image_sets
-- delete_image_set
-- save
-- load
-- sample_image
-- get_dataset
-- get_dataloader
-- get_transforms
-
-To implement:
-- inference (segmentation)
-- tolerate [-1, 1] bounding box / segmentation scale
-- correct image id float conversion
-'''
 class CVData:
     '''
     Main dataset class. Accepts root directory path and dictionary form of the structure.
@@ -298,12 +296,10 @@ class CVData:
                 opt = 'img_'
             colset = f"_{mode}_{opt}cols"
 
-            if mode == 'segmentation':
-                count = len(self.dataframe) - len(self.dataframe[
-                    self.dataframe[list(getattr(self, colset))].isna().any(axis=1)
-                ])
-                data += f'       | Complete entries for {mode}: {count}\n'
-                continue
+            count = len(self.dataframe) - len(self.dataframe[
+                self.dataframe[list(getattr(self, colset))].isna().any(axis=1)
+            ])
+            data += f'       | Complete entries for {mode}: {count}\n'
 
         if 'detection' in self.available_modes:
             data += f'       | Bounding box scaling option: {self.bbox_scale_option}\n'
@@ -329,6 +325,14 @@ class CVData:
             names = [list(map(lambda x: getattr(self, f'idx_to_{name.lower()}')[x], i))
                      if isinstance(i, list) else [] for i in self.dataframe[f'{name}_ID']]
             self.dataframe[f'{name}_NAME'] = names
+        else:
+            return
+        self._patch_ids(
+            name,
+            getattr(self, f'{name.lower()}_to_idx'),
+            getattr(self, f'idx_to_{name.lower()}'),
+            redundant=redundant
+        )
 
     def _get_img_sizes(self) -> None:
         self.dataframe['IMAGE_DIM'] = [open_image(filename).size if isinstance(filename, str)
@@ -443,6 +447,57 @@ class CVData:
                 check(ids, vals, name_to_idx)
         return name_to_idx, {v: k for k, v in name_to_idx.items()}
 
+    def _patch_ids(
+        self,
+        name: str,
+        name_to_idx: dict,
+        idx_to_name: dict,
+        redundant: bool = False,
+        verbose: bool = False
+    ) -> None:
+        '''Patch nan values of ids/vals accordingly.'''
+        ctr = 0
+        if not redundant:
+            for i, (ids, vals) in self.dataframe[[f'{name}_ID', f'{name}_NAME']].iterrows():
+                if isnan(ids) and isinstance(vals, float) and isnan(vals):
+                    ctr += 1
+                    if verbose:
+                        print(f'Found missing {name} id/name at row {i}')
+                    continue
+                if isnan(ids):
+                    self.dataframe.at[i, f'{name}_ID'] = name_to_idx[vals]
+                if isinstance(vals, float) and isnan(vals):
+                    self.dataframe.at[i, f'{name}_NAME'] = idx_to_name[ids]
+            if ctr:
+                print(f'[CVData] Patched {ctr} id/name pairs for {name}.')
+                if not verbose:
+                    print('[CVData] Use parse() with verbose=True to see all invalid entries.')
+            return
+        id_vals = []
+        name_vals = []
+        for i, (ids, vals) in self.dataframe[[f'{name}_ID', f'{name}_NAME']].iterrows():
+            if isinstance(ids, float) and isinstance(vals, float):
+                ctr += 1
+                if verbose:
+                    print(f'Found missing {name} id/name at row {i}')
+                id_vals.append([])
+                name_vals.append([])
+                continue
+            if isinstance(ids, float):
+                id_vals.append(list(map(lambda x: name_to_idx[x], vals)))
+            else:
+                id_vals.append(ids)
+            if isinstance(vals, float):
+                name_vals.append(list(map(lambda x: idx_to_name[x], ids)))
+            else:
+                name_vals.append(vals)
+        self.dataframe[f'{name}_ID'] = id_vals
+        self.dataframe[f'{name}_NAME'] = name_vals
+        if ctr:
+            print(f'[CVData] Patched {ctr} id/name pairs for {name}.')
+            if not verbose:
+                print('[CVData] Use parse() with verbose=True to see all invalid entries.')
+
     def _assign_ids(self, name: str, default=False, redundant=False) -> \
             tuple[dict[str, int], dict[int, str]]:
         sets = set()
@@ -456,7 +511,8 @@ class CVData:
                 continue
             if redundant:
                 sets.update(v)
-            else: sets.add(v)
+            else:
+                sets.add(v)
         name_to_idx = {v: i for i, v in enumerate(sets)}
         idx_to_name = {v: k for k, v in name_to_idx.items()}
         if redundant:
@@ -532,7 +588,8 @@ class CVData:
         '''
         Add doc
         '''
-        if not calculate_stats: return CVTransforms.get(mode, resize=resize)
+        if not calculate_stats:
+            return CVTransforms.get(mode, resize=resize)
         loader = self.get_dataloader(
             mode,
             remove_invalid=remove_invalid,
@@ -650,6 +707,11 @@ class CVData:
             id_mapping = None
         if remove_invalid:
             dataframe = dataframe.dropna()
+            if mode == 'detection':
+                start = len(dataframe)
+                dataframe = dataframe[dataframe['BOX'].apply(lambda x: len(x) != 0)]
+                end = len(dataframe)
+                print(f'[CVData] Removed {start - end} empty entries from data.')
         else:
             replace_nan = (lambda x: ([] if isinstance(x, float) and isnan(x) else x))
             if mode == 'detection':
@@ -1077,17 +1139,6 @@ class CVData:
         else:
             plt.imshow(image.permute(1, 2, 0))
 
-'''
-CVDataset class functions.
-
-Need testing:
-- __init__
-- __len__
-- _get_class_labels
-- _get_bbox_labels
-- _get_seg_labels
-- __getitem__
-'''
 class CVDataset(VisionDataset):
     '''
     Dataset implementation for the CVData environment.
@@ -1166,6 +1217,8 @@ class CVDataset(VisionDataset):
                                   p[2] * factor_resize[0] / factor_norm[0],
                                   p[3] * factor_resize[1] / factor_norm[1])
         bbox_tensors = [FloatTensor(apply_resize(box)) for box in boxes]
+        if not bbox_tensors:
+            Warnings.error('empty_bbox', file=item['ABSOLUTE_FILE'])
         if self.store_dim:
             return {
                 'label': {'boxes': torch.stack(bbox_tensors), 'labels': LongTensor(class_ids)},

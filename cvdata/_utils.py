@@ -57,6 +57,7 @@ class Warnings:
                    'original dataset form you should save the dataset with `safe=True`.')
     unsafe_save = ('Warning: attempting to save unsafe object (form). If you do not need to '
                    're-parse the dataset format again you should save with `safe=True`.')
+    
 
     # errors
     merge_conflict = ('Conflicting information found while merging two entries:'
@@ -108,6 +109,10 @@ class Warnings:
     pairings_missing = ('Must have at least 2 pairing datatypes.', ValueError)
     invalid_pairing = ('Pairings are not of the same type, either must all be redundant or none'
                        'redundant. Given: {paired}', MergeError)
+    invalid_shape = ('{mode} requires equal input image dimensions, try using the `resize` '
+                     'parameter when getting dataloader, or specify your own collate function.',
+                     RuntimeError)
+    empty_bbox = ('Bounding box is empty for image at {file}.', RuntimeError)
 
     @staticmethod
     def warn(name: str, **kwargs: str) -> None:

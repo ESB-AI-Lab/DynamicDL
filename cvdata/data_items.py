@@ -255,9 +255,9 @@ class DataItem:
     Base class for representing a data item. Contains a DataType and a value associated with it.
 
     - `delimiter` (`DataType`): the type of the DataItem.
-    - `value` (`str`): the value associated with the DataType, must be compatible.
+    - `value` (`Any`): the value associated with the DataType, must be compatible.
     '''
-    def __init__(self, delimiter: DataType, value: str) -> None:
+    def __init__(self, delimiter: DataType, value: Any) -> None:
         value = delimiter.token_type.transform(value)
         if not delimiter.token_type.verify_token(value):
             Warnings.error('data_invalid', value=value, delimiter=delimiter)
@@ -419,7 +419,30 @@ class DataEntry:
         # merge
         for item in items:
             if item.delimiter.desc not in self.data:
-                self.data[item.delimiter.desc] = item
+                if not isinstance(item.delimiter.token_type, RedundantToken):
+                    self.data[item.delimiter.desc] = item
+                    continue
+                for group in DataEntry._valid_sets:
+                    if item.delimiter.desc in group:
+                        break
+                # redundant token must fall into one of these groups so no error checking
+                # if none of the groups already exist then default to 1x application otherwise
+                # must match length with other items in the group
+                n = 1
+                for desc in group:
+                    if desc in self.data:
+                        n = len(self.data[desc].value)
+                        break
+
+                assert len(item.value) == 1, \
+                    ('Assertion failed - (len(item.value) == 1) Please report this error to the '
+                     'CVData developers.')
+
+                self.data[item.delimiter.desc] = DataItem(
+                    item.delimiter,
+                    item.value * n
+                )
+                continue
             elif isinstance(item.delimiter.token_type, RedundantToken):
                 self.data[item.delimiter.desc].add(item)
 
