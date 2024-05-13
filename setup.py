@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='cvdataloading',
-    version='0.1.0a2',
+    name='dynamicdl',
+    version='0.1.0-alpha',
     packages=find_packages(),
     license='Apache License 2.0',
     author='Anthony Tong',
@@ -10,7 +10,7 @@ setup(
     description='A PyTorch-based dynamic dataloading library',
     long_description=open('README.md', encoding='utf-8').read(),
     long_description_content_type='text/markdown',
-    url='https://github.com/atong28/CVData',
+    url='https://github.com/ESB-AI-Lab/DynamicDL',
     install_requires=[
         "opencv-python>=4.6.0,<=4.9.0.80",
         "Pillow>=8.0.0,<=10.3.0",
