@@ -3,14 +3,14 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.poetry]
-name = "cvdataloading"
-version = "0.1.0-alpha.2"
+name = "dynamicdl"
+version = "0.1.0-alpha"
 description = "A PyTorch-based dynamic dataloading library"
 authors = ["Anthony Tong <atong28.usa@gmail.com>"]
 license = "Apache-2.0"
 readme = "README.md"
-homepage = "https://github.com/atong28/CVData"
-repository = "https://github.com/atong28/CVData"
+homepage = "https://esb-ai-lab.github.io/DynamicDL"
+repository = "https://github.com/ESB-AI-Lab/DynamicDL"
 
 [tool.poetry.dependencies]
 python = ">=3.6"

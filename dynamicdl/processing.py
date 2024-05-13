@@ -55,7 +55,7 @@ class GenericList:
     Generic list item. Items inside the list are expected to repeat mod `len(form)`.
     
      - `form` (`list[Any] | Any`): the form to stick to. Each entry in `form` must be some valid
-        form following the syntax of `CVData` forms.
+        form following the syntax of `DynamicData` forms.
     '''
     def __init__(
         self,
@@ -70,7 +70,7 @@ class GenericList:
         '''
         Expand list into dict of statics.
         
-         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `CVData`
+         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `DynamicData`
             data.
         '''
         if len(dataset) % len(self.form) != 0:
@@ -144,7 +144,7 @@ class SegmentationObject:
         Evaluate object by expanding and merging, and extracting the corresponding X, Y values
         which define the SegmentationObject.
         
-         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `CVData`
+         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `DynamicData`
             data.
         '''
         item_dict, _ = self.form.expand(dataset)
@@ -179,7 +179,7 @@ class AmbiguousList:
         '''
         Expand potential list into dict of statics.
         
-         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `CVData`
+         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `DynamicData`
             data.
         '''
         dataset = union(dataset)
@@ -284,7 +284,7 @@ class Pairing:
     '''
     Used to specify when two nonunique datatypes should be associated together. Most commonly used
     to pair ID and name together.
-    - `form` (`Any`): Whatever follows the CVData specified form as required. Pairing is a wrapper
+    - `form` (`Any`): Whatever follows the DynamicData specified form as required. Pairing is a wrapper
     class so let it behave as it should
     - `paired` (`DataType`): Items which should be associated together.
     
@@ -358,7 +358,7 @@ class Pairing:
         Similar to other processes' `expand` function. Finds the pairing values and stores
         the data internally.
         
-         - `dataset` (`Any`): the dataset data, which should follow the syntax of `CVData` data.
+         - `dataset` (`Any`): the dataset data, which should follow the syntax of `DynamicData` data.
          - `in_file` (`bool`): distinguisher to check usage of either `expand_generics`
             or `expand_file_generics`.
         '''
@@ -383,7 +383,7 @@ def expand_generics(
     '''
     Expand all generics and replace with statics, inplace.
      - `dataset` (`Any`): the dataset true values, in nested blocks containing values
-     - `root` (`Any`): the format of the dataset, in accordance with valid CVData syntax
+     - `root` (`Any`): the format of the dataset, in accordance with valid DynamicData syntax
     '''
     if isinstance(root, list):
         root = GenericList(root)
@@ -491,7 +491,7 @@ def expand_file_generics(
     
      - `path` (`str`): the absolute filepath up to the root/dataset provided
      - `dataset` (`Any`): the dataset true values, in nested blocks containing values
-     - `root` (`Any`): the format of the dataset, in accordance with valid CVData syntax
+     - `root` (`Any`): the format of the dataset, in accordance with valid DynamicData syntax
     '''
     expanded_root: dict[Static, Any] = {}
     generics: list[Generic] = []
@@ -683,7 +683,7 @@ def populate_data(root: str, form: dict) -> list[DataEntry]:
     Parent process for parsing algorithm.
     
      - `root` (`str`): the file path of the root of the data
-     - `form` (`dict`): the form of the data, in accordance with CVData syntax.
+     - `form` (`dict`): the form of the data, in accordance with DynamicData syntax.
     '''
     with tqdm(total=4, desc="Getting files", unit="step") as pbar:
         dataset = _get_files(root)

@@ -1,0 +1,45 @@
+dynamicdl package
+=================
+
+Submodules
+----------
+
+dynamicdl.data\_items module
+----------------------------
+
+.. automodule:: dynamicdl.data_items
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dynamicdl.dynamicdl module
+--------------------------
+
+.. automodule:: dynamicdl.dynamicdl
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dynamicdl.processing module
+---------------------------
+
+.. automodule:: dynamicdl.processing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dynamicdl.transforms module
+---------------------------
+
+.. automodule:: dynamicdl.transforms
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: dynamicdl
+   :members:
+   :undoc-members:
+   :show-inheritance:

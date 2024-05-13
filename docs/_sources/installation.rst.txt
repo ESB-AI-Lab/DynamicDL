@@ -1,7 +1,8 @@
 Installation
 ============
 
-Currently CVDataloading is in alpha stage, meaning it is highly volatile. We recommend using some sort of environment manager to maintain your versions.
+Currently DynamicDL is in alpha stage, meaning it is highly volatile. We recommend using some sort 
+of environment manager to maintain your versions.
 
 pip install:
 
@@ -9,7 +10,7 @@ pip install:
 
     $ python -m venv .venv
     $ source .venv/bin/activate
-    (venv) $ pip install cvdataloading
+    (venv) $ pip install dynamicdl
 
 Building from source:
 
@@ -17,14 +18,5 @@ Building from source:
 
     $ python -m venv .venv
     $ source .venv/bin/activate
-    (venv) $ git clone https://github.com/atong28/CVData.git
+    (venv) $ git clone https://github.com/ESB-AI-Lab/DynamicDL
     (venv) $ pip install .
-
-
-
-Indices and tables
-******************
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

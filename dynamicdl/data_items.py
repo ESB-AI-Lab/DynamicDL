@@ -436,7 +436,7 @@ class DataEntry:
 
                 assert len(item.value) == 1, \
                     ('Assertion failed - (len(item.value) == 1) Please report this error to the '
-                     'CVData developers.')
+                     'DynamicData developers.')
 
                 self.data[item.delimiter.desc] = DataItem(
                     item.delimiter,

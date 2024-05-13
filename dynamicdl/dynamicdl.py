@@ -1,10 +1,10 @@
 '''
-Main module for processing datasets. Collects all parsed objects into the CVData object, and
-maintains the CVDataset class for PyTorch Dataset and DataLoader functionalities.
+Main module for processing datasets. Collects all parsed objects into the DynamicData object, and
+maintains the DynamicDL class for PyTorch Dataset and DataLoader functionalities.
 
 Collate functions (pseudo-private)
 
-CVData main class public functions:
+DynamicData main class public functions:
  - parse()
  - get_transforms()
  - get_dataset()
@@ -18,7 +18,7 @@ CVData main class public functions:
  - sample_image()
  - inference()
 
-CVDataset class (VisionDataset extension)
+DynamicDS class (VisionDataset extension)
 '''
 import os
 import time
@@ -48,7 +48,7 @@ from typing_extensions import Self
 
 from ._utils import next_avail_id, union, Warnings
 from .processing import populate_data
-from .transforms import CVTransforms
+from .transforms import Transforms
 
 def _collate_classification(batch):
     images, labels = zip(*batch)
@@ -114,7 +114,7 @@ def _collate(mode: str, store_dim: bool) -> Callable:
         return _collate_detection_dim if store_dim else _collate_detection
     return _collate_default
 
-class CVData:
+class DynamicData:
     '''
     Main dataset class. Accepts root directory path and dictionary form of the structure.
     
@@ -212,7 +212,7 @@ class CVData:
          - `override` (`bool`): whether to overwrite existing data if it has already been parsed and
             cleaned. Default: False
         '''
-        print('[CVData] Parsing data...')
+        print('[DynamicData] Parsing data...')
         start = time.time()
         if self.cleaned and not override:
             Warnings.error('already_parsed')
@@ -220,18 +220,18 @@ class CVData:
         entries = [{key: val.value for key, val in item.data.items()} for item in data]
         self.dataframe = DataFrame(entries)
         end = time.time()
-        print(f'[CVData] Parsed! ({(end - start):.3f}s)')
+        print(f'[DynamicData] Parsed! ({(end - start):.3f}s)')
         start = time.time()
         self._cleanup()
         end = time.time()
-        print(f'[CVData] Cleaned! ({(end - start):.3f}s)')
+        print(f'[DynamicData] Cleaned! ({(end - start):.3f}s)')
         print(self._get_statistics())
 
     def _cleanup(self) -> None:
         '''
         Run cleanup and sanity checks on all data. Assigns IDs to name-only values.
         '''
-        print('[CVData] Cleaning up data...')
+        print('[DynamicData] Cleaning up data...')
 
         # sort by image id first to prevent randomness
         if 'IMAGE_ID' in self.dataframe:
@@ -268,7 +268,7 @@ class CVData:
         self._process_ids('BBOX_CLASS', redundant=True)
 
         # check available columns to determine mode availability
-        self.available_modes = CVData._get_modes(self.dataframe)
+        self.available_modes = DynamicData._get_modes(self.dataframe)
 
         # cleanup image sets
         self._cleanup_image_sets()
@@ -277,21 +277,21 @@ class CVData:
     @staticmethod
     def _get_modes(df: DataFrame) -> list:
         modes = []
-        if CVData._inference_cols.issubset(df.columns):
+        if DynamicData._inference_cols.issubset(df.columns):
             modes.append('inference')
-        if CVData._diffusion_cols.issubset(df.columns):
+        if DynamicData._diffusion_cols.issubset(df.columns):
             modes.append('diffusion')
-        if CVData._classification_cols.issubset(df.columns):
+        if DynamicData._classification_cols.issubset(df.columns):
             modes.append('classification')
-        if CVData._detection_cols.issubset(df.columns):
+        if DynamicData._detection_cols.issubset(df.columns):
             modes.append('detection')
-        if CVData._segmentation_img_cols.issubset(df.columns) or \
-            CVData._segmentation_poly_cols.issubset(df.columns):
+        if DynamicData._segmentation_img_cols.issubset(df.columns) or \
+            DynamicData._segmentation_poly_cols.issubset(df.columns):
             modes.append('segmentation')
         return modes
 
     def _get_statistics(self):
-        data = '[CVData] Dataset statistics:\n'
+        data = '[DynamicData] Dataset statistics:\n'
         data += f'       | Available modes: {", ".join(self.available_modes)}\n'
         data += f'       | Images: {len(self.dataframe)}\n'
         for mode in self.available_modes:
@@ -347,7 +347,7 @@ class CVData:
 
     def _get_md5_hashes(self) -> None:
         hashes = [md5(open_image(item).tobytes()).hexdigest() for item in
-                  tqdm(self.dataframe['ABSOLUTE_FILE'],desc='[CVData] Calculating md5 hashes')]
+                  tqdm(self.dataframe['ABSOLUTE_FILE'],desc='[DynamicData] Calculating md5 hashes')]
         counter = {}
         for i, md5hash in enumerate(hashes):
             counter[md5hash] = counter.get(md5hash, []) + [i]
@@ -374,11 +374,11 @@ class CVData:
                 if any(coord < 0 for box in boxes for coord in box):
                     Warnings.error('invalid_scale_data_bbox', id=i)
             if self.bbox_scale_option == 'full':
-                print('[CVData] Detected full size bounding box scale option')
+                print('[DynamicData] Detected full size bounding box scale option')
                 return
-            print('[CVData] Detected [0, 1] bounding box scale option to be converted to full size')
+            print('[DynamicData] Detected [0, 1] bounding box scale option to be converted to full size')
             self.bbox_scale_option = 'zeroone'
-        if self.bbox_scale_option not in CVData._scale_options:
+        if self.bbox_scale_option not in DynamicData._scale_options:
             Warnings.error('invalid_scale', scale=self.bbox_scale_option)
 
     def _get_seg_scale(self) -> None:
@@ -386,13 +386,13 @@ class CVData:
             for i, shapes in enumerate(self.dataframe['POLYGON']):
                 if any(val > 1 for shape in shapes for coord in shape for val in coord):
                     self.seg_scale_option = 'full'
-                    print('[CVData] Detected full size segmentation scale option')
+                    print('[DynamicData] Detected full size segmentation scale option')
                     return
                 if any(coord < 0 for shape in shapes for coord in shape):
                     Warnings.error('invalid_scale_data', id=i)
-            print('[CVData] Detected [0, 1] segmentation scale option to be converted to full size')
+            print('[DynamicData] Detected [0, 1] segmentation scale option to be converted to full size')
             self.seg_scale_option = 'zeroone'
-        if self.seg_scale_option not in CVData._scale_options:
+        if self.seg_scale_option not in DynamicData._scale_options:
             Warnings.error('invalid_scale', scale=self.seg_scale_option)
 
     def _convert_box_scale(self) -> None:
@@ -476,9 +476,9 @@ class CVData:
                 if isinstance(vals, float) and isna(vals):
                     self.dataframe.at[i, f'{name}_NAME'] = idx_to_name[ids]
             if ctr:
-                print(f'[CVData] Patched {ctr} id/name pairs for {name}.')
+                print(f'[DynamicData] Patched {ctr} id/name pairs for {name}.')
                 if not verbose:
-                    print('[CVData] Use parse() with verbose=True to see all invalid entries.')
+                    print('[DynamicData] Use parse() with verbose=True to see all invalid entries.')
             return
         id_vals = []
         name_vals = []
@@ -501,9 +501,9 @@ class CVData:
         self.dataframe[f'{name}_ID'] = id_vals
         self.dataframe[f'{name}_NAME'] = name_vals
         if ctr:
-            print(f'[CVData] Patched {ctr} id/name pairs for {name}.')
+            print(f'[DynamicData] Patched {ctr} id/name pairs for {name}.')
             if not verbose:
-                print('[CVData] Use parse() with verbose=True to see all invalid entries.')
+                print('[DynamicData] Use parse() with verbose=True to see all invalid entries.')
 
     def _assign_ids(self, name: str, default=False, redundant=False) -> \
             tuple[dict[str, int], dict[int, str]]:
@@ -532,14 +532,14 @@ class CVData:
 
     def _convert_bbox(self) -> None:
         cols, funcs = None, None
-        for colset, key_cols, key_funcs in CVData._BBOX_MODES:
+        for colset, key_cols, key_funcs in DynamicData._BBOX_MODES:
             if colset.issubset(self.dataframe.columns):
                 cols, funcs = key_cols, key_funcs
         if cols is None or funcs is None:
-            if any(col in self.dataframe for col in CVData._BBOX_COLS):
+            if any(col in self.dataframe for col in DynamicData._BBOX_COLS):
                 Warnings.error(
                     'incomplete_bbox',
-                    columns=CVData._BBOX_COLS.intersection(self.dataframe.columns)
+                    columns=DynamicData._BBOX_COLS.intersection(self.dataframe.columns)
                 )
             return
 
@@ -568,7 +568,7 @@ class CVData:
                                 funcs[2]((x1, x2)), funcs[3]((y1, y2))))
                 boxes.append(box)
         self.dataframe['BOX'] = boxes
-        self.dataframe.drop(CVData._BBOX_COLS.difference({'BBOX_CLASS_ID', 'BBOX_CLASS_NAME'}),
+        self.dataframe.drop(DynamicData._BBOX_COLS.difference({'BBOX_CLASS_ID', 'BBOX_CLASS_NAME'}),
                             axis=1, inplace=True, errors='ignore')
 
     def _cleanup_image_sets(self) -> None:
@@ -627,7 +627,7 @@ class CVData:
         
         '''
         if not calculate_stats:
-            return CVTransforms.get(mode, resize=resize, normalize=normalize, mean=mean, std=std)
+            return Transforms.get(mode, resize=resize, normalize=normalize, mean=mean, std=std)
         if mode not in self.available_modes or mode in ('inference', 'diffusion'):
             return (None, None)
         loader = self.get_dataloader(
@@ -635,7 +635,7 @@ class CVData:
             remove_invalid=remove_invalid,
             image_set=None,
             preset_transform=False,
-            transforms=CVTransforms.get(mode, resize=resize, normalize=False),
+            transforms=Transforms.get(mode, resize=resize, normalize=False),
             resize=resize,
             batch_size=10,
             num_workers=0,
@@ -659,8 +659,8 @@ class CVData:
         mean /= len(loader.dataset)
         std /= len(loader.dataset)
 
-        print(f"[CVData] Got mean {mean} and std {std}")
-        return CVTransforms.get(mode, resize=resize, mean=mean, std=std, normalize=True)
+        print(f"[DynamicData] Got mean {mean} and std {std}")
+        return Transforms.get(mode, resize=resize, mean=mean, std=std, normalize=True)
 
     def get_dataset(
         self,
@@ -678,7 +678,7 @@ class CVData:
         transforms: Optional[tuple[Callable]] = None,
         resize: Optional[tuple[int, int]] = None,
         normalize_to: Optional[str] = None
-    ) -> 'CVDataset':
+    ) -> 'DynamicDS':
         '''
         Retrieve the PyTorch dataset (torch.utils.data.Dataset) of a specific mode and image set.
         
@@ -742,22 +742,22 @@ class CVData:
             Warnings.error('image_set_missing', imgset_name=imgset_mode, image_set=image_set)
         normalization = None
         if mode == 'classification':
-            dataframe = dataframe[list(CVData._classification_cols)]
+            dataframe = dataframe[list(DynamicData._classification_cols)]
             id_mapping = {k: i for i, k in enumerate(self.idx_to_class)}
         elif mode == 'detection':
-            dataframe = dataframe[list(CVData._detection_cols)]
+            dataframe = dataframe[list(DynamicData._detection_cols)]
             normalization = self.bbox_scale_option
             id_mapping = {k: i for i, k in enumerate(self.idx_to_bbox_class)}
         elif mode == 'segmentation':
-            dataframe = dataframe[list(CVData._segmentation_poly_cols if 'POLYGON' in
-                                       dataframe else CVData._segmentation_img_cols)]
+            dataframe = dataframe[list(DynamicData._segmentation_poly_cols if 'POLYGON' in
+                                       dataframe else DynamicData._segmentation_img_cols)]
             normalization = self.seg_scale_option
             id_mapping = {k: i for i, k in enumerate(self.idx_to_seg_class)}
         elif mode == 'inference':
-            dataframe = dataframe[list(CVData._inference_cols)]
+            dataframe = dataframe[list(DynamicData._inference_cols)]
             id_mapping = None
         elif mode == 'diffusion':
-            dataframe = dataframe[list(CVData._diffusion_cols)]
+            dataframe = dataframe[list(DynamicData._diffusion_cols)]
             id_mapping = None
         if remove_invalid:
             dataframe = dataframe.dropna()
@@ -765,7 +765,7 @@ class CVData:
                 start = len(dataframe)
                 dataframe = dataframe[dataframe['BOX'].apply(lambda x: len(x) != 0)]
                 end = len(dataframe)
-                print(f'[CVData] Removed {start - end} empty entries from data.')
+                print(f'[DynamicData] Removed {start - end} empty entries from data.')
         else:
             replace_nan = (lambda x: ([] if isinstance(x, float) and isna(x) else x))
             if mode == 'detection':
@@ -782,7 +782,7 @@ class CVData:
 
         if len(dataframe) == 0:
             Warnings.error('image_set_empty', image_set=image_set)
-        return CVDataset(dataframe, self.root, mode, id_mapping=id_mapping, transform=transform,
+        return DynamicDS(dataframe, self.root, mode, id_mapping=id_mapping, transform=transform,
                         target_transform=target_transform, resize=resize, store_dim=store_dim,
                         normalize_to=normalize_to, normalization=normalization)
 
@@ -1032,7 +1032,7 @@ class CVData:
         safe: bool = True
     ) -> None:
         '''
-        Save the dataset into CVData json format.
+        Save the dataset into DynamicData json format.
         
         Args:
          - filename (str): the filename to save the dataset.
@@ -1069,7 +1069,7 @@ class CVData:
     @classmethod
     def load(cls, filename: str) -> Self:
         '''
-        Load a CVData object from file. Warning: do not load any json files that you did not create.
+        Load a DynamicData object from file. Warning: do not load any json files that you did not create.
         This method uses jsonpickle, an insecure loading system with potential for arbitrary Python
         code execution.
         
@@ -1077,13 +1077,13 @@ class CVData:
          - filename (str): the filename to load the data from.
         '''
         try:
-            print('[CVData] Loading dataset...')
+            print('[DynamicData] Loading dataset...')
             start = time.time()
             with open(filename, 'r', encoding='utf-8') as f:
                 data = json.load(f)
             if not data['safe']:
                 Warnings.warn('unsafe_load')
-            this: CVData = cls(
+            this: DynamicData = cls(
                 data['root'],
                 jsonpickle.decode(data['form'], keys=True) if not data['safe'] else None,
                 get_md5_hashes=data['get_md5_hashes'],
@@ -1105,7 +1105,7 @@ class CVData:
             this.available_modes = data['available_modes']
             this.cleaned = data['cleaned']
             end = time.time()
-            print(f'[CVData] Loaded dataset! ({end - start}s)')
+            print(f'[DynamicData] Loaded dataset! ({end - start}s)')
         except Exception as e:
             print(f'The following error occurred: \n{e}')
             Warnings.error('invalid_dataset')
@@ -1142,7 +1142,7 @@ class CVData:
         image = transform(open_image(item['ABSOLUTE_FILE']).convert('RGB'))
         plt.figure(dpi=dpi)
         if 'classification' in mode:
-            print(f'[CVData] Image Class ID/Name: {item["CLASS_ID"]}/{item["CLASS_NAME"]}')
+            print(f'[DynamicData] Image Class ID/Name: {item["CLASS_ID"]}/{item["CLASS_NAME"]}')
         if 'detection' in mode:
             if len(item['BOX']) != 0:
                 image = draw_bounding_boxes(
@@ -1152,7 +1152,7 @@ class CVData:
                     labels=item['BBOX_CLASS_NAME'],
                     colors='red'
                 )
-            else: print('[CVData] Warning: Image has no bounding boxes.')
+            else: print('[DynamicData] Warning: Image has no bounding boxes.')
         if 'segmentation' in mode:
             _, axarr = plt.subplots(ncols=2)
             axarr[0].imshow(image.permute(1, 2, 0))
@@ -1193,7 +1193,7 @@ class CVData:
         plt.figure(dpi=dpi)
         if mode == 'classification':
             _, pred = torch.max(result, dim=1)
-            print(f'[CVData] Image Class ID/Name: {pred}/{self.idx_to_class[pred]}')
+            print(f'[DynamicData] Image Class ID/Name: {pred}/{self.idx_to_class[pred]}')
         elif mode == 'detection':
             boxes = result['boxes']
             labels = result['labels']
@@ -1205,7 +1205,7 @@ class CVData:
                     colors='red',
                     labels=[self.idx_to_bbox_class[label] for label in labels]
                 )
-            else: print('[CVData] Warning: Image has no bounding boxes.')
+            else: print('[DynamicData] Warning: Image has no bounding boxes.')
         if mode == 'segmentation':
             _, axarr = plt.subplots(ncols=2)
             axarr[0].imshow(image.permute(1, 2, 0))
@@ -1217,12 +1217,12 @@ class CVData:
         else:
             plt.imshow(image.permute(1, 2, 0))
 
-class CVDataset(VisionDataset):
+class DynamicDS(VisionDataset):
     '''
-    Dataset implementation for the CVData environment.
+    Dataset implementation for the DynamicData environment.
     
     Args:
-    - `df` (`DataFrame`): the dataframe from CVData.
+    - `df` (`DataFrame`): the dataframe from DynamicData.
     - `root` (`str`): the root of the dataset folder.
     - `mode` (`str`): the mode of the data to retrieve, i.e. classification, segmentation, etc.
     - `id_mapping` (`dict[int, int]`): the id mapping from the dataframe to retrieve class names.

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to CVDataloading’s documentation! &mdash; CVData 0.1.0-alpha.1 documentation</title>
+  <title>Welcome to DynamicDL’s documentation! &mdash; CVData 0.1.0-alpha.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -46,8 +46,8 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html">CVData Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">CVData</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">DynamicData Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">DynamicDL</a></li>
 </ul>
 
         </div>
@@ -64,7 +64,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Welcome to CVDataloading’s documentation!</li>
+      <li class="breadcrumb-item active">Welcome to DynamicDL’s documentation!</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -74,79 +74,27 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="welcome-to-cvdataloading-s-documentation">
-<h1>Welcome to CVDataloading’s documentation!<a class="headerlink" href="#welcome-to-cvdataloading-s-documentation" title="Link to this heading"></a></h1>
-<section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
-<p>In recent days computer vision has become a hot topic in the field of AI and computer science. Advances in hardware and computational power has enabled deep learning to become pervasive in everyday life, and computer vision architectures serve many purposes in today’s world. Yet a high barrier of entry remains in dataloading. While deep learning architectures are a “plug and chug”, requiring users to possess near-zero knowledge about its inner works, dataloading still remains a barrier to most seeking to test their custom datasets. CVData is a library to counteract that, containing code to dynamically process datasets.</p>
+  <section id="welcome-to-dynamicdl-s-documentation">
+<h1>Welcome to DynamicDL’s documentation!<a class="headerlink" href="#welcome-to-dynamicdl-s-documentation" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#indices-and-tables">Indices and tables</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tutorial.html">CVData Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorial.html#indices-and-tables">Indices and tables</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">CVData</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cvdataloading.html">cvdataloading package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#module-cvdataloading.cvdata">cvdataloading.cvdata module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.cvdata.CVData"><code class="docutils literal notranslate"><span class="pre">CVData</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.cvdata.CVDataset"><code class="docutils literal notranslate"><span class="pre">CVDataset</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#module-cvdataloading.data_items">cvdataloading.data_items module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.Alias"><code class="docutils literal notranslate"><span class="pre">Alias</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataEntry"><code class="docutils literal notranslate"><span class="pre">DataEntry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataItem"><code class="docutils literal notranslate"><span class="pre">DataItem</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.DataTypes"><code class="docutils literal notranslate"><span class="pre">DataTypes</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.File"><code class="docutils literal notranslate"><span class="pre">File</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.Folder"><code class="docutils literal notranslate"><span class="pre">Folder</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.Generic"><code class="docutils literal notranslate"><span class="pre">Generic</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.Image"><code class="docutils literal notranslate"><span class="pre">Image</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.ImageFile"><code class="docutils literal notranslate"><span class="pre">ImageFile</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.SegmentationImage"><code class="docutils literal notranslate"><span class="pre">SegmentationImage</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.data_items.Static"><code class="docutils literal notranslate"><span class="pre">Static</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#module-cvdataloading.processing">cvdataloading.processing module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.AmbiguousList"><code class="docutils literal notranslate"><span class="pre">AmbiguousList</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.GenericList"><code class="docutils literal notranslate"><span class="pre">GenericList</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.JSONFile"><code class="docutils literal notranslate"><span class="pre">JSONFile</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.Pairing"><code class="docutils literal notranslate"><span class="pre">Pairing</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.SegmentationObject"><code class="docutils literal notranslate"><span class="pre">SegmentationObject</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.TXTFile"><code class="docutils literal notranslate"><span class="pre">TXTFile</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.XMLFile"><code class="docutils literal notranslate"><span class="pre">XMLFile</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.processing.YAMLFile"><code class="docutils literal notranslate"><span class="pre">YAMLFile</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#module-cvdataloading.transforms">cvdataloading.transforms module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.CVTransforms"><code class="docutils literal notranslate"><span class="pre">CVTransforms</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.ImageClassification"><code class="docutils literal notranslate"><span class="pre">ImageClassification</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.ObjectDetection"><code class="docutils literal notranslate"><span class="pre">ObjectDetection</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="cvdataloading.html#cvdataloading.transforms.SemanticSegmentation"><code class="docutils literal notranslate"><span class="pre">SemanticSegmentation</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="cvdataloading.html#module-cvdataloading">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#indices-and-tables">Indices and tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">DynamicData Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">DynamicDL</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.html">dynamicdl package</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </section>
 <section id="indices-and-tables">
-<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h2>
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
-</section>
 </section>
 
 

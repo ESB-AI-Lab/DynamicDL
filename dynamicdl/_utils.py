@@ -1,5 +1,5 @@
 '''
-Private utility functions for CVData.
+Private utility functions for DynamicData.
 '''
 import json
 from typing import Union, NoReturn
@@ -47,7 +47,7 @@ class LengthMismatchError(Exception):
 
 class Warnings:
     '''
-    Predefined warning and error messages for CVData.
+    Predefined warning and error messages for DynamicData.
     '''
     # warnings
     file_ext = ('Warning: pattern has a . in it. If this is a file extension, omit in the pattern '
@@ -57,7 +57,6 @@ class Warnings:
                    'original dataset form you should save the dataset with `safe=True`.')
     unsafe_save = ('Warning: attempting to save unsafe object (form). If you do not need to '
                    're-parse the dataset format again you should save with `safe=True`.')
-    
 
     # errors
     merge_conflict = ('Conflicting information found while merging two entries:'

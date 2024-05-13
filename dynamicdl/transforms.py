@@ -141,7 +141,7 @@ class SemanticSegmentation(nn.Module):
             f"``mean={self.mean}`` and ``std={self.std}``."
         )
 
-class CVTransforms:
+class Transforms:
     '''
     Standard transforms presets for computer vision. Adapted from torchvision 0.17.2
     '''

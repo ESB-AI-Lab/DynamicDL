@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CVData Tutorial &mdash; CVData 0.1.0-alpha.1 documentation</title>
+  <title>DynamicData Tutorial &mdash; CVData 0.1.0-alpha.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -21,7 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="CVData" href="modules.html" />
+    <link rel="next" title="DynamicDL" href="modules.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
 </head>
 
@@ -47,11 +47,8 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">CVData Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">CVData</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">DynamicData Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">DynamicDL</a></li>
 </ul>
 
         </div>
@@ -68,7 +65,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">CVData Tutorial</li>
+      <li class="breadcrumb-item active">DynamicData Tutorial</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/tutorial.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -78,9 +75,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="cvdata-tutorial">
-<h1>CVData Tutorial<a class="headerlink" href="#cvdata-tutorial" title="Link to this heading"></a></h1>
-<p>CVData uses a hierarchy-based parsing algorithm to take in data. Given some dataset, you need to feed in the <em>structure</em> of the dataset.</p>
+  <section id="dynamicdata-tutorial">
+<h1>DynamicData Tutorial<a class="headerlink" href="#dynamicdata-tutorial" title="Link to this heading"></a></h1>
+<p>DynamicData uses a hierarchy-based parsing algorithm to take in data. Given some dataset, you need
+to feed in the <em>structure</em> of the dataset.</p>
 <p>Suppose you have a standard COCODetection dataset with the following structure:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>coco_dataset/
 |
@@ -100,47 +98,55 @@
         └── ...
 </pre></div>
 </div>
-<p>You will need to be able to tell CVData what each item does, generically. An example for a possible syntax in python uses <cite>dict</cite> objects:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cvdata</span> <span class="k">as</span> <span class="nn">cvd</span>
+<p>You will need to be able to tell DynamicData what each item does, generically. An example for a
+possible syntax in python uses <cite>dict</cite> objects:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dynamicdl</span> <span class="k">as</span> <span class="nn">ddl</span>
 <span class="n">root</span> <span class="o">=</span> <span class="s1">&#39;~/coco_dataset/&#39;</span>
 <span class="n">form</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;annotations&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;instances_train.json&#39;</span><span class="p">:</span> <span class="n">cvd</span><span class="o">.</span><span class="n">JSONFile</span><span class="p">(</span> <span class="o">...</span> <span class="p">),</span>
-        <span class="s1">&#39;instances_val.json&#39;</span><span class="p">:</span> <span class="n">cvd</span><span class="o">.</span><span class="n">JSONFile</span><span class="p">(</span> <span class="o">...</span> <span class="p">)</span>
+        <span class="s1">&#39;instances_train.json&#39;</span><span class="p">:</span> <span class="n">ddl</span><span class="o">.</span><span class="n">JSONFile</span><span class="p">(</span> <span class="o">...</span> <span class="p">),</span>
+        <span class="s1">&#39;instances_val.json&#39;</span><span class="p">:</span> <span class="n">ddl</span><span class="o">.</span><span class="n">JSONFile</span><span class="p">(</span> <span class="o">...</span> <span class="p">)</span>
     <span class="p">},</span>
     <span class="s1">&#39;images&#39;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;image_train1.jpg&#39;</span><span class="p">:</span> <span class="n">cvd</span><span class="o">.</span><span class="n">Image</span><span class="p">(),</span>
-            <span class="s1">&#39;image_train2.jpg&#39;</span><span class="p">:</span> <span class="n">cvd</span><span class="o">.</span><span class="n">Image</span><span class="p">(),</span>
+            <span class="s1">&#39;image_train1.jpg&#39;</span><span class="p">:</span> <span class="n">ddl</span><span class="o">.</span><span class="n">Image</span><span class="p">(),</span>
+            <span class="s1">&#39;image_train2.jpg&#39;</span><span class="p">:</span> <span class="n">ddl</span><span class="o">.</span><span class="n">Image</span><span class="p">(),</span>
             <span class="o">...</span>
         <span class="p">},</span>
         <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;image_val1.jpg&#39;</span><span class="p">:</span> <span class="n">cvd</span><span class="o">.</span><span class="n">Image</span><span class="p">(),</span>
-            <span class="s1">&#39;image_val2.jpg&#39;</span><span class="p">:</span> <span class="n">cvd</span><span class="o">.</span><span class="n">Image</span><span class="p">(),</span>
+            <span class="s1">&#39;image_val1.jpg&#39;</span><span class="p">:</span> <span class="n">ddl</span><span class="o">.</span><span class="n">Image</span><span class="p">(),</span>
+            <span class="s1">&#39;image_val2.jpg&#39;</span><span class="p">:</span> <span class="n">ddl</span><span class="o">.</span><span class="n">Image</span><span class="p">(),</span>
             <span class="o">...</span>
         <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>But the dataset has thousands of images! We can’t possibly write all of them manually. Also, we need a method to tell <cite>cvdata</cite> how to extract data from both the names of the files, folders, and also the contents of the files.</p>
-<p>The <cite>DataTypes</cite> class introduces a solution: in the class we have many preset tokens which cover the functionalities of the image classification, object detection, and semantic segmentation operations. More on this in the <a class="reference external" href="https://atong28.github.io/CVData">docs</a>. Then, we can wrap these <cite>DataType</cite> objects into <cite>Generic</cite> objects (or <cite>File</cite> and <cite>Folder</cite> objects, which extend the <cite>Generic</cite> class)! Let’s update the previous example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cvdata</span> <span class="kn">import</span> <span class="n">DataTypes</span> <span class="k">as</span> <span class="n">DT</span>
-<span class="kn">import</span> <span class="nn">cvdata</span> <span class="k">as</span> <span class="nn">cvd</span>
+<p>But the dataset has thousands of images! We can’t possibly write all of them manually. Also, we
+need a method to tell <cite>dynamicdl</cite> how to extract data from both the names of the files, folders, and
+also the contents of the files.</p>
+<p>The <cite>DataTypes</cite> class introduces a solution: in the class we have many preset tokens which cover
+the functionalities of the image classification, object detection, and semantic segmentation
+operations. More on this in the <a class="reference external" href="https://esb-ai-lab.github.io/DynamicDL">docs</a>. Then, we can
+wrap these <cite>DataType</cite> objects into <cite>Generic</cite> objects (or <cite>File</cite> and <cite>Folder</cite> objects, which extend
+the <cite>Generic</cite> class)! Let’s update the previous example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dynamicdl</span> <span class="kn">import</span> <span class="n">DataTypes</span> <span class="k">as</span> <span class="n">DT</span>
+<span class="kn">import</span> <span class="nn">dynamicdl</span> <span class="k">as</span> <span class="nn">ddl</span>
 <span class="n">root</span> <span class="o">=</span> <span class="s1">&#39;~/coco_dataset/&#39;</span>
 <span class="n">form</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;annotations&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">cvd</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;instances_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">DT</span><span class="o">.</span><span class="n">IMAGE_SET_NAME</span><span class="p">):</span> <span class="n">cvd</span><span class="o">.</span><span class="n">JSONFile</span><span class="p">(</span> <span class="o">...</span> <span class="p">)</span>
+        <span class="n">ddl</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;instances_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">DT</span><span class="o">.</span><span class="n">IMAGE_SET_NAME</span><span class="p">):</span> <span class="n">ddl</span><span class="o">.</span><span class="n">JSONFile</span><span class="p">(</span> <span class="o">...</span> <span class="p">)</span>
     <span class="p">},</span>
     <span class="s1">&#39;images&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">cvd</span><span class="o">.</span><span class="n">Folder</span><span class="p">(</span><span class="n">DT</span><span class="o">.</span><span class="n">IMAGE_SET_NAME</span><span class="p">):</span> <span class="p">{</span>
-            <span class="n">cvd</span><span class="o">.</span><span class="n">ImageFile</span><span class="p">(</span><span class="n">DT</span><span class="o">.</span><span class="n">IMAGE_NAME</span><span class="p">):</span> <span class="n">cvd</span><span class="o">.</span><span class="n">Image</span><span class="p">()</span>
+        <span class="n">ddl</span><span class="o">.</span><span class="n">Folder</span><span class="p">(</span><span class="n">DT</span><span class="o">.</span><span class="n">IMAGE_SET_NAME</span><span class="p">):</span> <span class="p">{</span>
+            <span class="n">ddl</span><span class="o">.</span><span class="n">ImageFile</span><span class="p">(</span><span class="n">DT</span><span class="o">.</span><span class="n">IMAGE_NAME</span><span class="p">):</span> <span class="n">ddl</span><span class="o">.</span><span class="n">Image</span><span class="p">()</span>
         <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Much better. But now we need to find out what is inside the JSON file! The syntax remains nearly the same. For a COCO dataset, here’s what it looks like inside:</p>
+<p>Much better. But now we need to find out what is inside the JSON file! The syntax remains nearly
+the same. For a COCO dataset, here’s what it looks like inside:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;info&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;COCO Dataset&quot;</span><span class="p">,</span>
@@ -214,13 +220,14 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>That’s a lot of data! Fortunately, we only have to tell <cite>CVData</cite> what we need. Here’s our form once again, expanded with the <cite>JSONFile</cite> constructor:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cvdata</span> <span class="kn">import</span> <span class="n">DataTypes</span> <span class="k">as</span> <span class="n">DT</span>
-<span class="kn">import</span> <span class="nn">cvdata</span> <span class="k">as</span> <span class="nn">cvd</span>
+<p>That’s a lot of data! Fortunately, we only have to tell <cite>DynamicData</cite> what we need. Here’s our form
+once again, expanded with the <cite>JSONFile</cite> constructor:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dynamicdl</span> <span class="kn">import</span> <span class="n">DataTypes</span> <span class="k">as</span> <span class="n">DT</span>
+<span class="kn">import</span> <span class="nn">dynamicdl</span> <span class="k">as</span> <span class="nn">ddl</span>
 <span class="n">root</span> <span class="o">=</span> <span class="s1">&#39;~/coco_dataset/&#39;</span>
 <span class="n">form</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;annotations&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">cvd</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;instances_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">DT</span><span class="o">.</span><span class="n">IMAGE_SET_NAME</span><span class="p">):</span> <span class="n">cvd</span><span class="o">.</span><span class="n">JSONFile</span><span class="p">({</span>
+        <span class="n">ddl</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;instances_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">DT</span><span class="o">.</span><span class="n">IMAGE_SET_NAME</span><span class="p">):</span> <span class="n">ddl</span><span class="o">.</span><span class="n">JSONFile</span><span class="p">({</span>
             <span class="s1">&#39;images&#39;</span><span class="p">:</span> <span class="p">[{</span>
                 <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">DT</span><span class="o">.</span><span class="n">IMAGE_ID</span><span class="p">,</span>
                 <span class="s1">&#39;file_name&#39;</span><span class="p">:</span> <span class="n">DT</span><span class="o">.</span><span class="n">ABSOLUTE_FILE</span>
@@ -237,33 +244,35 @@
         <span class="p">})</span>
     <span class="p">},</span>
     <span class="s1">&#39;images&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">cvd</span><span class="o">.</span><span class="n">Folder</span><span class="p">(</span><span class="n">DT</span><span class="o">.</span><span class="n">IMAGE_SET_NAME</span><span class="p">):</span> <span class="p">{</span>
-            <span class="n">cvd</span><span class="o">.</span><span class="n">ImageFile</span><span class="p">(</span><span class="n">DT</span><span class="o">.</span><span class="n">IMAGE_NAME</span><span class="p">):</span> <span class="n">cvd</span><span class="o">.</span><span class="n">Image</span><span class="p">()</span>
+        <span class="n">ddl</span><span class="o">.</span><span class="n">Folder</span><span class="p">(</span><span class="n">DT</span><span class="o">.</span><span class="n">IMAGE_SET_NAME</span><span class="p">):</span> <span class="p">{</span>
+            <span class="n">ddl</span><span class="o">.</span><span class="n">ImageFile</span><span class="p">(</span><span class="n">DT</span><span class="o">.</span><span class="n">IMAGE_NAME</span><span class="p">):</span> <span class="n">ddl</span><span class="o">.</span><span class="n">Image</span><span class="p">()</span>
         <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>my_data = cvd.CVData(root, form)
+<p>my_data = ddl.DynamicData(root, form)
 my_data.parse()</p>
-<p>Voila! We have a fully functional COCO Dataset parser. Notice how straightforward it was - the JSONFile parsing almost exactly matches the syntax of the json file itself. The only exception is the <cite>Pairing</cite> class, which is a wrapper class to tell <cite>cvdata</cite> that two datatypes are generally associated together but are not tied to any specific images. This is to avoid confusion and some problems that may arise during parsing.</p>
-<p>How does it work? Well, <cite>cvdata</cite> uses a hierarchy-based algorithm to merge data together. It starts at the deepest levels and merges data tokens together into <cite>DataEntry</cite> items and gradually works its way up to the surface level. Data entries are merged if they share the same unique identifier (i.e. image name, filename, image id, etc.), and bubbled up to the top. Then we can view our data in a Pandas dataframe:</p>
+<p>Voila! We have a fully functional COCO Dataset parser. Notice how straightforward it was - the
+JSONFile parsing almost exactly matches the syntax of the json file itself. The only exception is
+the <cite>Pairing</cite> class, which is a wrapper class to tell <cite>dynamicdl</cite> that two datatypes are generally
+associated together but are not tied to any specific images. This is to avoid confusion and some
+problems that may arise during parsing.</p>
+<p>How does it work? Well, <cite>dynamicdl</cite> uses a hierarchy-based algorithm to merge data together. It
+starts at the deepest levels and merges data tokens together into <cite>DataEntry</cite> items and gradually
+works its way up to the surface level. Data entries are merged if they share the same unique
+identifier (i.e. image name, filename, image id, etc.), and bubbled up to the top. Then we can view
+our data in a Pandas dataframe:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">my_data</span><span class="o">.</span><span class="n">dataframe</span>
 </pre></div>
 </div>
-<p>And done! Of course, there are other functions, and a lot of functions behind the scenes to clean up the (potentially) messy data and address inconsistencies. We can now access our dataloader with the following:</p>
+<p>And done! Of course, there are other functions, and a lot of functions behind the scenes to clean
+up the (potentially) messy data and address inconsistencies. We can now access our dataloader with
+the following:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dataloader</span> <span class="o">=</span> <span class="n">my_data</span><span class="o">.</span><span class="n">get_dataloader</span><span class="p">(</span><span class="s1">&#39;detection&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>See the <a class="reference external" href="https://atong28.github.io/CVData">docs</a> for more details on options you can use!</p>
-<section id="indices-and-tables">
-<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
-</section>
+<p>See the <a class="reference external" href="https://esb-ai-lab.github.io/DynamicDL">docs</a> for more details on options you can use!</p>
 </section>
 
 
@@ -271,7 +280,7 @@ my_data.parse()</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="modules.html" class="btn btn-neutral float-right" title="CVData" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="modules.html" class="btn btn-neutral float-right" title="DynamicDL" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
