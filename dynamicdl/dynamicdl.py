@@ -140,6 +140,8 @@ class DynamicData:
     _segmentation_img_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'ABSOLUTE_FILE_SEG', 'IMAGE_DIM'}
     _segmentation_poly_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'POLYGON', 'SEG_CLASS_ID', 'IMAGE_DIM'}
 
+    _generics = ['GENERIC, GENERIC_INT, GENERIC_WORD, GENERIC_FLOAT']
+
     _BBOX_MODES = [
         (
             {'X1', 'X2', 'Y1', 'Y2'},
@@ -233,6 +235,9 @@ class DynamicData:
         '''
         print('[DynamicData] Cleaning up data...')
 
+        if 'ABSOLUTE_FILE' not in self.dataframe:
+            Warnings.error('no_images')
+
         # sort by image id first to prevent randomness
         if 'IMAGE_ID' in self.dataframe:
             self.dataframe.sort_values('IMAGE_ID', ignore_index=True, inplace=True)
@@ -248,7 +253,7 @@ class DynamicData:
             self._get_md5_hashes()
 
         # drop generic as it is useless data
-        self.dataframe.drop(columns='GENERIC', inplace=True, errors='ignore')
+        self.dataframe.drop(columns=DynamicData._generics, inplace=True, errors='ignore')
 
         # convert bounding boxes into proper format and store under 'BOX'
         self._convert_bbox()

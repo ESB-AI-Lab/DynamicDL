@@ -40,6 +40,7 @@ from typing_extensions import Self
 from ._utils import union, Warnings
 
 __all__ = [
+    'DataType',
     'DataTypes',
     'DataItem',
     'DataEntry',
@@ -101,6 +102,13 @@ class WildcardToken(Token):
     operations.
     '''
 
+class WildcardWordToken(WildcardToken):
+    '''
+    Disallows spaces in the wildcard.
+    '''
+    def verify_token(self, token: str) -> bool:
+        return ' ' not in token
+
 class FilenameToken(UniqueToken):
     '''
     The FilenameToken class is a Token which checks for valid absolute filenames.
@@ -118,6 +126,11 @@ class IDToken(Token):
     def transform(self, token: str) -> Any:
         return int(token)
 
+class WildcardIntToken(IDToken, WildcardToken):
+    '''
+    Wildcards for only integers.
+    '''
+
 class QuantityToken(Token):
     '''
     Represents a numeric quantity. Can be int or float.
@@ -127,6 +140,11 @@ class QuantityToken(Token):
 
     def transform(self, token: str) -> Any:
         return float(token)
+
+class WildcardQuantityToken(QuantityToken, WildcardToken):
+    '''
+    Wildcards for only quantities.
+    '''
 
 class RedundantQuantityToken(QuantityToken, RedundantToken):
     '''
@@ -222,6 +240,9 @@ class DataTypes:
     IMAGE_NAME = DataType('IMAGE_NAME', UniqueToken())
     IMAGE_ID = DataType('IMAGE_ID', UniqueIDToken())
     GENERIC = DataType('GENERIC', WildcardToken())
+    GENERIC_INT = DataType('GENERIC_INT', WildcardIntToken())
+    GENERIC_QUANTITY = DataType('GENERIC_QUANTITY', WildcardQuantityToken())
+    GENERIC_WORD = DataType('GENERIC_WORD', WildcardWordToken())
 
     # classification
     CLASS_NAME = DataType('CLASS_NAME', Token())
@@ -298,7 +319,8 @@ class DataEntry:
     '''
     Contains all items required for an entry in the dataset, which contains DataItem objects.
     
-     - `items` (`list[DataItem] | DataItem`): a (list of) data items which are to be batched together
+     - `items` (`list[DataItem] | DataItem`): a (list of) data items which are to be batched
+     together
     '''
 
     _valid_sets = [
@@ -311,10 +333,12 @@ class DataEntry:
 
     def __init__(self, items: Union[list[DataItem], DataItem]) -> None:
         items: list[DataItem] = union(items)
-        self.unique: bool = any(isinstance(item.delimiter.token_type, UniqueToken)
-                                for item in items if not isinstance(item, list))
-        self.data: dict[str, DataItem] = {(item.delimiter.desc if not isinstance(item, list)
-                                           else item[0].delimiter.desc): item for item in items}
+        self.data: dict[str, DataItem] = {item.delimiter.desc: item for item in items}
+        self._update_unique()
+
+    def _update_unique(self) -> bool:
+        self.unique = any(isinstance(item.delimiter.token_type, UniqueToken)
+                          for item in self.data.values())
 
     @classmethod
     def merge(cls, first: Self, second: Self) -> Self:
@@ -357,6 +381,7 @@ class DataEntry:
             if desc not in merged.data:
                 merged.data[desc] = item
                 continue
+        merged._update_unique()
         return merged
 
     def merge_inplace(self, other: Self) -> None:
@@ -396,6 +421,7 @@ class DataEntry:
             if desc not in self.data:
                 self.data[desc] = item
                 continue
+        self._update_unique()
 
     def apply_tokens(self, items: Union[list[DataItem], DataItem]) -> None:
         '''
@@ -410,7 +436,7 @@ class DataEntry:
             if isinstance(item.delimiter.token_type, RedundantToken):
                 continue
             if isinstance(item.delimiter.token_type, UniqueToken):
-                if self.data[item.delimiter.desc] != item:
+                if item.delimiter.desc in self.data and self.data[item.delimiter.desc] != item:
                     Warnings.error(
                         'merge_unique_conflict',
                         parent=self.data[item.delimiter.desc],
@@ -433,7 +459,6 @@ class DataEntry:
                     if desc in self.data:
                         n = len(self.data[desc].value)
                         break
-
                 assert len(item.value) == 1, \
                     ('Assertion failed - (len(item.value) == 1) Please report this error to the '
                      'DynamicData developers.')
@@ -445,6 +470,7 @@ class DataEntry:
                 continue
             elif isinstance(item.delimiter.token_type, RedundantToken):
                 self.data[item.delimiter.desc].add(item)
+        self._update_unique()
 
     def __repr__(self) -> str:
         return ' '.join(['DataEntry:']+[str(item) for item in self.data.values()])

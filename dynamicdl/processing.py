@@ -212,49 +212,113 @@ class JSONFile(DataFile):
 class TXTFile(DataFile):
     '''
     Utility functions for parsing txt files.
-    
-     - `line_format` (`GenericList | Pairing | Any`): the structure to parse, repetitively. If
-        neither a GenericList nor Pairing is passed then structure is assumed to be the args in
-        the constructor of a GenericList.
-     - `offset` (`int`): number of items to skip from the top of the file.
-     - `ignore_type` (`list[Generic | str] | Generic | str`): ignore the list of formats or lines 
-        beginning with str when parsing.
-     - `by_line` (`bool`): true if parsing is to be done per line, rather than continuously.
     '''
     def __init__(
         self,
-        line_format: Union[GenericList, 'Pairing', Any],
-        offset: int = 0,
-        ignore_type: Union[list[Union[Generic, str]], Generic, str] = None
+        form: Union[dict, list],
+        ignore_type: Optional[Union[list[Union[Generic, str]], Generic, str]] = None
     ) -> None:
-        if not isinstance(line_format, (GenericList, Pairing)):
-            line_format = GenericList(line_format)
-        self.line_format = line_format
-        self.offset: int = offset
+        self.form = form
+        self.named = isinstance(form, dict)
         self.ignore_type: list[Generic] = []
         if ignore_type:
             ignore_type = union(ignore_type)
             self.ignore_type = [Generic(rule + '{}', DataTypes.GENERIC) if
                            isinstance(rule, str) else rule for rule in ignore_type]
 
-    def parse(self, path: str) -> list[Static]:
+    def parse(self, path: str) -> dict:
         def filter_ignores(line: str):
             for ignore_type in self.ignore_type:
                 if ignore_type.match(line)[0]:
                     return True
             return False
+        data = []
         with open(path, 'r', encoding='utf-8') as f:
-            lines: list[str] = f.readlines()[self.offset:]
-        filtered_lines = []
-        for line in lines:
-            if filter_ignores(line):
+            lines = f.readlines()
+            for line in lines:
+                line = line.strip()
+                if filter_ignores(line):
+                    continue
+                data.append(line)
+        data, _ = TXTFile._parse(data, self.form)
+        return expand_generics(data, self.form)
+
+    @staticmethod
+    def _parse(data: list[str], form: Any) -> Any:
+        if isinstance(form, Pairing):
+            form = form.form
+        if isinstance(form, (Generic, Static, str, DataType)):
+            if isinstance(form, str):
+                form = Static(form)
+            elif isinstance(form, DataType):
+                form = Generic('{}', form)
+            if form.match(data[0]):
+                return data, 1
+            raise ValueError("TXTFile Failed to parse")
+        if isinstance(form, dict):
+            return TXTFile._parse_dict(data, form)
+        if isinstance(form, list):
+            return TXTFile._parse_list(data, form)
+        raise ValueError("Unknown Token")
+
+    @staticmethod
+    def _parse_list(data: list[str], form: list) -> list:
+        parsed_data = []
+        ctr = 0
+        i = 0
+        while True:
+            if ctr >= len(data):
+                return parsed_data, ctr
+            next_form = form[i]
+            if isinstance(next_form, (list, dict)):
+                obj_data, endline = TXTFile._parse(data[ctr:], form)
+                parsed_data.append(obj_data)
+                ctr += endline
+                i = (i + 1) % len(form)
                 continue
-            filtered_lines.append(line)
-        if isinstance(self.line_format, GenericList):
-            return expand_generics(filtered_lines, self.line_format)
-        if isinstance(self.line_format, Pairing):
-            self.line_format.find_pairings(filtered_lines, in_file=True)
-            return {}, [self.line_format]
+            if isinstance(next_form, str):
+                next_form = Static(next_form)
+            elif isinstance(next_form, DataType):
+                next_form = Generic('{}', next_form)
+            result, _ = next_form.match(data[ctr])
+            if not result:
+                return parsed_data, ctr
+            parsed_data.append(data[ctr])
+            ctr += 1
+            i = (i + 1) % len(form)
+
+    @staticmethod
+    def _parse_dict(data: list[str], form: dict) -> dict:
+        cleaned_form: dict[Union[Static, Generic], Any] = {}
+        for generic, subform in form.items():
+            if isinstance(generic, str):
+                generic = Static(generic)
+            elif isinstance(generic, DataType):
+                generic = Generic('{}', generic)
+            cleaned_form[generic] = subform
+        form: dict[Union[Static, Generic], Any] = cleaned_form
+        parsed_data = {}
+        prev = -1
+        start = -1
+        for i, line in enumerate(data):
+            result = False
+            for generic in form:
+                result, _ = generic.match(line)
+                if result:
+                    break
+            if not result:
+                continue
+            if start != -1:
+                parsed_data[prev_line], _ = TXTFile._parse(data[start:i], form[key])
+            prev = start
+            start = i + 1
+            key = generic
+            prev_line = line
+        if start != prev:
+            parsed_data[prev_line], start = TXTFile._parse(data[start:], form[key])
+        else:
+            start = 0
+        return parsed_data, start
 
 class XMLFile(DataFile):
     '''
@@ -284,8 +348,8 @@ class Pairing:
     '''
     Used to specify when two nonunique datatypes should be associated together. Most commonly used
     to pair ID and name together.
-    - `form` (`Any`): Whatever follows the DynamicData specified form as required. Pairing is a wrapper
-    class so let it behave as it should
+    - `form` (`Any`): Whatever follows the DynamicData specified form as required. Pairing is a
+        wrapper class so let it behave as it should
     - `paired` (`DataType`): Items which should be associated together.
     
     '''
@@ -296,10 +360,12 @@ class Pairing:
         self.paired_desc = {pair.desc for pair in paired}
         self.form = form
         self.redundant = isinstance(paired[0].token_type, RedundantToken)
-        if (not all(isinstance(pair.token_type, RedundantToken) for pair in self.paired)
-            if self.redundant else
-            all(not isinstance(pair.token_type, RedundantToken) for pair in self.paired)):
-            Warnings.error('invalid_pairing', paired=', '.join(map(str, paired)))
+        if self.redundant:
+            if any(not isinstance(pair.token_type, RedundantToken) for pair in self.paired):
+                Warnings.error('invalid_pairing', paired=', '.join(map(str, paired)))
+        else:
+            if any(isinstance(pair.token_type, RedundantToken) for pair in self.paired):
+                Warnings.error('invalid_pairing', paired=', '.join(map(str, paired)))
 
     def update_pairing(self, entry: DataEntry) -> None:
         '''
@@ -314,26 +380,41 @@ class Pairing:
         to_fill = self.paired_desc - overlap
         overlap = list(overlap)
         if not self.redundant:
-            index = self.paired_to_idx.get(overlap[0], {}).get(entry.data[overlap[0]].value)
-            if not index:
+            index = -1
+            for i, pairing in enumerate(self.pairs):
+                if entry.data[overlap[0]].value == pairing.data[overlap[0]].value:
+                    index = i
+                    break
+            if index == -1:
                 return
             for check in overlap:
-                res = self.paired_to_idx.get(check, {}).get(entry.data[check].value)
-                if not res or res != index:
+                res = pairing.data.get(check, {}).value == entry.data[check].value
+                if not res:
                     return
             for empty in to_fill:
-                entry.data[empty] = self.idx_to_paired[index].data[empty]
+                entry.data[empty] = DataItem.copy(pairing.data[empty])
             return
-        indices = [self.paired_to_idx.get(overlap[0], {}).get(v)
-                   for v in entry.data[overlap[0]].value]
-        for check in overlap:
-            results = [self.paired_to_idx.get(check, {}).get(v) for v in entry.data[check].value]
-            if indices != results:
-                return
+        indices: list[Optional[int]] = []
+        for v in entry.data[overlap[0]].value:
+            index = -1
+            for i, pairing in enumerate(self.pairs):
+                if v == pairing.data[overlap[0]].value:
+                    index = i
+                    break
+            if index == -1:
+                indices.append(None)
+            else:
+                indices.append(i)
+            for check in overlap:
+                res = pairing.data.get(check, {}).value == v
+                if not res:
+                    return
         for empty in to_fill:
-            entry.data[empty] = DataItem(getattr(DataTypes, empty),
-                                         [self.idx_to_paired[index].data[empty].value[0]
-                                          if index is not None else None for index in indices])
+            entry.data[empty] = DataItem(
+                getattr(DataTypes, empty),
+                [self.pairs[index].data[empty].value[0]
+                 if index is not None else None for index in indices]
+            )
 
     def _find_pairings(self, pairings: dict[Union[Static, int], Any]) -> list[DataEntry]:
         if all(isinstance(key, (Static, int)) and isinstance(val, Static)
@@ -358,7 +439,8 @@ class Pairing:
         Similar to other processes' `expand` function. Finds the pairing values and stores
         the data internally.
         
-         - `dataset` (`Any`): the dataset data, which should follow the syntax of `DynamicData` data.
+         - `dataset` (`Any`): the dataset data, which should follow the syntax of `DynamicData`
+            data.
          - `in_file` (`bool`): distinguisher to check usage of either `expand_generics`
             or `expand_file_generics`.
         '''
@@ -371,10 +453,7 @@ class Pairing:
         for pair in pairs_try:
             if self.paired.issubset({item.delimiter for item in pair.data.values()}):
                 pairs.append(DataEntry([pair.data[k.desc] for k in self.paired]))
-        self.paired_to_idx = {desc.desc: {(v.data[desc.desc].value[0] if self.redundant
-                              else v.data[desc.desc].value): i for i, v in enumerate(pairs)}
-                              for desc in self.paired}
-        self.idx_to_paired = pairs
+        self.pairs = pairs
 
 def expand_generics(
     dataset: Any,
@@ -403,7 +482,8 @@ def expand_generics(
     for i, key in enumerate(root):
         # convert DataType to Generic with low priority
         if isinstance(key, DataType):
-            heapq.heappush(generics, (0, i, Generic('{}', key)))
+            heapq.heappush(generics, (0, i, key))
+            continue
 
         # priority queue push to prioritize generics with the most wildcards for disambiguation
         if isinstance(key, Generic):
@@ -430,13 +510,12 @@ def expand_generics(
             # basic checks
             if name in names:
                 continue
-            if isinstance(generic, Folder) and dataset[name] == "File":
-                continue
-            if isinstance(generic, File) and dataset[name] != "File":
-                continue
 
             # attempt to match name to generic
-            status, items = generic.match(name)
+            if isinstance(generic, DataType):
+                status, items = Generic('{}', generic).match(name)
+            else: status, items = generic.match(name)
+
             if not status:
                 continue
             names.add(name)
@@ -630,7 +709,8 @@ def _merge(data: Union[dict[Union[Static, int], Any], Static]) -> \
         # unique entry result
         if isinstance(result, DataEntry):
             if isinstance(key, Static):
-                result = DataEntry.merge(DataEntry(key.data), result)
+                result.apply_tokens(key.data)
+                # result = DataEntry.merge(DataEntry(key.data), result)
             if result.unique:
                 recursive.append([result])
             else: recursive.append(result)
@@ -659,6 +739,7 @@ def _merge(data: Union[dict[Union[Static, int], Any], Static]) -> \
 
     # if inside unique loop, either can merge all together or result has multiple entries
     if not check_map((item.unique for item in tokens), 2):
+        
         result = DataEntry([])
         for item in tokens:
             result = DataEntry.merge(item, result)

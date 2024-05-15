@@ -3,14 +3,13 @@ Private utility functions for DynamicData.
 '''
 import json
 from typing import Union, NoReturn
-from itertools import repeat
 
 def union(item: Union[list[object], object]) -> list[object]:
     '''
     Returns the item in a list format if not already in a list format.
     '''
     if not isinstance(item, list):
-        item = [ item ]
+        item = [item]
     return item
 
 def next_avail_id(idx_to_name: dict[int, str]) -> int:
@@ -33,7 +32,7 @@ def get_str(data):
 
 def check_map(it, num):
     '''Check an iterator for num occurrences'''
-    return all(map(any, repeat(iter(it), num)))
+    return sum(it) >= num
 
 class MergeError(Exception):
     '''
@@ -112,6 +111,8 @@ class Warnings:
                      'parameter when getting dataloader, or specify your own collate function.',
                      RuntimeError)
     empty_bbox = ('Bounding box is empty for image at {file}.', RuntimeError)
+    no_images = ('Dataset has no image files. DynamicDL does not currently support non-image '
+                 'datasets.', RuntimeError)
 
     @staticmethod
     def warn(name: str, **kwargs: str) -> None:
