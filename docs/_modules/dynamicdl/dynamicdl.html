@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dynamicdl.dynamicdl &mdash; CVData 0.1.0-alpha.1 documentation</title>
+  <title>dynamicdl.dynamicdl &mdash; DynamicDL 0.1.1-alpha documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -14,7 +14,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=90c6d82f"></script>
+        <script src="../../_static/documentation_options.js?v=e30984f2"></script>
         <script src="../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -31,7 +31,7 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            CVData
+            DynamicDL
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -41,15 +41,20 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"></div>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">DynamicData Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">DynamicDL</a></li>
+</ul>
+
         </div>
       </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">CVData</a>
+          <a href="../../index.html">DynamicDL</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -212,6 +217,8 @@
     <span class="n">_segmentation_img_cols</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ABSOLUTE_FILE&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;ABSOLUTE_FILE_SEG&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_DIM&#39;</span><span class="p">}</span>
     <span class="n">_segmentation_poly_cols</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ABSOLUTE_FILE&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;POLYGON&#39;</span><span class="p">,</span> <span class="s1">&#39;SEG_CLASS_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_DIM&#39;</span><span class="p">}</span>
 
+    <span class="n">_generics</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GENERIC, GENERIC_INT, GENERIC_WORD, GENERIC_FLOAT&#39;</span><span class="p">]</span>
+
     <span class="n">_BBOX_MODES</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span>
             <span class="p">{</span><span class="s1">&#39;X1&#39;</span><span class="p">,</span> <span class="s1">&#39;X2&#39;</span><span class="p">,</span> <span class="s1">&#39;Y1&#39;</span><span class="p">,</span> <span class="s1">&#39;Y2&#39;</span><span class="p">},</span>
@@ -277,7 +284,7 @@
 
 <div class="viewcode-block" id="DynamicData.parse">
 <a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.dynamicdl.DynamicData.parse">[docs]</a>
-    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">override</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">override</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Must be called to instantiate the data in the dataset instance. Performs the recursive</span>
 <span class="sd">        populate_data algorithm and creates the dataframe, and then cleans up the data.</span>
@@ -290,7 +297,7 @@
         <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">override</span><span class="p">:</span>
             <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;already_parsed&#39;</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">populate_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">populate_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
         <span class="n">entries</span> <span class="o">=</span> <span class="p">[{</span><span class="n">key</span><span class="p">:</span> <span class="n">val</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
         <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -308,6 +315,9 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[DynamicData] Cleaning up data...&#39;</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="s1">&#39;ABSOLUTE_FILE&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">:</span>
+            <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;no_images&#39;</span><span class="p">)</span>
+
         <span class="c1"># sort by image id first to prevent randomness</span>
         <span class="k">if</span> <span class="s1">&#39;IMAGE_ID&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;IMAGE_ID&#39;</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -323,7 +333,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_get_md5_hashes</span><span class="p">()</span>
 
         <span class="c1"># drop generic as it is useless data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s1">&#39;GENERIC&#39;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">DynamicData</span><span class="o">.</span><span class="n">_generics</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
 
         <span class="c1"># convert bounding boxes into proper format and store under &#39;BOX&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convert_bbox</span><span class="p">()</span>
@@ -451,7 +461,8 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bbox_scale_option</span> <span class="o">==</span> <span class="s1">&#39;full&#39;</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[DynamicData] Detected full size bounding box scale option&#39;</span><span class="p">)</span>
                 <span class="k">return</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[DynamicData] Detected [0, 1] bounding box scale option to be converted to full size&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[DynamicData] Detected [0, 1] bounding box scale option to be converted to full &#39;</span>
+                  <span class="s1">&#39;size&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">bbox_scale_option</span> <span class="o">=</span> <span class="s1">&#39;zeroone&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bbox_scale_option</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DynamicData</span><span class="o">.</span><span class="n">_scale_options</span><span class="p">:</span>
             <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;invalid_scale&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bbox_scale_option</span><span class="p">)</span>
@@ -465,7 +476,8 @@
                     <span class="k">return</span>
                 <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">coord</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">shapes</span> <span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="n">shape</span><span class="p">):</span>
                     <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;invalid_scale_data&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[DynamicData] Detected [0, 1] segmentation scale option to be converted to full size&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[DynamicData] Detected [0, 1] segmentation scale option to be converted to full &#39;</span>
+                  <span class="s1">&#39;size&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">seg_scale_option</span> <span class="o">=</span> <span class="s1">&#39;zeroone&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_scale_option</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DynamicData</span><span class="o">.</span><span class="n">_scale_options</span><span class="p">:</span>
             <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;invalid_scale&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seg_scale_option</span><span class="p">)</span>
@@ -1170,9 +1182,9 @@
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Load a DynamicData object from file. Warning: do not load any json files that you did not create.</span>
-<span class="sd">        This method uses jsonpickle, an insecure loading system with potential for arbitrary Python</span>
-<span class="sd">        code execution.</span>
+<span class="sd">        Load a DynamicData object from file. Warning: do not load any json files that you did not</span>
+<span class="sd">        create. This method uses jsonpickle, an insecure loading system with potential for arbitrary</span>
+<span class="sd">        Python code execution.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
 <span class="sd">         - filename (str): the filename to load the data from.</span>

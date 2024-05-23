@@ -205,7 +205,7 @@ class DynamicData:
         self.bbox_scale_option = bbox_scale_option
         self.seg_scale_option = seg_scale_option
 
-    def parse(self, override: bool = False) -> None:
+    def parse(self, override: bool = False, verbose: bool = False) -> None:
         '''
         Must be called to instantiate the data in the dataset instance. Performs the recursive
         populate_data algorithm and creates the dataframe, and then cleans up the data.
@@ -218,7 +218,7 @@ class DynamicData:
         start = time.time()
         if self.cleaned and not override:
             Warnings.error('already_parsed')
-        data = populate_data(self.root, self.form)
+        data = populate_data(self.root, self.form, verbose=verbose)
         entries = [{key: val.value for key, val in item.data.items()} for item in data]
         self.dataframe = DataFrame(entries)
         end = time.time()
@@ -381,7 +381,8 @@ class DynamicData:
             if self.bbox_scale_option == 'full':
                 print('[DynamicData] Detected full size bounding box scale option')
                 return
-            print('[DynamicData] Detected [0, 1] bounding box scale option to be converted to full size')
+            print('[DynamicData] Detected [0, 1] bounding box scale option to be converted to full '
+                  'size')
             self.bbox_scale_option = 'zeroone'
         if self.bbox_scale_option not in DynamicData._scale_options:
             Warnings.error('invalid_scale', scale=self.bbox_scale_option)
@@ -395,7 +396,8 @@ class DynamicData:
                     return
                 if any(coord < 0 for shape in shapes for coord in shape):
                     Warnings.error('invalid_scale_data', id=i)
-            print('[DynamicData] Detected [0, 1] segmentation scale option to be converted to full size')
+            print('[DynamicData] Detected [0, 1] segmentation scale option to be converted to full '
+                  'size')
             self.seg_scale_option = 'zeroone'
         if self.seg_scale_option not in DynamicData._scale_options:
             Warnings.error('invalid_scale', scale=self.seg_scale_option)
@@ -1074,9 +1076,9 @@ class DynamicData:
     @classmethod
     def load(cls, filename: str) -> Self:
         '''
-        Load a DynamicData object from file. Warning: do not load any json files that you did not create.
-        This method uses jsonpickle, an insecure loading system with potential for arbitrary Python
-        code execution.
+        Load a DynamicData object from file. Warning: do not load any json files that you did not
+        create. This method uses jsonpickle, an insecure loading system with potential for arbitrary
+        Python code execution.
         
         Args:
          - filename (str): the filename to load the data from.

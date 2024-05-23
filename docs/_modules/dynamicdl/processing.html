@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dynamicdl.processing &mdash; CVData 0.1.0-alpha.1 documentation</title>
+  <title>dynamicdl.processing &mdash; DynamicDL 0.1.1-alpha documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -14,7 +14,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=90c6d82f"></script>
+        <script src="../../_static/documentation_options.js?v=e30984f2"></script>
         <script src="../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -31,7 +31,7 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            CVData
+            DynamicDL
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -41,15 +41,20 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"></div>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">DynamicData Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">DynamicDL</a></li>
+</ul>
+
         </div>
       </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">CVData</a>
+          <a href="../../index.html">DynamicDL</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -106,8 +111,9 @@
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
 <span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">union</span><span class="p">,</span> <span class="n">check_map</span><span class="p">,</span> <span class="n">Warnings</span>
-<span class="kn">from</span> <span class="nn">.data_items</span> <span class="kn">import</span> <span class="n">DataTypes</span><span class="p">,</span> <span class="n">DataItem</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Static</span><span class="p">,</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">DataEntry</span><span class="p">,</span> <span class="n">RedundantToken</span><span class="p">,</span> \
-                        <span class="n">Folder</span><span class="p">,</span> <span class="n">File</span><span class="p">,</span> <span class="n">Image</span><span class="p">,</span> <span class="n">SegmentationImage</span><span class="p">,</span> <span class="n">UniqueToken</span>
+<span class="kn">from</span> <span class="nn">.tokens</span> <span class="kn">import</span> <span class="n">RedundantToken</span><span class="p">,</span> <span class="n">UniqueToken</span>
+<span class="kn">from</span> <span class="nn">.data</span> <span class="kn">import</span> <span class="n">DataTypes</span><span class="p">,</span> <span class="n">DataEntry</span><span class="p">,</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">DataItem</span>
+<span class="kn">from</span> <span class="nn">.data_items</span> <span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Static</span><span class="p">,</span> <span class="n">Folder</span><span class="p">,</span> <span class="n">File</span><span class="p">,</span> <span class="n">Image</span><span class="p">,</span> <span class="n">SegmentationImage</span><span class="p">,</span> <span class="n">Namespace</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;GenericList&#39;</span><span class="p">,</span>
@@ -119,6 +125,8 @@
     <span class="s1">&#39;YAMLFile&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Pairing&#39;</span>
 <span class="p">]</span>
+
+<span class="n">MAX_PBAR_DEPTH</span> <span class="o">=</span> <span class="mi">2</span>
 
 <div class="viewcode-block" id="GenericList">
 <a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.processing.GenericList">[docs]</a>
@@ -139,21 +147,34 @@
 <a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.processing.GenericList.expand">[docs]</a>
     <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">pbar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">tqdm</span><span class="p">],</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">list</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Expand list into dict of statics.</span>
 <span class="sd">        </span>
-<span class="sd">         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `DynamicData`</span>
-<span class="sd">            data.</span>
+<span class="sd">         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of </span>
+<span class="sd">            `DynamicData` data.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">MAX_PBAR_DEPTH</span><span class="p">:</span>
+            <span class="n">pbar</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expanding generics: </span><span class="si">{</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;generic_list_length&#39;</span><span class="p">,</span> <span class="n">length1</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">length2</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">))</span>
         <span class="n">item_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">item</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Static</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">pairings</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
-            <span class="n">result</span><span class="p">,</span> <span class="n">pairing</span> <span class="o">=</span> <span class="n">expand_generics</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="n">index</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">)])</span>
+            <span class="n">result</span><span class="p">,</span> <span class="n">pairing</span> <span class="o">=</span> <span class="n">expand_generics</span><span class="p">(</span>
+                <span class="n">path</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">index</span><span class="p">)],</span>
+                <span class="n">entry</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="n">index</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">)],</span>
+                <span class="n">pbar</span><span class="p">,</span>
+                <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="p">)</span>
             <span class="n">pairings</span> <span class="o">+=</span> <span class="n">pairing</span>
             <span class="n">item</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -218,16 +239,28 @@
 <a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.processing.SegmentationObject.expand">[docs]</a>
     <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">pbar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">tqdm</span><span class="p">],</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">list</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Evaluate object by expanding and merging, and extracting the corresponding X, Y values</span>
 <span class="sd">        which define the SegmentationObject.</span>
 <span class="sd">        </span>
-<span class="sd">         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `DynamicData`</span>
-<span class="sd">            data.</span>
+<span class="sd">         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of </span>
+<span class="sd">            `DynamicData` data.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">item_dict</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">MAX_PBAR_DEPTH</span><span class="p">:</span>
+            <span class="n">pbar</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expanding generics: </span><span class="si">{</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">item_dict</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span>
+            <span class="n">path</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">pbar</span><span class="p">,</span>
+            <span class="n">depth</span><span class="o">=</span><span class="n">depth</span>
+        <span class="p">)</span>
         <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge</span><span class="p">(</span><span class="n">item_dict</span><span class="p">)</span>
         <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;GENERIC&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
@@ -261,15 +294,26 @@
 
 <div class="viewcode-block" id="AmbiguousList.expand">
 <a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.processing.AmbiguousList.expand">[docs]</a>
-    <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">pbar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">tqdm</span><span class="p">],</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Expand potential list into dict of statics.</span>
 <span class="sd">        </span>
-<span class="sd">         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `DynamicData`</span>
-<span class="sd">            data.</span>
+<span class="sd">         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of </span>
+<span class="sd">            `DynamicData` data.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">union</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span>
+            <span class="n">path</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">pbar</span><span class="p">,</span>
+            <span class="n">depth</span><span class="o">=</span><span class="n">depth</span>
+        <span class="p">)</span></div>
 </div>
 
 
@@ -278,7 +322,13 @@
 <span class="sd">    Abstract base class for classes that parse annotation files.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">curr_path</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">pbar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">tqdm</span><span class="p">],</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Parses a file.</span>
 <span class="sd">        </span>
@@ -296,10 +346,26 @@
 
 <div class="viewcode-block" id="JSONFile.parse">
 <a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.processing.JSONFile.parse">[docs]</a>
-    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">curr_path</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">pbar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">tqdm</span><span class="p">],</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">MAX_PBAR_DEPTH</span><span class="p">:</span>
+            <span class="n">pbar</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expanding generics: </span><span class="si">{</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">curr_path</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">expand_generics</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">expand_generics</span><span class="p">(</span>
+            <span class="n">curr_path</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">,</span>
+            <span class="n">pbar</span><span class="p">,</span>
+            <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
+        <span class="p">)</span></div>
 </div>
 
 
@@ -308,25 +374,14 @@
 <span class="k">class</span> <span class="nc">TXTFile</span><span class="p">(</span><span class="n">DataFile</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Utility functions for parsing txt files.</span>
-<span class="sd">    </span>
-<span class="sd">     - `line_format` (`GenericList | Pairing | Any`): the structure to parse, repetitively. If</span>
-<span class="sd">        neither a GenericList nor Pairing is passed then structure is assumed to be the args in</span>
-<span class="sd">        the constructor of a GenericList.</span>
-<span class="sd">     - `offset` (`int`): number of items to skip from the top of the file.</span>
-<span class="sd">     - `ignore_type` (`list[Generic | str] | Generic | str`): ignore the list of formats or lines </span>
-<span class="sd">        beginning with str when parsing.</span>
-<span class="sd">     - `by_line` (`bool`): true if parsing is to be done per line, rather than continuously.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">line_format</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GenericList</span><span class="p">,</span> <span class="s1">&#39;Pairing&#39;</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-        <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">ignore_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Generic</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">Generic</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">form</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">],</span>
+        <span class="n">ignore_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Generic</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">Generic</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line_format</span><span class="p">,</span> <span class="p">(</span><span class="n">GenericList</span><span class="p">,</span> <span class="n">Pairing</span><span class="p">)):</span>
-            <span class="n">line_format</span> <span class="o">=</span> <span class="n">GenericList</span><span class="p">(</span><span class="n">line_format</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">line_format</span> <span class="o">=</span> <span class="n">line_format</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">offset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="n">form</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">named</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ignore_type</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Generic</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">ignore_type</span><span class="p">:</span>
             <span class="n">ignore_type</span> <span class="o">=</span> <span class="n">union</span><span class="p">(</span><span class="n">ignore_type</span><span class="p">)</span>
@@ -335,25 +390,116 @@
 
 <div class="viewcode-block" id="TXTFile.parse">
 <a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.processing.TXTFile.parse">[docs]</a>
-    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Static</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">curr_path</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">pbar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">tqdm</span><span class="p">],</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="k">def</span> <span class="nf">filter_ignores</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">ignore_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_type</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">ignore_type</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
                     <span class="k">return</span> <span class="kc">True</span>
             <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">MAX_PBAR_DEPTH</span><span class="p">:</span>
+            <span class="n">pbar</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expanding generics: </span><span class="si">{</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">curr_path</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">lines</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">:]</span>
-        <span class="n">filtered_lines</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">filter_ignores</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">filter_ignores</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">TXTFile</span><span class="o">.</span><span class="n">_parse</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">expand_generics</span><span class="p">(</span>
+            <span class="n">curr_path</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">,</span>
+            <span class="n">pbar</span><span class="p">,</span>
+            <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
+        <span class="p">)</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">form</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">Pairing</span><span class="p">):</span>
+            <span class="n">form</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">form</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="p">(</span><span class="n">Generic</span><span class="p">,</span> <span class="n">Static</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">DataType</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">form</span> <span class="o">=</span> <span class="n">Static</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
+                <span class="n">form</span> <span class="o">=</span> <span class="n">Generic</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">form</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="mi">1</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;TXTFile Failed to parse&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">TXTFile</span><span class="o">.</span><span class="n">_parse_dict</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">form</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">TXTFile</span><span class="o">.</span><span class="n">_parse_list</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">form</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown Token&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_parse_list</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">form</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="n">parsed_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ctr</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ctr</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">parsed_data</span><span class="p">,</span> <span class="n">ctr</span>
+            <span class="n">next_form</span> <span class="o">=</span> <span class="n">form</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">next_form</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
+                <span class="n">obj_data</span><span class="p">,</span> <span class="n">endline</span> <span class="o">=</span> <span class="n">TXTFile</span><span class="o">.</span><span class="n">_parse</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">ctr</span><span class="p">:],</span> <span class="n">form</span><span class="p">)</span>
+                <span class="n">parsed_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj_data</span><span class="p">)</span>
+                <span class="n">ctr</span> <span class="o">+=</span> <span class="n">endline</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
                 <span class="k">continue</span>
-            <span class="n">filtered_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">line_format</span><span class="p">,</span> <span class="n">GenericList</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">expand_generics</span><span class="p">(</span><span class="n">filtered_lines</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_format</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">line_format</span><span class="p">,</span> <span class="n">Pairing</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">line_format</span><span class="o">.</span><span class="n">find_pairings</span><span class="p">(</span><span class="n">filtered_lines</span><span class="p">,</span> <span class="n">in_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">{},</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">line_format</span><span class="p">]</span></div>
-</div>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">next_form</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">next_form</span> <span class="o">=</span> <span class="n">Static</span><span class="p">(</span><span class="n">next_form</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">next_form</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
+                <span class="n">next_form</span> <span class="o">=</span> <span class="n">Generic</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">next_form</span><span class="p">)</span>
+            <span class="n">result</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">next_form</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">ctr</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">parsed_data</span><span class="p">,</span> <span class="n">ctr</span>
+            <span class="n">parsed_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">ctr</span><span class="p">])</span>
+            <span class="n">ctr</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_parse_dict</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">form</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">cleaned_form</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="n">Generic</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">generic</span><span class="p">,</span> <span class="n">subform</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">generic</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">generic</span> <span class="o">=</span> <span class="n">Static</span><span class="p">(</span><span class="n">generic</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">generic</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
+                <span class="n">generic</span> <span class="o">=</span> <span class="n">Generic</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">generic</span><span class="p">)</span>
+            <span class="n">cleaned_form</span><span class="p">[</span><span class="n">generic</span><span class="p">]</span> <span class="o">=</span> <span class="n">subform</span>
+        <span class="n">form</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="n">Generic</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">cleaned_form</span>
+        <span class="n">parsed_data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">prev</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">generic</span> <span class="ow">in</span> <span class="n">form</span><span class="p">:</span>
+                <span class="n">result</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">generic</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">start</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">parsed_data</span><span class="p">[</span><span class="n">prev_line</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">TXTFile</span><span class="o">.</span><span class="n">_parse</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">i</span><span class="p">],</span> <span class="n">form</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="n">prev</span> <span class="o">=</span> <span class="n">start</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">generic</span>
+            <span class="n">prev_line</span> <span class="o">=</span> <span class="n">line</span>
+        <span class="k">if</span> <span class="n">start</span> <span class="o">!=</span> <span class="n">prev</span><span class="p">:</span>
+            <span class="n">parsed_data</span><span class="p">[</span><span class="n">prev_line</span><span class="p">],</span> <span class="n">start</span> <span class="o">=</span> <span class="n">TXTFile</span><span class="o">.</span><span class="n">_parse</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">start</span><span class="p">:],</span> <span class="n">form</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">parsed_data</span><span class="p">,</span> <span class="n">start</span></div>
 
 
 <div class="viewcode-block" id="XMLFile">
@@ -367,10 +513,26 @@
 
 <div class="viewcode-block" id="XMLFile.parse">
 <a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.processing.XMLFile.parse">[docs]</a>
-    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">curr_path</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">pbar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">tqdm</span><span class="p">],</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">MAX_PBAR_DEPTH</span><span class="p">:</span>
+            <span class="n">pbar</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expanding generics: </span><span class="si">{</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">curr_path</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">xmltodict</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
-        <span class="k">return</span> <span class="n">expand_generics</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">expand_generics</span><span class="p">(</span>
+            <span class="n">curr_path</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">,</span>
+            <span class="n">pbar</span><span class="p">,</span>
+            <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
+        <span class="p">)</span></div>
 </div>
 
 
@@ -385,10 +547,26 @@
 
 <div class="viewcode-block" id="YAMLFile.parse">
 <a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.processing.YAMLFile.parse">[docs]</a>
-    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">curr_path</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">pbar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">tqdm</span><span class="p">],</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">MAX_PBAR_DEPTH</span><span class="p">:</span>
+            <span class="n">pbar</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expanding generics: </span><span class="si">{</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">curr_path</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">expand_generics</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">expand_generics</span><span class="p">(</span>
+            <span class="n">curr_path</span><span class="p">,</span>
+            <span class="n">data</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">,</span>
+            <span class="n">pbar</span><span class="p">,</span>
+            <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
+        <span class="p">)</span></div>
 </div>
 
 
@@ -398,10 +576,11 @@
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Used to specify when two nonunique datatypes should be associated together. Most commonly used</span>
 <span class="sd">    to pair ID and name together.</span>
-<span class="sd">    - `form` (`Any`): Whatever follows the DynamicData specified form as required. Pairing is a wrapper</span>
-<span class="sd">    class so let it behave as it should</span>
+
+<span class="sd">    - `form` (`Any`): Whatever follows the DynamicData specified form as required. Pairing is a</span>
+<span class="sd">        wrapper class so let it behave as it should</span>
 <span class="sd">    - `paired` (`DataType`): Items which should be associated together.</span>
-<span class="sd">    </span>
+
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">paired</span><span class="p">:</span> <span class="n">DataType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">paired</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
@@ -410,10 +589,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">paired_desc</span> <span class="o">=</span> <span class="p">{</span><span class="n">pair</span><span class="o">.</span><span class="n">desc</span> <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">paired</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="n">form</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">redundant</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">paired</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">token_type</span><span class="p">,</span> <span class="n">RedundantToken</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">pair</span><span class="o">.</span><span class="n">token_type</span><span class="p">,</span> <span class="n">RedundantToken</span><span class="p">)</span> <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">paired</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">redundant</span> <span class="k">else</span>
-            <span class="nb">all</span><span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pair</span><span class="o">.</span><span class="n">token_type</span><span class="p">,</span> <span class="n">RedundantToken</span><span class="p">)</span> <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">paired</span><span class="p">)):</span>
-            <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;invalid_pairing&#39;</span><span class="p">,</span> <span class="n">paired</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">paired</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">redundant</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pair</span><span class="o">.</span><span class="n">token_type</span><span class="p">,</span> <span class="n">RedundantToken</span><span class="p">)</span> <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">paired</span><span class="p">):</span>
+                <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;invalid_pairing&#39;</span><span class="p">,</span> <span class="n">paired</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">paired</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">pair</span><span class="o">.</span><span class="n">token_type</span><span class="p">,</span> <span class="n">RedundantToken</span><span class="p">)</span> <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">paired</span><span class="p">):</span>
+                <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;invalid_pairing&#39;</span><span class="p">,</span> <span class="n">paired</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">paired</span><span class="p">)))</span>
 
 <div class="viewcode-block" id="Pairing.update_pairing">
 <a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.processing.Pairing.update_pairing">[docs]</a>
@@ -430,26 +611,41 @@
         <span class="n">to_fill</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paired_desc</span> <span class="o">-</span> <span class="n">overlap</span>
         <span class="n">overlap</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">overlap</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">redundant</span><span class="p">:</span>
-            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paired_to_idx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">overlap</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">overlap</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">index</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pairing</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pairs</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">overlap</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">pairing</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">overlap</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                    <span class="n">index</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                 <span class="k">return</span>
             <span class="k">for</span> <span class="n">check</span> <span class="ow">in</span> <span class="n">overlap</span><span class="p">:</span>
-                <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paired_to_idx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">check</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">check</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span> <span class="ow">or</span> <span class="n">res</span> <span class="o">!=</span> <span class="n">index</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">pairing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">check</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">check</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">:</span>
                     <span class="k">return</span>
             <span class="k">for</span> <span class="n">empty</span> <span class="ow">in</span> <span class="n">to_fill</span><span class="p">:</span>
-                <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">empty</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx_to_paired</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">empty</span><span class="p">]</span>
+                <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">empty</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataItem</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">pairing</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">empty</span><span class="p">])</span>
             <span class="k">return</span>
-        <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">paired_to_idx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">overlap</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-                   <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">overlap</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">check</span> <span class="ow">in</span> <span class="n">overlap</span><span class="p">:</span>
-            <span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">paired_to_idx</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">check</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">check</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">indices</span> <span class="o">!=</span> <span class="n">results</span><span class="p">:</span>
-                <span class="k">return</span>
+        <span class="n">indices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">overlap</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pairing</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pairs</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="n">pairing</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">overlap</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                    <span class="n">index</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">check</span> <span class="ow">in</span> <span class="n">overlap</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">pairing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">check</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">v</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">:</span>
+                    <span class="k">return</span>
         <span class="k">for</span> <span class="n">empty</span> <span class="ow">in</span> <span class="n">to_fill</span><span class="p">:</span>
-            <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">empty</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataItem</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">DataTypes</span><span class="p">,</span> <span class="n">empty</span><span class="p">),</span>
-                                         <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_to_paired</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">empty</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                                          <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">])</span></div>
+            <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">empty</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataItem</span><span class="p">(</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="n">DataTypes</span><span class="p">,</span> <span class="n">empty</span><span class="p">),</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pairs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">empty</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                 <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+            <span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="nf">_find_pairings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pairings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataEntry</span><span class="p">]:</span>
@@ -469,37 +665,60 @@
 <a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.processing.Pairing.find_pairings">[docs]</a>
     <span class="k">def</span> <span class="nf">find_pairings</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
         <span class="n">dataset</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">pbar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">tqdm</span><span class="p">],</span>
+        <span class="n">curr_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">in_file</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Similar to other processes&#39; `expand` function. Finds the pairing values and stores</span>
 <span class="sd">        the data internally.</span>
 <span class="sd">        </span>
-<span class="sd">         - `dataset` (`Any`): the dataset data, which should follow the syntax of `DynamicData` data.</span>
+<span class="sd">         - `dataset` (`Any`): the dataset data, which should follow the syntax of `DynamicData`</span>
+<span class="sd">            data.</span>
 <span class="sd">         - `in_file` (`bool`): distinguisher to check usage of either `expand_generics`</span>
 <span class="sd">            or `expand_file_generics`.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">MAX_PBAR_DEPTH</span><span class="p">:</span>
+            <span class="n">pbar</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">curr_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">curr_path</span> <span class="o">=</span> <span class="n">path</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expanding generics: </span><span class="si">{</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">curr_path</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">in_file</span><span class="p">:</span>
-            <span class="n">expanded</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">expand_generics</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">)</span>
+            <span class="n">expanded</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">expand_generics</span><span class="p">(</span>
+                <span class="n">path</span><span class="p">,</span>
+                <span class="n">dataset</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">,</span>
+                <span class="n">pbar</span><span class="p">,</span>
+                <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">expanded</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">expand_file_generics</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">)</span>
+            <span class="n">expanded</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">expand_file_generics</span><span class="p">(</span>
+                <span class="n">path</span><span class="p">,</span>
+                <span class="n">curr_path</span><span class="p">,</span>
+                <span class="n">dataset</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">,</span>
+                <span class="n">pbar</span><span class="p">,</span>
+                <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
+            <span class="p">)</span>
         <span class="n">pairs_try</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_pairings</span><span class="p">(</span><span class="n">expanded</span><span class="p">)</span>
         <span class="n">pairs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataEntry</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">pairs_try</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">paired</span><span class="o">.</span><span class="n">issubset</span><span class="p">({</span><span class="n">item</span><span class="o">.</span><span class="n">delimiter</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">pair</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">()}):</span>
                 <span class="n">pairs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DataEntry</span><span class="p">([</span><span class="n">pair</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="o">.</span><span class="n">desc</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">paired</span><span class="p">]))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">paired_to_idx</span> <span class="o">=</span> <span class="p">{</span><span class="n">desc</span><span class="o">.</span><span class="n">desc</span><span class="p">:</span> <span class="p">{(</span><span class="n">v</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">desc</span><span class="o">.</span><span class="n">desc</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">redundant</span>
-                              <span class="k">else</span> <span class="n">v</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">desc</span><span class="o">.</span><span class="n">desc</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">):</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pairs</span><span class="p">)}</span>
-                              <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">paired</span><span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">idx_to_paired</span> <span class="o">=</span> <span class="n">pairs</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pairs</span> <span class="o">=</span> <span class="n">pairs</span></div>
 </div>
 
 
 <span class="k">def</span> <span class="nf">expand_generics</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="n">root</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">root</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">pbar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">tqdm</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">Static</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Expand all generics and replace with statics, inplace.</span>
@@ -509,10 +728,15 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="n">root</span> <span class="o">=</span> <span class="n">GenericList</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="p">(</span><span class="n">GenericList</span><span class="p">,</span> <span class="n">SegmentationObject</span><span class="p">)):</span>
-        <span class="k">return</span> <span class="n">root</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">root</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span>
+            <span class="n">path</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">pbar</span><span class="p">,</span>
+            <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
+        <span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
         <span class="n">root</span> <span class="o">=</span> <span class="n">Generic</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">root</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">Generic</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="p">(</span><span class="n">Generic</span><span class="p">,</span> <span class="n">Namespace</span><span class="p">)):</span>
         <span class="n">success</span><span class="p">,</span> <span class="n">tokens</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
             <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;fail_generic_match&#39;</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">)</span>
@@ -521,14 +745,20 @@
     <span class="n">generics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Generic</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">names</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Static</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">pairings</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Pairing</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">MAX_PBAR_DEPTH</span><span class="p">:</span>
+        <span class="n">pbar</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">pbar</span><span class="p">:</span>
+        <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expanding generics: </span><span class="si">{</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
-        <span class="c1"># convert DataType to Generic with low priority</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
-            <span class="n">heapq</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="n">generics</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">Generic</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">)))</span>
-
         <span class="c1"># priority queue push to prioritize generics with the most wildcards for disambiguation</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
+            <span class="n">heapq</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="n">generics</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+            <span class="k">continue</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Generic</span><span class="p">):</span>
             <span class="n">heapq</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="n">generics</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">data</span><span class="p">),</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Namespace</span><span class="p">):</span>
+            <span class="n">heapq</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="n">generics</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
             <span class="k">continue</span>
         <span class="n">val</span> <span class="o">=</span> <span class="n">root</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
@@ -551,13 +781,13 @@
             <span class="c1"># basic checks</span>
             <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">generic</span><span class="p">,</span> <span class="n">Folder</span><span class="p">)</span> <span class="ow">and</span> <span class="n">dataset</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;File&quot;</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">generic</span><span class="p">,</span> <span class="n">File</span><span class="p">)</span> <span class="ow">and</span> <span class="n">dataset</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;File&quot;</span><span class="p">:</span>
-                <span class="k">continue</span>
 
             <span class="c1"># attempt to match name to generic</span>
-            <span class="n">status</span><span class="p">,</span> <span class="n">items</span> <span class="o">=</span> <span class="n">generic</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">generic</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
+                <span class="n">status</span><span class="p">,</span> <span class="n">items</span> <span class="o">=</span> <span class="n">Generic</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">generic</span><span class="p">)</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">status</span><span class="p">,</span> <span class="n">items</span> <span class="o">=</span> <span class="n">generic</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
             <span class="k">if</span> <span class="ow">not</span> <span class="n">status</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="n">names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -568,20 +798,35 @@
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">expanded_root</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">GenericList</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">Generic</span><span class="p">)):</span>
-            <span class="n">uniques</span><span class="p">,</span> <span class="n">pairing</span> <span class="o">=</span> <span class="n">expand_generics</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">],</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Namespace</span><span class="p">)):</span>
+            <span class="n">uniques</span><span class="p">,</span> <span class="n">pairing</span> <span class="o">=</span> <span class="n">expand_generics</span><span class="p">(</span>
+                <span class="n">path</span> <span class="o">+</span> <span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Static</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)],</span>
+                <span class="n">dataset</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">],</span>
+                <span class="n">value</span><span class="p">,</span>
+                <span class="n">pbar</span><span class="p">,</span>
+                <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="p">)</span>
             <span class="n">expanded_root</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">uniques</span>
             <span class="n">pairings</span> <span class="o">+=</span> <span class="n">pairing</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">GenericList</span><span class="p">,</span> <span class="n">AmbiguousList</span><span class="p">)):</span>
-            <span class="n">uniques</span><span class="p">,</span> <span class="n">pairing</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">GenericList</span><span class="p">,</span> <span class="n">AmbiguousList</span><span class="p">,</span> <span class="n">SegmentationObject</span><span class="p">)):</span>
+            <span class="n">uniques</span><span class="p">,</span> <span class="n">pairing</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span>
+                <span class="n">path</span> <span class="o">+</span> <span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Static</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)],</span>
+                <span class="n">dataset</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">],</span>
+                <span class="n">pbar</span><span class="p">,</span>
+                <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="p">)</span>
             <span class="n">expanded_root</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">uniques</span>
             <span class="n">pairings</span> <span class="o">+=</span> <span class="n">pairing</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
             <span class="n">expanded_root</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Static</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">],</span> <span class="n">DataItem</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dataset</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">]))</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">SegmentationObject</span><span class="p">):</span>
-            <span class="n">expanded_root</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Pairing</span><span class="p">):</span>
-            <span class="n">value</span><span class="o">.</span><span class="n">find_pairings</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">],</span> <span class="n">in_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">value</span><span class="o">.</span><span class="n">find_pairings</span><span class="p">(</span>
+                <span class="n">path</span> <span class="o">+</span> <span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Static</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)],</span>
+                <span class="n">dataset</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">],</span>
+                <span class="n">pbar</span><span class="p">,</span>
+                <span class="n">in_file</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="p">)</span>
             <span class="n">pairings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="n">to_pop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -604,8 +849,11 @@
 
 <span class="k">def</span> <span class="nf">expand_file_generics</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">curr_path</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-    <span class="n">root</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Static</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">DataType</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="n">root</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Static</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">DataType</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">pbar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">tqdm</span><span class="p">],</span>
+    <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Variant of the expand_generics function above. Also contains path tracking.&#39;</span>
@@ -618,17 +866,21 @@
     <span class="n">generics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Generic</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">names</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Static</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">pairings</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Pairing</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-
+    <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">MAX_PBAR_DEPTH</span><span class="p">:</span>
+        <span class="n">pbar</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">pbar</span><span class="p">:</span>
+        <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expanding generics: </span><span class="si">{</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">curr_path</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="c1"># move Statics to expanded root, move Generics to priority queue for expansion</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
-        <span class="c1"># convert DataType to Generic with low priority</span>
+        <span class="c1"># priority queue push to prioritize generics with the most wildcards for disambiguation</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
             <span class="n">heapq</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="n">generics</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
             <span class="k">continue</span>
-
-        <span class="c1"># priority queue push to prioritize generics with the most wildcards for disambiguation</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Generic</span><span class="p">):</span>
             <span class="n">heapq</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="n">generics</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">data</span><span class="p">),</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Namespace</span><span class="p">):</span>
+            <span class="n">heapq</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="n">generics</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
             <span class="k">continue</span>
         <span class="n">val</span> <span class="o">=</span> <span class="n">root</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
@@ -659,7 +911,8 @@
             <span class="c1"># attempt to match name to generic</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">generic</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
                 <span class="n">status</span><span class="p">,</span> <span class="n">items</span> <span class="o">=</span> <span class="n">Generic</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">generic</span><span class="p">)</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span> <span class="n">status</span><span class="p">,</span> <span class="n">items</span> <span class="o">=</span> <span class="n">generic</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">status</span><span class="p">,</span> <span class="n">items</span> <span class="o">=</span> <span class="n">generic</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">status</span><span class="p">:</span>
                 <span class="k">continue</span>
@@ -672,13 +925,21 @@
             <span class="n">next_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
             <span class="n">uniques</span><span class="p">,</span> <span class="n">pairing</span> <span class="o">=</span> <span class="n">expand_file_generics</span><span class="p">(</span>
                 <span class="n">next_path</span><span class="p">,</span>
+                <span class="n">curr_path</span> <span class="o">+</span> <span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">],</span>
                 <span class="n">dataset</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">],</span>
-                <span class="n">value</span>
+                <span class="n">value</span><span class="p">,</span>
+                <span class="n">pbar</span><span class="p">,</span>
+                <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="p">)</span>
             <span class="n">expanded_root</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">uniques</span>
             <span class="n">pairings</span> <span class="o">+=</span> <span class="n">pairing</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">DataFile</span><span class="p">):</span>
-            <span class="n">uniques</span><span class="p">,</span> <span class="n">pairing</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="n">uniques</span><span class="p">,</span> <span class="n">pairing</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="n">curr_path</span> <span class="o">+</span> <span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">],</span>
+                <span class="n">pbar</span><span class="p">,</span>
+                <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="n">expanded_root</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">uniques</span>
             <span class="n">pairings</span> <span class="o">+=</span> <span class="n">pairing</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Image</span><span class="p">):</span>
@@ -693,7 +954,13 @@
             <span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Pairing</span><span class="p">):</span>
             <span class="n">to_pop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-            <span class="n">value</span><span class="o">.</span><span class="n">find_pairings</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">],</span> <span class="n">in_file</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="n">value</span><span class="o">.</span><span class="n">find_pairings</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="n">dataset</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">],</span>
+                <span class="n">pbar</span><span class="p">,</span>
+                <span class="n">in_file</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="n">curr_path</span> <span class="o">=</span> <span class="n">curr_path</span> <span class="o">+</span> <span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">],</span>
+                <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;inappropriate_type&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">to_pop</span><span class="p">:</span>
@@ -736,8 +1003,11 @@
         <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">hashmaps</span><span class="p">[</span><span class="n">identifier</span><span class="o">.</span><span class="n">desc</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">_merge</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Static</span><span class="p">])</span> <span class="o">-&gt;</span> \
-        <span class="n">Union</span><span class="p">[</span><span class="n">DataEntry</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataEntry</span><span class="p">]]:</span>
+<span class="k">def</span> <span class="nf">_merge</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Static</span><span class="p">],</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataEntry</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataEntry</span><span class="p">]]:</span>
     <span class="c1"># base cases</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Static</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DataEntry</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
@@ -745,13 +1015,21 @@
         <span class="k">return</span> <span class="p">[]</span>
     <span class="n">recursive</span> <span class="o">=</span> <span class="p">[]</span>
 
+    <span class="n">pbar</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>
+        <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="n">position</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="c1"># get result</span>
-    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">_merge</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">pbar</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">_merge</span><span class="p">(</span>
+            <span class="n">val</span><span class="p">,</span>
+            <span class="n">path</span> <span class="o">+</span> <span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Static</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)],</span>
+            <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="p">)</span>
         <span class="c1"># unique entry result</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">DataEntry</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Static</span><span class="p">):</span>
-                <span class="n">result</span> <span class="o">=</span> <span class="n">DataEntry</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">DataEntry</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">data</span><span class="p">),</span> <span class="n">result</span><span class="p">)</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">apply_tokens</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                <span class="c1"># result = DataEntry.merge(DataEntry(key.data), result)</span>
             <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">unique</span><span class="p">:</span>
                 <span class="n">recursive</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">result</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span> <span class="n">recursive</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
@@ -775,7 +1053,7 @@
         <span class="k">if</span> <span class="n">tokens</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">:</span>
-                    <span class="n">item</span><span class="o">.</span><span class="n">apply_tokens</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+                    <span class="n">item</span><span class="o">.</span><span class="n">apply_tokens</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">result</span>
 
     <span class="c1"># if inside unique loop, either can merge all together or result has multiple entries</span>
@@ -796,24 +1074,35 @@
             <span class="n">others</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">others</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">uniques</span><span class="p">:</span>
-            <span class="n">entry</span><span class="o">.</span><span class="n">apply_tokens</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">entry</span><span class="o">.</span><span class="n">apply_tokens</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">uniques</span>
 
-<span class="k">def</span> <span class="nf">populate_data</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataEntry</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">populate_data</span><span class="p">(</span><span class="n">root_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataEntry</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Parent process for parsing algorithm.</span>
 <span class="sd">    </span>
 <span class="sd">     - `root` (`str`): the file path of the root of the data</span>
 <span class="sd">     - `form` (`dict`): the form of the data, in accordance with DynamicData syntax.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Getting files&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;step&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="n">_get_files</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span>
+        <span class="n">total</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Getting files&quot;</span><span class="p">,</span>
+        <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;step&quot;</span><span class="p">,</span>
+        <span class="n">bar_format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{desc:&lt;60.60}{percentage:3.0f}</span><span class="s2">%|</span><span class="si">{bar:10}{r_bar}</span><span class="s2">&quot;</span>
+    <span class="p">)</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">_get_files</span><span class="p">(</span><span class="n">root_dir</span><span class="p">)</span>
         <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s1">&#39;Expanding generics&#39;</span><span class="p">)</span>
-        <span class="n">data</span><span class="p">,</span> <span class="n">pairings</span> <span class="o">=</span> <span class="n">expand_file_generics</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">form</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">pairings</span> <span class="o">=</span> <span class="n">expand_file_generics</span><span class="p">(</span>
+            <span class="n">root_dir</span><span class="p">,</span>
+            <span class="p">[],</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">form</span><span class="p">,</span>
+            <span class="n">pbar</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
         <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s1">&#39;Merging data&#39;</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">_merge</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">_merge</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">[],</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s1">&#39;Applying pairing entries&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">pairing</span> <span class="ow">in</span> <span class="n">pairings</span><span class="p">:</span>

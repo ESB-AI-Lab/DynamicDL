@@ -4,6 +4,14 @@ dynamicdl package
 Submodules
 ----------
 
+dynamicdl.data module
+---------------------
+
+.. automodule:: dynamicdl.data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dynamicdl.data\_items module
 ----------------------------
 
@@ -24,6 +32,14 @@ dynamicdl.processing module
 ---------------------------
 
 .. automodule:: dynamicdl.processing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dynamicdl.tokens module
+-----------------------
+
+.. automodule:: dynamicdl.tokens
    :members:
    :undoc-members:
    :show-inheritance:

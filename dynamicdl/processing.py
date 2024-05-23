@@ -36,8 +36,9 @@ import yaml
 from tqdm import tqdm
 
 from ._utils import union, check_map, Warnings
-from .data_items import DataTypes, DataItem, Generic, Static, DataType, DataEntry, RedundantToken, \
-                        Folder, File, Image, SegmentationImage, UniqueToken
+from .tokens import RedundantToken, UniqueToken
+from .data import DataTypes, DataEntry, DataType, DataItem
+from .data_items import Generic, Static, Folder, File, Image, SegmentationImage, Namespace
 
 __all__ = [
     'GenericList',
@@ -49,6 +50,8 @@ __all__ = [
     'YAMLFile',
     'Pairing'
 ]
+
+MAX_PBAR_DEPTH = 2
 
 class GenericList:
     '''
@@ -65,21 +68,34 @@ class GenericList:
 
     def expand(
         self,
-        dataset: list[Any]
+        path: list[str],
+        dataset: list[Any],
+        pbar: Optional[tqdm],
+        depth: int = 0
     ) -> tuple[dict[Static, Any], list]:
         '''
         Expand list into dict of statics.
         
-         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `DynamicData`
-            data.
+         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of 
+            `DynamicData` data.
         '''
+        if depth >= MAX_PBAR_DEPTH:
+            pbar = None
+        if pbar:
+            pbar.set_description(f'Expanding generics: {"/".join(path)}')
         if len(dataset) % len(self.form) != 0:
             Warnings.error('generic_list_length', length1=len(dataset), length2=len(self.form))
         item_list: list[Any] = []
         item: list[Static | dict] = []
         pairings = []
         for index, entry in enumerate(dataset):
-            result, pairing = expand_generics(entry, self.form[index % len(self.form)])
+            result, pairing = expand_generics(
+                path + [str(index)],
+                entry,
+                self.form[index % len(self.form)],
+                pbar,
+                depth = depth + 1
+            )
             pairings += pairing
             item.append(result)
             if (index + 1) % len(self.form) == 0:
@@ -138,16 +154,28 @@ class SegmentationObject:
 
     def expand(
         self,
-        dataset: list[Any]
+        path: list[str],
+        dataset: list[Any],
+        pbar: Optional[tqdm],
+        depth: int = 0
     ) -> tuple[dict[Static, Any], list]:
         '''
         Evaluate object by expanding and merging, and extracting the corresponding X, Y values
         which define the SegmentationObject.
         
-         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `DynamicData`
-            data.
+         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of 
+            `DynamicData` data.
         '''
-        item_dict, _ = self.form.expand(dataset)
+        if depth >= MAX_PBAR_DEPTH:
+            pbar = None
+        if pbar:
+            pbar.set_description(f'Expanding generics: {"/".join(path)}')
+        item_dict, _ = self.form.expand(
+            path,
+            dataset,
+            pbar,
+            depth=depth
+        )
         entry = self._merge(item_dict)
         entry.data.pop('GENERIC', '')
         x = entry.data.get('X').value
@@ -175,22 +203,39 @@ class AmbiguousList:
     def __init__(self, form: Union[GenericList, list, Any]):
         self.form = form if isinstance(form, GenericList) else GenericList(form)
 
-    def expand(self, dataset: Any) -> dict[Static, Any]:
+    def expand(
+        self,
+        path: list[str],
+        dataset: Any,
+        pbar: Optional[tqdm],
+        depth: int = 0
+    ) -> dict[Static, Any]:
         '''
         Expand potential list into dict of statics.
         
-         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of `DynamicData`
-            data.
+         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of 
+            `DynamicData` data.
         '''
         dataset = union(dataset)
-        return self.form.expand(dataset)
+        return self.form.expand(
+            path,
+            dataset,
+            pbar,
+            depth=depth
+        )
 
 class DataFile(ABC):
     '''
     Abstract base class for classes that parse annotation files.
     '''
     @abstractmethod
-    def parse(self, path: str) -> dict:
+    def parse(
+        self,
+        path: str,
+        curr_path: list[str],
+        pbar: Optional[tqdm],
+        depth: int = 0
+    ) -> dict:
         '''
         Parses a file.
         
@@ -204,10 +249,26 @@ class JSONFile(DataFile):
     def __init__(self, form: dict[Union[Static, Generic], Any]) -> None:
         self.form = form
 
-    def parse(self, path: str) -> dict:
+    def parse(
+        self,
+        path: str,
+        curr_path: list[str],
+        pbar: Optional[tqdm],
+        depth: int = 0
+    ) -> dict:
+        if depth >= MAX_PBAR_DEPTH:
+            pbar = None
+        if pbar:
+            pbar.set_description(f'Expanding generics: {"/".join(curr_path)}')
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-        return expand_generics(data, self.form)
+        return expand_generics(
+            curr_path,
+            data,
+            self.form,
+            pbar,
+            depth = depth
+        )
 
 class TXTFile(DataFile):
     '''
@@ -226,12 +287,22 @@ class TXTFile(DataFile):
             self.ignore_type = [Generic(rule + '{}', DataTypes.GENERIC) if
                            isinstance(rule, str) else rule for rule in ignore_type]
 
-    def parse(self, path: str) -> dict:
+    def parse(
+        self,
+        path: str,
+        curr_path: list[str],
+        pbar: Optional[tqdm],
+        depth: int = 0
+    ) -> dict:
         def filter_ignores(line: str):
             for ignore_type in self.ignore_type:
                 if ignore_type.match(line)[0]:
                     return True
             return False
+        if depth >= MAX_PBAR_DEPTH:
+            pbar = None
+        if pbar:
+            pbar.set_description(f'Expanding generics: {"/".join(curr_path)}')
         data = []
         with open(path, 'r', encoding='utf-8') as f:
             lines = f.readlines()
@@ -241,7 +312,13 @@ class TXTFile(DataFile):
                     continue
                 data.append(line)
         data, _ = TXTFile._parse(data, self.form)
-        return expand_generics(data, self.form)
+        return expand_generics(
+            curr_path,
+            data,
+            self.form,
+            pbar,
+            depth = depth
+        )
 
     @staticmethod
     def _parse(data: list[str], form: Any) -> Any:
@@ -327,10 +404,26 @@ class XMLFile(DataFile):
     def __init__(self, form: dict[Union[Static, Generic], Any]) -> None:
         self.form = form
 
-    def parse(self, path: str) -> dict:
+    def parse(
+        self,
+        path: str,
+        curr_path: list[str],
+        pbar: Optional[tqdm],
+        depth: int = 0
+    ) -> dict:
+        if depth >= MAX_PBAR_DEPTH:
+            pbar = None
+        if pbar:
+            pbar.set_description(f'Expanding generics: {"/".join(curr_path)}')
         with open(path, 'r', encoding='utf-8') as f:
             data = xmltodict.parse(f.read())
-        return expand_generics(data, self.form)
+        return expand_generics(
+            curr_path,
+            data,
+            self.form,
+            pbar,
+            depth = depth
+        )
 
 class YAMLFile(DataFile):
     '''
@@ -339,19 +432,36 @@ class YAMLFile(DataFile):
     def __init__(self, form: dict[Union[Static, Generic], Any]) -> None:
         self.form = form
 
-    def parse(self, path: str) -> dict:
+    def parse(
+        self,
+        path: str,
+        curr_path: list[str],
+        pbar: Optional[tqdm],
+        depth: int = 0
+    ) -> dict:
+        if depth >= MAX_PBAR_DEPTH:
+            pbar = None
+        if pbar:
+            pbar.set_description(f'Expanding generics: {"/".join(curr_path)}')
         with open(path, 'r', encoding='utf-8') as f:
             data = yaml.safe_load(f)
-        return expand_generics(data, self.form)
+        return expand_generics(
+            curr_path,
+            data,
+            self.form,
+            pbar,
+            depth = depth
+        )
 
 class Pairing:
     '''
     Used to specify when two nonunique datatypes should be associated together. Most commonly used
     to pair ID and name together.
+
     - `form` (`Any`): Whatever follows the DynamicData specified form as required. Pairing is a
         wrapper class so let it behave as it should
     - `paired` (`DataType`): Items which should be associated together.
-    
+
     '''
     def __init__(self, form: Any, *paired: DataType) -> None:
         if len(paired) <= 1:
@@ -431,9 +541,12 @@ class Pairing:
 
     def find_pairings(
         self,
+        path: Union[str, list[str]],
         dataset: Any,
+        pbar: Optional[tqdm],
+        curr_path: Optional[list[str]] = None,
         in_file: bool = True,
-        path: Optional[str] = None
+        depth: int = 0
     ) -> None:
         '''
         Similar to other processes' `expand` function. Finds the pairing values and stores
@@ -444,10 +557,29 @@ class Pairing:
          - `in_file` (`bool`): distinguisher to check usage of either `expand_generics`
             or `expand_file_generics`.
         '''
+        if depth >= MAX_PBAR_DEPTH:
+            pbar = None
+        if pbar:
+            if curr_path is None:
+                curr_path = path
+            pbar.set_description(f'Expanding generics: {"/".join(curr_path)}')
         if in_file:
-            expanded, _ = expand_generics(dataset, self.form)
+            expanded, _ = expand_generics(
+                path,
+                dataset,
+                self.form,
+                pbar,
+                depth = depth
+            )
         else:
-            expanded, _ = expand_file_generics(path, dataset, self.form)
+            expanded, _ = expand_file_generics(
+                path,
+                curr_path,
+                dataset,
+                self.form,
+                pbar,
+                depth = depth
+            )
         pairs_try = self._find_pairings(expanded)
         pairs: list[DataEntry] = []
         for pair in pairs_try:
@@ -456,8 +588,11 @@ class Pairing:
         self.pairs = pairs
 
 def expand_generics(
+    path: list[str],
     dataset: Any,
-    root: Any
+    root: Any,
+    pbar: Optional[tqdm] = None,
+    depth: int = 0
 ) -> Union[dict, Static]:
     '''
     Expand all generics and replace with statics, inplace.
@@ -467,10 +602,15 @@ def expand_generics(
     if isinstance(root, list):
         root = GenericList(root)
     if isinstance(root, (GenericList, SegmentationObject)):
-        return root.expand(dataset)
+        return root.expand(
+            path,
+            dataset,
+            pbar,
+            depth = depth
+        )
     if isinstance(root, DataType):
         root = Generic('{}', root)
-    if isinstance(root, Generic):
+    if isinstance(root, (Generic, Namespace)):
         success, tokens = root.match(str(dataset))
         if not success:
             Warnings.error('fail_generic_match', dataset=dataset, root=root)
@@ -479,15 +619,20 @@ def expand_generics(
     generics: list[Generic] = []
     names: set[Static] = set()
     pairings: list[Pairing] = []
+    if depth >= MAX_PBAR_DEPTH:
+        pbar = None
+    if pbar:
+        pbar.set_description(f'Expanding generics: {"/".join(path)}')
     for i, key in enumerate(root):
-        # convert DataType to Generic with low priority
+        # priority queue push to prioritize generics with the most wildcards for disambiguation
         if isinstance(key, DataType):
             heapq.heappush(generics, (0, i, key))
             continue
-
-        # priority queue push to prioritize generics with the most wildcards for disambiguation
         if isinstance(key, Generic):
             heapq.heappush(generics, (-len(key.data), i, key))
+            continue
+        if isinstance(key, Namespace):
+            heapq.heappush(generics, (1, i, key))
             continue
         val = root[key]
 
@@ -514,7 +659,8 @@ def expand_generics(
             # attempt to match name to generic
             if isinstance(generic, DataType):
                 status, items = Generic('{}', generic).match(name)
-            else: status, items = generic.match(name)
+            else:
+                status, items = generic.match(name)
 
             if not status:
                 continue
@@ -526,20 +672,35 @@ def expand_generics(
     for key, value in expanded_root.items():
         if isinstance(value, list):
             value = GenericList(value)
-        if isinstance(value, (dict, Generic)):
-            uniques, pairing = expand_generics(dataset[key.name], value)
+        if isinstance(value, (dict, Generic, Namespace)):
+            uniques, pairing = expand_generics(
+                path + [key.name if isinstance(key, Static) else str(key)],
+                dataset[key.name],
+                value,
+                pbar,
+                depth = depth + 1
+            )
             expanded_root[key] = uniques
             pairings += pairing
-        elif isinstance(value, (GenericList, AmbiguousList)):
-            uniques, pairing = value.expand(dataset[key.name])
+        elif isinstance(value, (GenericList, AmbiguousList, SegmentationObject)):
+            uniques, pairing = value.expand(
+                path + [key.name if isinstance(key, Static) else str(key)],
+                dataset[key.name],
+                pbar,
+                depth = depth + 1
+            )
             expanded_root[key] = uniques
             pairings += pairing
         elif isinstance(value, DataType):
             expanded_root[key] = Static(dataset[key.name], DataItem(value, dataset[key.name]))
-        elif isinstance(value, SegmentationObject):
-            expanded_root[key] = value.expand(dataset[key.name])[0]
         elif isinstance(value, Pairing):
-            value.find_pairings(dataset[key.name], in_file=True)
+            value.find_pairings(
+                path + [key.name if isinstance(key, Static) else str(key)],
+                dataset[key.name],
+                pbar,
+                in_file = True,
+                depth = depth + 1
+            )
             pairings.append(value)
             to_pop.append(key)
         else:
@@ -562,8 +723,11 @@ def _get_files(path: str) -> dict[str, Union[str, dict]]:
 
 def expand_file_generics(
     path: str,
+    curr_path: list[str],
     dataset: dict[str, Any],
-    root: dict[Union[str, Static, Generic, DataType], Any]
+    root: dict[Union[str, Static, Generic, DataType], Any],
+    pbar: Optional[tqdm],
+    depth: int = 0
 ) -> dict:
     '''
     Variant of the expand_generics function above. Also contains path tracking.'
@@ -576,17 +740,21 @@ def expand_file_generics(
     generics: list[Generic] = []
     names: set[Static] = set()
     pairings: list[Pairing] = []
-
+    if depth >= MAX_PBAR_DEPTH:
+        pbar = None
+    if pbar:
+        pbar.set_description(f'Expanding generics: {"/".join(curr_path)}')
     # move Statics to expanded root, move Generics to priority queue for expansion
     for i, key in enumerate(root):
-        # convert DataType to Generic with low priority
+        # priority queue push to prioritize generics with the most wildcards for disambiguation
         if isinstance(key, DataType):
             heapq.heappush(generics, (0, i, key))
             continue
-
-        # priority queue push to prioritize generics with the most wildcards for disambiguation
         if isinstance(key, Generic):
             heapq.heappush(generics, (-len(key.data), i, key))
+            continue
+        if isinstance(key, Namespace):
+            heapq.heappush(generics, (1, i, key))
             continue
         val = root[key]
 
@@ -617,7 +785,8 @@ def expand_file_generics(
             # attempt to match name to generic
             if isinstance(generic, DataType):
                 status, items = Generic('{}', generic).match(name)
-            else: status, items = generic.match(name)
+            else:
+                status, items = generic.match(name)
 
             if not status:
                 continue
@@ -630,13 +799,21 @@ def expand_file_generics(
             next_path: str = os.path.join(path, key.name)
             uniques, pairing = expand_file_generics(
                 next_path,
+                curr_path + [key.name],
                 dataset[key.name],
-                value
+                value,
+                pbar,
+                depth = depth + 1
             )
             expanded_root[key] = uniques
             pairings += pairing
         elif isinstance(value, DataFile):
-            uniques, pairing = value.parse(os.path.join(path, key.name))
+            uniques, pairing = value.parse(
+                os.path.join(path, key.name),
+                curr_path + [key.name],
+                pbar,
+                depth = depth + 1,
+            )
             expanded_root[key] = uniques
             pairings += pairing
         elif isinstance(value, Image):
@@ -651,7 +828,13 @@ def expand_file_generics(
             )
         elif isinstance(value, Pairing):
             to_pop.append(key)
-            value.find_pairings(dataset[key.name], in_file=False, path=os.path.join(path, key.name))
+            value.find_pairings(
+                os.path.join(path, key.name),
+                dataset[key.name],
+                pbar,
+                in_file = False,
+                curr_path = curr_path + [key.name],
+                depth = depth + 1)
         else:
             Warnings.error('inappropriate_type', value=value)
     for item in to_pop:
@@ -694,8 +877,11 @@ def _merge_lists(lists: list[list[DataEntry]]) -> list[DataEntry]:
         data.update(hashmaps[identifier.desc].values())
     return list(data)
 
-def _merge(data: Union[dict[Union[Static, int], Any], Static]) -> \
-        Union[DataEntry, list[DataEntry]]:
+def _merge(
+    data: Union[dict[Union[Static, int], Any], Static],
+    path: list[str],
+    depth: int = 0
+) -> Union[DataEntry, list[DataEntry]]:
     # base cases
     if isinstance(data, Static):
         return DataEntry(data.data)
@@ -703,9 +889,16 @@ def _merge(data: Union[dict[Union[Static, int], Any], Static]) -> \
         return []
     recursive = []
 
+    pbar = data.items()
+    if len(data) > 100:
+        pbar = tqdm(data.items(), desc="/".join(path), position=depth, leave=False)
     # get result
-    for key, val in data.items():
-        result = _merge(val)
+    for key, val in pbar:
+        result = _merge(
+            val,
+            path + [key.name if isinstance(key, Static) else str(key)],
+            depth = depth + 1
+        )
         # unique entry result
         if isinstance(result, DataEntry):
             if isinstance(key, Static):
@@ -734,12 +927,11 @@ def _merge(data: Union[dict[Union[Static, int], Any], Static]) -> \
         if tokens:
             for item in result:
                 for token in tokens:
-                    item.apply_tokens(token)
+                    item.apply_tokens(token.data.values())
         return result
 
     # if inside unique loop, either can merge all together or result has multiple entries
     if not check_map((item.unique for item in tokens), 2):
-        
         result = DataEntry([])
         for item in tokens:
             result = DataEntry.merge(item, result)
@@ -756,24 +948,35 @@ def _merge(data: Union[dict[Union[Static, int], Any], Static]) -> \
             others.append(item)
     for other in others:
         for entry in uniques:
-            entry.apply_tokens(other.data)
+            entry.apply_tokens(other.data.values())
     return uniques
 
-def populate_data(root: str, form: dict) -> list[DataEntry]:
+def populate_data(root_dir: str, form: dict, verbose: bool = False) -> list[DataEntry]:
     '''
     Parent process for parsing algorithm.
     
      - `root` (`str`): the file path of the root of the data
      - `form` (`dict`): the form of the data, in accordance with DynamicData syntax.
     '''
-    with tqdm(total=4, desc="Getting files", unit="step") as pbar:
-        dataset = _get_files(root)
+    with tqdm(
+        total=4,
+        desc="Getting files",
+        unit="step",
+        bar_format="{desc:<60.60}{percentage:3.0f}%|{bar:10}{r_bar}"
+    ) as pbar:
+        dataset = _get_files(root_dir)
         pbar.update(1)
         pbar.set_description('Expanding generics')
-        data, pairings = expand_file_generics(root, dataset, form)
+        data, pairings = expand_file_generics(
+            root_dir,
+            [],
+            dataset,
+            form,
+            pbar if verbose else None
+        )
         pbar.update(1)
         pbar.set_description('Merging data')
-        data = _merge(data)
+        data = _merge(data, [], depth=1)
         pbar.update(1)
         pbar.set_description('Applying pairing entries')
         for pairing in pairings:
