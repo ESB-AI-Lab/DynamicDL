@@ -78,7 +78,7 @@
 <span class="sd">&#39;&#39;&#39;</span>
 
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
 
 <span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">union</span><span class="p">,</span> <span class="n">Warnings</span>
@@ -102,17 +102,19 @@
 <span class="sd">    through the `DataTypes` module. This will change in future versions. Static objects and further</span>
 <span class="sd">    documentation are provided in the `DataTypes` class.</span>
 
-<span class="sd">    Constructor parameters:</span>
-<span class="sd">     - `desc` (`str`): the purpose of the DataType. This should be unique for every new object.</span>
-<span class="sd">     - `token_type` (`Token`): the token type of the DataType.</span>
+<span class="sd">    :param desc: The purpose of the DataType. This should be unique for every new object.</span>
+<span class="sd">    :type desc: str</span>
+<span class="sd">    :param token_type: The token type of the DataType.</span>
+<span class="sd">    :type token_type: Token</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">token_type</span><span class="p">:</span> <span class="n">Token</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">token_type</span><span class="p">:</span> <span class="n">Token</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">desc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">desc</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">token_type</span><span class="p">:</span> <span class="n">Token</span> <span class="o">=</span> <span class="n">token_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">doc</span> <span class="k">if</span> <span class="n">doc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">desc</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">desc</span><span class="si">}</span><span class="s1">&gt;&#39;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">doc</span><span class="si">}</span><span class="s1">&#39;</span>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="vm">__class__</span><span class="p">:</span>
@@ -142,114 +144,142 @@
 <span class="sd">    The `DataTypes` class contains static presets for `DataType` types. Below is a description of</span>
 <span class="sd">    all presets currently available:</span>
 <span class="sd">    </span>
-<span class="sd">    General DataTypes</span>
-<span class="sd">    +++++++++++++++++</span>
-<span class="sd">    </span>
-<span class="sd">    - `IMAGE_SET_NAME`: Represents the name of an image set. This includes any valid strings, but</span>
-<span class="sd">      is not meant to store the ID of the image set; see `IMAGE_SET_ID`. Image sets are used to</span>
-<span class="sd">      allocate specific entries to a group which can be split when dataloading. Most commonly</span>
-<span class="sd">      image set names will be `train`, `val`, or `test`.</span>
-<span class="sd">    - `IMAGE_SET_ID`: Represents the ID of an image set. This includes any valid integers. The named</span>
-<span class="sd">      complement of this DataType is `IMAGE_SET_NAME`. See above for details.</span>
-<span class="sd">    - `ABSOLUTE_FILE`: Represents the **absolute** filepath of an entry image only. This DataType is</span>
-<span class="sd">      automatically generated in `Image` and `File` type objects when parsing, but can also be</span>
-<span class="sd">      used to parse data. All valid values under `ABSOLUTE_FILE` must be a valid filepath on the</span>
-<span class="sd">      user&#39;s filesystem. `RELATIVE_FILE` is currently not supported, but may be in future versions.</span>
-<span class="sd">    - `ABSOLUTE_FILE_SEG`: Represents the **absolute** filepath of an entry segmentation mask only.</span>
-<span class="sd">      This DataType is also automatically generated in `Image` and `File` type objects when</span>
-<span class="sd">      parsing, but can also be used to parse data. All valid values under `ABSOLUTE_FILE` must be</span>
-<span class="sd">      a valid filepath on the user&#39;s filesystem. `RELATIVE_FILE_SEG` is currently not supported,</span>
-<span class="sd">      but may be in future versions.</span>
-<span class="sd">    - `IMAGE_NAME`: Represents an identifier token for image entries via a string description.</span>
-<span class="sd">      As of 0.1.1-alpha all `IMAGE_NAME` entries must be unique as it serves as a sole identifier</span>
-<span class="sd">      for image entries. Accepts parsed strings. Its ID complement can be found under `IMAGE_ID`.</span>
-<span class="sd">    - `IMAGE_ID`: The ID (parsed to int) complement for `IMAGE_NAME`. Behaves just like its</span>
-<span class="sd">      complement.</span>
-<span class="sd">    - `GENERIC`: A generic token with no significance that can be used as a wildcard token for</span>
-<span class="sd">      parsing. Can represent anything, and any type.</span>
-<span class="sd">    - `GENERIC_INT`: Same as `GENERIC`, except accepts only integer types.</span>
-<span class="sd">    - `GENERIC_QUANTITY`: Same as `GENERIC`, except accepts only numeric types (i.e. float and int)</span>
-<span class="sd">    - `GENERIC_WORD`: Same as `GENERIC`, except accepts only one word, i.e. no spaces allowed.</span>
-<span class="sd">    </span>
 <span class="sd">    Classification DataTypes</span>
 <span class="sd">    ++++++++++++++++++++++++</span>
 <span class="sd">    </span>
-<span class="sd">    - `CLASS_NAME`: Represents the classification class name of an image entry. There can only be</span>
+<span class="sd">    * `CLASS_NAME`: Represents the classification class name of an image entry. There can only be</span>
 <span class="sd">      one class per image entry, and accepts parsed strings. Its ID complement can be found under</span>
 <span class="sd">      `CLASS_ID`.</span>
-<span class="sd">    - `CLASS_ID`: The ID (parsed to int) complement for `CLASS_NAME`. Behaves just like its</span>
+<span class="sd">    * `CLASS_ID`: The ID (parsed to int) complement for `CLASS_NAME`. Behaves just like its</span>
 <span class="sd">      complement.</span>
 <span class="sd">    </span>
 <span class="sd">    Detection DataTypes</span>
 <span class="sd">    +++++++++++++++++++</span>
 <span class="sd">    </span>
-<span class="sd">    - `BBOX_CLASS_NAME`: Represents the detection class name of an image entry. There can be</span>
+<span class="sd">    * `BBOX_CLASS_NAME`: Represents the detection class name of an image entry. There can be</span>
 <span class="sd">      multiple classes per image entry, and accepts parsed strings. Its ID complement can be found</span>
 <span class="sd">      under `BBOX_CLASS_ID`. Each detection class must have a one-to-one correspondence to a valid</span>
 <span class="sd">      bounding box when in the same hierarchy. When in different hierarchies it, just like other</span>
 <span class="sd">      redundant types, will expand naturally to fit the existing length.</span>
-<span class="sd">    - `BBOX_CLASS_ID`: The ID (parsed to int) complement for `BBOX_CLASS_NAME`. Behaves just like</span>
+<span class="sd">    * `BBOX_CLASS_ID`: The ID (parsed to int) complement for `BBOX_CLASS_NAME`. Behaves just like</span>
 <span class="sd">      its complement.</span>
-<span class="sd">    - `XMIN`: The minimum x-coordinate in the bounding box. Must be accompanied with `YMIN` or else</span>
+<span class="sd">    * `XMIN`: The minimum x-coordinate in the bounding box. Must be accompanied with `YMIN` or else</span>
 <span class="sd">      has no effect, and must be accompanied either with `XMAX` or `WIDTH` and their y-counterparts.</span>
-<span class="sd">    - `YMIN`: The minimum y-coordinate in the bounding box. Must be accompanied with `XMIN` or else</span>
+<span class="sd">    * `YMIN`: The minimum y-coordinate in the bounding box. Must be accompanied with `XMIN` or else</span>
 <span class="sd">      has no effect, and must be accompanied either with `YMAX` or `HEIGHT` and their</span>
 <span class="sd">      x-counterparts.</span>
-<span class="sd">    - `XMAX`: The maximum x-coordinate in the bounding box. Must be accompanied with `YMAX` or else</span>
+<span class="sd">    * `XMAX`: The maximum x-coordinate in the bounding box. Must be accompanied with `YMAX` or else</span>
 <span class="sd">      has no effect, and must be accompanied either with `XMIN` or `WIDTH` and their y-counterparts.</span>
-<span class="sd">    - `YMAX`: The maximum y-coordinate in the bounding box. Must be accompanied with `XMAX` or else</span>
+<span class="sd">    * `YMAX`: The maximum y-coordinate in the bounding box. Must be accompanied with `XMAX` or else</span>
 <span class="sd">      has no effect, and must be accompanied either with `YMIN` or `HEIGHT` and their</span>
 <span class="sd">      x-counterparts.</span>
-<span class="sd">    - `XMID`: The midpoint x-coordinate in the bounding box. Used to denote the horizontal center of</span>
+<span class="sd">    * `XMID`: The midpoint x-coordinate in the bounding box. Used to denote the horizontal center of</span>
 <span class="sd">      the bounding box. Must be accompanied with `YMID` to define a central point.</span>
-<span class="sd">    - `YMID`: The midpoint y-coordinate in the bounding box. Used to denote the vertical center of</span>
+<span class="sd">    * `YMID`: The midpoint y-coordinate in the bounding box. Used to denote the vertical center of</span>
 <span class="sd">      the bounding box. Must be accompanied with XMID to define a central point.</span>
-<span class="sd">    - `X1`: A bounding box x-coordinate. Can be in any order as long as it forms a valid bounding</span>
+<span class="sd">    * `X1`: A bounding box x-coordinate. Can be in any order as long as it forms a valid bounding</span>
 <span class="sd">      box with `Y1`, `X2`, and `Y2`.</span>
-<span class="sd">    - `Y1`: A bounding box y-coordinate. Can be in any order as long as it forms a valid bounding</span>
+<span class="sd">    * `Y1`: A bounding box y-coordinate. Can be in any order as long as it forms a valid bounding</span>
 <span class="sd">      box with `X1`, `X2`, and `Y2`.</span>
-<span class="sd">    - `X2`: A bounding box x-coordinate. Can be in any order as long as it forms a valid bounding</span>
+<span class="sd">    * `X2`: A bounding box x-coordinate. Can be in any order as long as it forms a valid bounding</span>
 <span class="sd">      box with `Y1`, `X1`, and `Y2`.</span>
-<span class="sd">    - `Y2`: A bounding box y-coordinate. Can be in any order as long as it forms a valid bounding</span>
+<span class="sd">    * `Y2`: A bounding box y-coordinate. Can be in any order as long as it forms a valid bounding</span>
 <span class="sd">      box with `X1`, `X2`, and `Y1`.</span>
-<span class="sd">    - `WIDTH`: The width of the bounding box. Must be accompanied with `HEIGHT` or else has no</span>
+<span class="sd">    * `WIDTH`: The width of the bounding box. Must be accompanied with `HEIGHT` or else has no</span>
 <span class="sd">      effect. Can be used as an alternative to defining `XMAX` and `XMIN`.</span>
-<span class="sd">    - `HEIGHT`: The height of the bounding box. Must be accompanied with `WIDTH` or else has no</span>
+<span class="sd">    * `HEIGHT`: The height of the bounding box. Must be accompanied with `WIDTH` or else has no</span>
 <span class="sd">      effect. Can be used as an alternative to defining `YMAX` and `YMIN`.</span>
 <span class="sd">    </span>
 <span class="sd">    Segmentation DataTypes</span>
 <span class="sd">    ++++++++++++++++++++++</span>
 
-<span class="sd">    - `SEG_CLASS_NAME`: Represents the segmentation class name of an image entry. There can be</span>
+<span class="sd">    * `SEG_CLASS_NAME`: Represents the segmentation class name of an image entry. There can be</span>
 <span class="sd">      multiple classes per image entry, and accepts parsed strings. Its ID complement can be found</span>
 <span class="sd">      under `SEG_CLASS_ID`. Each detection class must have a one-to-one correspondence to a valid</span>
 <span class="sd">      bounding box when in the same hierarchy. When in different hierarchies it, just like other</span>
 <span class="sd">      redundant types, will expand naturally to fit the existing length.</span>
-<span class="sd">    - `SEG_CLASS_ID`: The ID (parsed to int) complement for `SEG_CLASS_NAME`. Behaves just like</span>
+<span class="sd">    * `SEG_CLASS_ID`: The ID (parsed to int) complement for `SEG_CLASS_NAME`. Behaves just like</span>
 <span class="sd">      its complement.</span>
-<span class="sd">    - `X`: A segmentation polygon x-coordinate. Used to define the vertices of a polygon for</span>
+<span class="sd">    * `X`: A segmentation polygon x-coordinate. Used to define the vertices of a polygon for</span>
 <span class="sd">      segmentation tasks. Each `X` coordinate must be paired with a corresponding `Y` coordinate</span>
 <span class="sd">      to form a valid vertex.</span>
-<span class="sd">    - `Y`: A segmentation polygon y-coordinate. Used to define the vertices of a polygon for</span>
+<span class="sd">    * `Y`: A segmentation polygon y-coordinate. Used to define the vertices of a polygon for</span>
 <span class="sd">      segmentation tasks. Each `Y` coordinate must be paired with a corresponding `X` coordinate</span>
 <span class="sd">      to form a valid vertex.</span>
-<span class="sd">    - `POLYGON`: Should not be instantiated by the user as there is no way to parse it. However, it</span>
+<span class="sd">    * `POLYGON`: Should not be instantiated by the user as there is no way to parse it. However, it</span>
 <span class="sd">      is automatically created upon every `SegmentationObject` wrapper of `X` and `Y` objects.</span>
 <span class="sd">      This DataType is used internally for parsing.</span>
 <span class="sd">    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="c1"># main types</span>
-    <span class="n">IMAGE_SET_NAME</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span><span class="s1">&#39;IMAGE_SET_NAME&#39;</span><span class="p">,</span> <span class="n">RedundantToken</span><span class="p">())</span>
-    <span class="n">IMAGE_SET_ID</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span><span class="s1">&#39;IMAGE_SET_ID&#39;</span><span class="p">,</span> <span class="n">RedundantIDToken</span><span class="p">())</span>
-    <span class="n">ABSOLUTE_FILE</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span><span class="s1">&#39;ABSOLUTE_FILE&#39;</span><span class="p">,</span> <span class="n">FilenameToken</span><span class="p">())</span>
-    <span class="n">ABSOLUTE_FILE_SEG</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span><span class="s1">&#39;ABSOLUTE_FILE_SEG&#39;</span><span class="p">,</span> <span class="n">FilenameToken</span><span class="p">())</span>
-    <span class="n">IMAGE_NAME</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span><span class="s1">&#39;IMAGE_NAME&#39;</span><span class="p">,</span> <span class="n">UniqueToken</span><span class="p">())</span>
-    <span class="n">IMAGE_ID</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span><span class="s1">&#39;IMAGE_ID&#39;</span><span class="p">,</span> <span class="n">UniqueIDToken</span><span class="p">())</span>
-    <span class="n">GENERIC</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span><span class="s1">&#39;GENERIC&#39;</span><span class="p">,</span> <span class="n">WildcardToken</span><span class="p">())</span>
-    <span class="n">GENERIC_INT</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span><span class="s1">&#39;GENERIC_INT&#39;</span><span class="p">,</span> <span class="n">WildcardIntToken</span><span class="p">())</span>
-    <span class="n">GENERIC_QUANTITY</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span><span class="s1">&#39;GENERIC_QUANTITY&#39;</span><span class="p">,</span> <span class="n">WildcardQuantityToken</span><span class="p">())</span>
-    <span class="n">GENERIC_WORD</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span><span class="s1">&#39;GENERIC_WORD&#39;</span><span class="p">,</span> <span class="n">WildcardWordToken</span><span class="p">())</span>
+    <span class="n">IMAGE_SET_NAME</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;IMAGE_SET_NAME&#39;</span><span class="p">,</span>
+        <span class="n">RedundantToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Represents the name of an image set. This includes any valid strings, but is not &#39;</span>
+            <span class="s1">&#39;meant to store the ID of the image set; see `IMAGE_SET_ID`. Image sets are used to &#39;</span>
+            <span class="s1">&#39;allocate specific entries to a group which can be split when dataloading. Most &#39;</span>
+            <span class="s1">&#39;commonly, image set names will be `train`, `val`, or `test`. [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">IMAGE_SET_ID</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;IMAGE_SET_ID&#39;</span><span class="p">,</span>
+        <span class="n">RedundantIDToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Represents the ID of an image set. This includes any valid integers. The named &#39;</span>
+            <span class="s1">&#39;complement of this DataType is `IMAGE_SET_NAME`. See above for details. [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">ABSOLUTE_FILE</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;ABSOLUTE_FILE&#39;</span><span class="p">,</span>
+        <span class="n">FilenameToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Represents the **absolute** filepath of an entry image only. This DataType is &#39;</span>
+            <span class="s1">&#39;automatically generated in `Image` and `File` type objects when parsing, but can also &#39;</span>
+            <span class="s1">&#39;be used to parse data. All valid values under `ABSOLUTE_FILE` must be a valid &#39;</span>
+            <span class="s1">&#39;filepath on the user</span><span class="se">\&#39;</span><span class="s1">s filesystem. `RELATIVE_FILE` is currently not supported, but &#39;</span>
+            <span class="s1">&#39;may be in future versions. [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">ABSOLUTE_FILE_SEG</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;ABSOLUTE_FILE_SEG&#39;</span><span class="p">,</span>
+        <span class="n">FilenameToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Represents the **absolute** filepath of an entry segmentation mask only. This &#39;</span>
+            <span class="s1">&#39;DataType is also automatically generated in `Image` and `File` type objects when &#39;</span>
+            <span class="s1">&#39;parsing, but can also be used to parse data. All valid values under `ABSOLUTE_FILE` &#39;</span>
+            <span class="s1">&#39;must be a valid filepath on the user</span><span class="se">\&#39;</span><span class="s1">s filesystem. `RELATIVE_FILE_SEG` is currently &#39;</span>
+            <span class="s1">&#39;not supported, but may be in future versions. [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">IMAGE_NAME</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;IMAGE_NAME&#39;</span><span class="p">,</span>
+        <span class="n">UniqueToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Represents an identifier token for image entries via a string description. As of &#39;</span>
+            <span class="s1">&#39;0.1.1-alpha all `IMAGE_NAME` entries must be unique as it serves as a sole identifier &#39;</span>
+            <span class="s1">&#39;for image entries. Accepts parsed strings. Its ID complement can be found under &#39;</span>
+            <span class="s1">&#39;`IMAGE_ID`. [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">IMAGE_ID</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;IMAGE_ID&#39;</span><span class="p">,</span>
+        <span class="n">UniqueIDToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;The ID (parsed to int) complement for `IMAGE_NAME`. Behaves just like its &#39;</span>
+            <span class="s1">&#39;complement. [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">GENERIC</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;GENERIC&#39;</span><span class="p">,</span>
+        <span class="n">WildcardToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;A generic token with no significance that can be used as a wildcard token for &#39;</span>
+            <span class="s1">&#39;parsing. Can represent anything, and any type. [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">GENERIC_INT</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;GENERIC_INT&#39;</span><span class="p">,</span>
+        <span class="n">WildcardIntToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Same as `GENERIC`, except accepts only integer types. [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">GENERIC_QUANTITY</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;GENERIC_QUANTITY&#39;</span><span class="p">,</span>
+        <span class="n">WildcardQuantityToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Same as `GENERIC`, except accepts only numeric types (i.e. float and int). [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">GENERIC_WORD</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;GENERIC_WORD&#39;</span><span class="p">,</span>
+        <span class="n">WildcardWordToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Same as `GENERIC`, except accepts only one word, i.e. no spaces allowed. [GENERAL]&#39;</span>
+    <span class="p">)</span>
 
     <span class="c1"># classification</span>
     <span class="n">CLASS_NAME</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span><span class="s1">&#39;CLASS_NAME&#39;</span><span class="p">,</span> <span class="n">Token</span><span class="p">())</span>
@@ -292,10 +322,10 @@
 <span class="sd">    The above example creates a static which contains the value `my_set` as an image set name for</span>
 <span class="sd">    its hierarchical children to inherit.</span>
 
-<span class="sd">    Constructor parameters:</span>
-<span class="sd">    - `delimiter` (`DataType`): the type of the DataItem.</span>
-<span class="sd">    - `value` (`Any`): the value associated with the DataType, must be compatible.</span>
-<span class="sd">    </span>
+<span class="sd">    :param delimiter: The type of the DataItem.</span>
+<span class="sd">    :type delimiter: DataType</span>
+<span class="sd">    :param value: The value associated with the DataType, must be compatible.</span>
+<span class="sd">    :type value: Any</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delimiter</span><span class="p">:</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">delimiter</span><span class="o">.</span><span class="n">token_type</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -318,9 +348,9 @@
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Add an item to current data if it is redundant. Used by internal merging processes.</span>
 <span class="sd">        </span>
-<span class="sd">        - `item` (`Self`): an item to add to itself.</span>
-<span class="sd">        </span>
-<span class="sd">        Throws `ValueError` if either `self` or `item` are not redundant.</span>
+<span class="sd">        :param item: An item to add to itself.</span>
+<span class="sd">        :type item: DataItem</span>
+<span class="sd">        :raises ValueError: Either `self` or `item` are not redundant.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span><span class="o">.</span><span class="n">token_type</span><span class="p">,</span> <span class="n">RedundantToken</span><span class="p">)</span> <span class="ow">or</span>
             <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">delimiter</span><span class="o">.</span><span class="n">token_type</span><span class="p">,</span> <span class="n">RedundantToken</span><span class="p">)):</span>
@@ -335,7 +365,10 @@
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Shallow copy self&#39;s data into new instance. Used by internal merging processes.</span>
 <span class="sd">        </span>
-<span class="sd">        - `first` (`Self`): item to copy.</span>
+<span class="sd">        :param first: The item to copy.</span>
+<span class="sd">        :type first: DataItem</span>
+<span class="sd">        :return: A shallow copy of the data item.</span>
+<span class="sd">        :rtype: DataItem</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">first</span><span class="o">.</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">copy</span><span class="p">(</span><span class="n">first</span><span class="o">.</span><span class="n">value</span><span class="p">))</span></div>
 </div>
@@ -348,11 +381,8 @@
 <span class="sd">    Contains all items required for an entry in the dataset, a collection of DataItem objects. Most</span>
 <span class="sd">    use is handled by internal merging processes, and is not to be instantiated by users.</span>
 <span class="sd">    </span>
-<span class="sd">    Constructor parameters:</span>
-<span class="sd">    </span>
-<span class="sd">    - `items` (`list[DataItem] | DataItem`): a (list of) data items which are to be batched</span>
-<span class="sd">        together</span>
-
+<span class="sd">    :param items: A (list of) data items which are to be batched together</span>
+<span class="sd">    :type items: list[DataItem] | DataItem</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="n">_valid_sets</span> <span class="o">=</span> <span class="p">[</span>
@@ -380,10 +410,10 @@
 <span class="sd">        Merge two data entries together, storing it in a new instance. For inplace operations see</span>
 <span class="sd">        `merge_inplace`.</span>
 <span class="sd">        </span>
-<span class="sd">        - `first` (`DataEntry`): the first data entry to merge.</span>
-<span class="sd">        - `second` (`DataEntry`): the second data entry to merge.</span>
-<span class="sd">        - `overlap` (`bool`): whether to allow nonunique item overlapping. Default: True.</span>
-
+<span class="sd">        :param first: The first data entry to merge.</span>
+<span class="sd">        :type first: DataEntry</span>
+<span class="sd">        :param second: The second data entry to merge.</span>
+<span class="sd">        :type second: DataEntry</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">merged</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">first</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
         <span class="n">redundant_overlap</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -426,9 +456,8 @@
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Merge two data entries together, storing it in this instance.</span>
 <span class="sd">        </span>
-<span class="sd">        - `other` (`DataEntry`): the other data entry to merge into this instance.</span>
-<span class="sd">        - `overlap` (`bool`): whether to allow nonunique item overlapping. Default: True.</span>
-
+<span class="sd">        :param other: The other data entry to merge into this instance.</span>
+<span class="sd">        :type other: DataEntry</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">redundant_overlap</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">desc</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -469,8 +498,8 @@
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Apply new tokens to the item.</span>
 <span class="sd">        </span>
-<span class="sd">        - `items` (`list[DataItem] | DataItem`): additional items to associate with this data</span>
-<span class="sd">            entry.</span>
+<span class="sd">        :param items: Additional items to associate with this data entry.</span>
+<span class="sd">        :type items: list[DataItem] | DataItem</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
             <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">items</span><span class="p">]</span>

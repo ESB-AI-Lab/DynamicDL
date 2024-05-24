@@ -1,7 +1,7 @@
 import os
 from typing import Any
 
-from ._utils import union
+from .._utils import union
 
 class Token:
     '''

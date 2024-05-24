@@ -111,9 +111,12 @@
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
 <span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">union</span><span class="p">,</span> <span class="n">check_map</span><span class="p">,</span> <span class="n">Warnings</span>
-<span class="kn">from</span> <span class="nn">.tokens</span> <span class="kn">import</span> <span class="n">RedundantToken</span><span class="p">,</span> <span class="n">UniqueToken</span>
-<span class="kn">from</span> <span class="nn">.data</span> <span class="kn">import</span> <span class="n">DataTypes</span><span class="p">,</span> <span class="n">DataEntry</span><span class="p">,</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">DataItem</span>
-<span class="kn">from</span> <span class="nn">.data_items</span> <span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Static</span><span class="p">,</span> <span class="n">Folder</span><span class="p">,</span> <span class="n">File</span><span class="p">,</span> <span class="n">Image</span><span class="p">,</span> <span class="n">SegmentationImage</span><span class="p">,</span> <span class="n">Namespace</span>
+<span class="kn">from</span> <span class="nn">.data.tokens</span> <span class="kn">import</span> <span class="n">RedundantToken</span><span class="p">,</span> <span class="n">UniqueToken</span>
+<span class="kn">from</span> <span class="nn">.data.datatype</span> <span class="kn">import</span> <span class="n">DataType</span>
+<span class="kn">from</span> <span class="nn">.data.datatypes</span> <span class="kn">import</span> <span class="n">DataTypes</span>
+<span class="kn">from</span> <span class="nn">.data.dataitem</span> <span class="kn">import</span> <span class="n">DataItem</span>
+<span class="kn">from</span> <span class="nn">.data.dataentry</span> <span class="kn">import</span> <span class="n">DataEntry</span>
+<span class="kn">from</span> <span class="nn">.data_items</span> <span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Static</span><span class="p">,</span> <span class="n">Folder</span><span class="p">,</span> <span class="n">File</span><span class="p">,</span> <span class="n">ImageEntry</span><span class="p">,</span> <span class="n">SegmentationImage</span><span class="p">,</span> <span class="n">Namespace</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;GenericList&#39;</span><span class="p">,</span>
@@ -942,9 +945,9 @@
             <span class="p">)</span>
             <span class="n">expanded_root</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">uniques</span>
             <span class="n">pairings</span> <span class="o">+=</span> <span class="n">pairing</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Image</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ImageEntry</span><span class="p">):</span>
             <span class="n">expanded_root</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Static</span><span class="p">(</span>
-                <span class="s1">&#39;Image&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;ImageEntry&#39;</span><span class="p">,</span>
                 <span class="n">DataItem</span><span class="p">(</span><span class="n">DataTypes</span><span class="o">.</span><span class="n">ABSOLUTE_FILE</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">key</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
             <span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">SegmentationImage</span><span class="p">):</span>

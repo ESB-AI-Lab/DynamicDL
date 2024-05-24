@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dynamicdl.data.datatypes &mdash; DynamicDL 0.1.1-alpha documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e30984f2"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            DynamicDL
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">DynamicData Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">DynamicDL</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DynamicDL</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">dynamicdl.data.datatypes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for dynamicdl.data.datatypes</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.tokens</span> <span class="kn">import</span> <span class="n">Token</span><span class="p">,</span> <span class="n">UniqueToken</span><span class="p">,</span> <span class="n">UniqueIDToken</span><span class="p">,</span> <span class="n">RedundantIDToken</span><span class="p">,</span> <span class="n">RedundantObjectToken</span><span class="p">,</span> \
+                    <span class="n">RedundantQuantityToken</span><span class="p">,</span> <span class="n">RedundantToken</span><span class="p">,</span> <span class="n">WildcardIntToken</span><span class="p">,</span> \
+                    <span class="n">WildcardQuantityToken</span><span class="p">,</span> <span class="n">WildcardToken</span><span class="p">,</span> <span class="n">WildcardWordToken</span><span class="p">,</span> <span class="n">FilenameToken</span><span class="p">,</span> <span class="n">IDToken</span>
+<span class="kn">from</span> <span class="nn">.datatype</span> <span class="kn">import</span> <span class="n">DataType</span>
+
+<div class="viewcode-block" id="DataTypes">
+<a class="viewcode-back" href="../../../dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes">[docs]</a>
+<span class="k">class</span> <span class="nc">DataTypes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The `DataTypes` class contains static presets for `DataType` types. Below is a description of</span>
+<span class="sd">    all presets currently available:</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1"># main types</span>
+    <span class="n">IMAGE_SET_NAME</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;IMAGE_SET_NAME&#39;</span><span class="p">,</span>
+        <span class="n">RedundantToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Represents the name of an image set. This includes any valid strings, but is not &#39;</span>
+            <span class="s1">&#39;meant to store the ID of the image set; see `IMAGE_SET_ID`. Image sets are used to &#39;</span>
+            <span class="s1">&#39;allocate specific entries to a group which can be split when dataloading. Most &#39;</span>
+            <span class="s1">&#39;commonly, image set names will be `train`, `val`, or `test`. [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">IMAGE_SET_ID</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;IMAGE_SET_ID&#39;</span><span class="p">,</span>
+        <span class="n">RedundantIDToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Represents the ID of an image set. This includes any valid integers. The named &#39;</span>
+            <span class="s1">&#39;complement of this DataType is `IMAGE_SET_NAME`. See above for details. [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">ABSOLUTE_FILE</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;ABSOLUTE_FILE&#39;</span><span class="p">,</span>
+        <span class="n">FilenameToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Represents the **absolute** filepath of an entry image only. This DataType is &#39;</span>
+            <span class="s1">&#39;automatically generated in `Image` and `File` type objects when parsing, but can also &#39;</span>
+            <span class="s1">&#39;be used to parse data. All valid values under `ABSOLUTE_FILE` must be a valid &#39;</span>
+            <span class="s1">&#39;filepath on the user</span><span class="se">\&#39;</span><span class="s1">s filesystem. `RELATIVE_FILE` is currently not supported, but &#39;</span>
+            <span class="s1">&#39;may be in future versions. [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">ABSOLUTE_FILE_SEG</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;ABSOLUTE_FILE_SEG&#39;</span><span class="p">,</span>
+        <span class="n">FilenameToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Represents the **absolute** filepath of an entry segmentation mask only. This &#39;</span>
+            <span class="s1">&#39;DataType is also automatically generated in `Image` and `File` type objects when &#39;</span>
+            <span class="s1">&#39;parsing, but can also be used to parse data. All valid values under `ABSOLUTE_FILE` &#39;</span>
+            <span class="s1">&#39;must be a valid filepath on the user</span><span class="se">\&#39;</span><span class="s1">s filesystem. `RELATIVE_FILE_SEG` is currently &#39;</span>
+            <span class="s1">&#39;not supported, but may be in future versions. [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">IMAGE_NAME</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;IMAGE_NAME&#39;</span><span class="p">,</span>
+        <span class="n">UniqueToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Represents an identifier token for image entries via a string description. As of &#39;</span>
+            <span class="s1">&#39;0.1.1-alpha all `IMAGE_NAME` entries must be unique as it serves as a sole identifier &#39;</span>
+            <span class="s1">&#39;for image entries. Accepts parsed strings. Its ID complement can be found under &#39;</span>
+            <span class="s1">&#39;`IMAGE_ID`. [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">IMAGE_ID</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;IMAGE_ID&#39;</span><span class="p">,</span>
+        <span class="n">UniqueIDToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;The ID (parsed to int) complement for `IMAGE_NAME`. Behaves just like its &#39;</span>
+            <span class="s1">&#39;complement. [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">GENERIC</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;GENERIC&#39;</span><span class="p">,</span>
+        <span class="n">WildcardToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;A generic token with no significance that can be used as a wildcard token for &#39;</span>
+            <span class="s1">&#39;parsing. Can represent anything, and any type. [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">GENERIC_INT</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;GENERIC_INT&#39;</span><span class="p">,</span>
+        <span class="n">WildcardIntToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Same as `GENERIC`, except accepts only integer types. [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">GENERIC_QUANTITY</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;GENERIC_QUANTITY&#39;</span><span class="p">,</span>
+        <span class="n">WildcardQuantityToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Same as `GENERIC`, except accepts only numeric types (i.e. float and int). [GENERAL]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">GENERIC_WORD</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;GENERIC_WORD&#39;</span><span class="p">,</span>
+        <span class="n">WildcardWordToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Same as `GENERIC`, except accepts only one word, i.e. no spaces allowed. [GENERAL]&#39;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># classification</span>
+    <span class="n">CLASS_NAME</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;CLASS_NAME&#39;</span><span class="p">,</span>
+        <span class="n">Token</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Represents the classification class name of an image entry. There can only be one &#39;</span>
+            <span class="s1">&#39;class per image entry, and accepts parsed strings. Its ID complement can be found &#39;</span>
+            <span class="s1">&#39;under `CLASS_ID`. [CLASSIFICATION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">CLASS_ID</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;CLASS_ID&#39;</span><span class="p">,</span>
+        <span class="n">IDToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;The ID (parsed to int) complement for `CLASS_NAME`. Behaves just like its &#39;</span>
+            <span class="s1">&#39;complement. [CLASSIFICATION]&#39;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># detection</span>
+    <span class="n">BBOX_CLASS_NAME</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;BBOX_CLASS_NAME&#39;</span><span class="p">,</span>
+        <span class="n">RedundantToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Represents the detection class name of an image entry. There can be multiple &#39;</span>
+            <span class="s1">&#39;classes per image entry, and accepts parsed strings. Its ID complement can be found &#39;</span>
+            <span class="s1">&#39;under `BBOX_CLASS_ID`. Each detection class must have a one-to-one correspondence to &#39;</span>
+            <span class="s1">&#39;a valid bounding box when in the same hierarchy. When in different hierarchies it, &#39;</span>
+            <span class="s1">&#39;just like other redundant types, will expand naturally to fit the existing length. &#39;</span>
+            <span class="s1">&#39;[DETECTION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">BBOX_CLASS_ID</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;BBOX_CLASS_ID&#39;</span><span class="p">,</span>
+        <span class="n">RedundantIDToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;The ID (parsed to int) complement for `BBOX_CLASS_NAME`. Behaves just like its &#39;</span>
+            <span class="s1">&#39;complement. [DETECTION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">XMIN</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;XMIN&#39;</span><span class="p">,</span>
+        <span class="n">RedundantQuantityToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;The minimum x-coordinate in the bounding box. Must be accompanied with `YMIN` or &#39;</span>
+            <span class="s1">&#39;else has no effect, and must be accompanied either with `XMAX` or `WIDTH` and their &#39;</span>
+            <span class="s1">&#39;y-counterparts. [DETECTION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">YMIN</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;YMIN&#39;</span><span class="p">,</span>
+        <span class="n">RedundantQuantityToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;The minimum y-coordinate in the bounding box. Must be accompanied with `XMIN` or &#39;</span>
+            <span class="s1">&#39;else has no effect, and must be accompanied either with `YMAX` or `HEIGHT` and their &#39;</span>
+            <span class="s1">&#39;y-counterparts. [DETECTION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">XMAX</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;XMAX&#39;</span><span class="p">,</span>
+        <span class="n">RedundantQuantityToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;The maximum x-coordinate in the bounding box. Must be accompanied with `YMAX` or &#39;</span>
+            <span class="s1">&#39;else has no effect, and must be accompanied either with `XMIN` or `WIDTH` and their &#39;</span>
+            <span class="s1">&#39;y-counterparts. [DETECTION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">YMAX</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;YMAX&#39;</span><span class="p">,</span>
+        <span class="n">RedundantQuantityToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;The maximum y-coordinate in the bounding box. Must be accompanied with `XMAX` or &#39;</span>
+            <span class="s1">&#39;else has no effect, and must be accompanied either with `YMIN` or `HEIGHT` and their &#39;</span>
+            <span class="s1">&#39;y-counterparts. [DETECTION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">XMID</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;XMID&#39;</span><span class="p">,</span>
+        <span class="n">RedundantQuantityToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;The midpoint x-coordinate in the bounding box. Used to denote the vertical center &#39;</span>
+            <span class="s1">&#39;of the bounding box. Must be accompanied with `YMID` to define a central point, and &#39;</span>
+            <span class="s1">&#39;with either `XMIN` or `XMAX` to fill the bounding box. [DETECTION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">YMID</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;YMID&#39;</span><span class="p">,</span>
+        <span class="n">RedundantQuantityToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;The midpoint y-coordinate in the bounding box. Used to denote the vertical center &#39;</span>
+            <span class="s1">&#39;of the bounding box. Must be accompanied with `XMID` to define a central point, and &#39;</span>
+            <span class="s1">&#39;with either `YMIN` or `YMAX` to fill the bounding box. [DETECTION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">X1</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;X1&#39;</span><span class="p">,</span>
+        <span class="n">RedundantQuantityToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;A bounding box x-coordinate. Can be in any order as long as it forms a valid &#39;</span>
+            <span class="s1">&#39;bounding box with `X2`, `Y1`, and `Y2`. [DETECTION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">Y1</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;Y1&#39;</span><span class="p">,</span>
+        <span class="n">RedundantQuantityToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;A bounding box y-coordinate. Can be in any order as long as it forms a valid &#39;</span>
+            <span class="s1">&#39;bounding box with `X1`, `X2`, and `Y2`. [DETECTION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">X2</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;X2&#39;</span><span class="p">,</span>
+        <span class="n">RedundantQuantityToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;A bounding box x-coordinate. Can be in any order as long as it forms a valid &#39;</span>
+            <span class="s1">&#39;bounding box with `X1`, `Y1`, and `Y2`. [DETECTION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">Y2</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;Y2&#39;</span><span class="p">,</span>
+        <span class="n">RedundantQuantityToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;A bounding box y-coordinate. Can be in any order as long as it forms a valid &#39;</span>
+            <span class="s1">&#39;bounding box with `X1`, `X2`, and `Y1`. [DETECTION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">WIDTH</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;WIDTH&#39;</span><span class="p">,</span>
+        <span class="n">RedundantQuantityToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;The width of the bounding box. Must be accompanied with `HEIGHT` or else has no &#39;</span>
+            <span class="s1">&#39;effect. Can be used as an alternative to defining `XMAX` or `XMIN`. [DETECTION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">HEIGHT</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;HEIGHT&#39;</span><span class="p">,</span>
+        <span class="n">RedundantQuantityToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;The height of the bounding box. Must be accompanied with `WIDTH` or else has no &#39;</span>
+            <span class="s1">&#39;effect. Can be used as an alternative to defining `YMAX` or `YMIN`. [DETECTION]&#39;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># segmentation</span>
+    <span class="n">SEG_CLASS_NAME</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;SEG_CLASS_NAME&#39;</span><span class="p">,</span>
+        <span class="n">RedundantToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Represents the segmentation class name of an image entry. There can be multiple &#39;</span>
+            <span class="s1">&#39;classes per image entry, and accepts parsed strings. Its ID complement can be found &#39;</span>
+            <span class="s1">&#39;under `SEG_CLASS_ID`. Each detection class must have a one-to-one correspondence to a &#39;</span>
+            <span class="s1">&#39;valid bounding box when in the same hierarchy. When in different hierarchies it, just &#39;</span>
+            <span class="s1">&#39;like other redundant types, will expand naturally to fit the existing length. &#39;</span>
+            <span class="s1">&#39;[SEGMENTATION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">SEG_CLASS_ID</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;SEG_CLASS_ID&#39;</span><span class="p">,</span>
+        <span class="n">RedundantIDToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;The ID (parsed to int) complement for `SEG_CLASS_NAME`. Behaves just like its &#39;</span>
+            <span class="s1">&#39;complement. [SEGMENTATION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;X&#39;</span><span class="p">,</span>
+        <span class="n">RedundantQuantityToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;A segmentation polygon x-coordinate. Used to define the vertices of a polygon for &#39;</span>
+            <span class="s1">&#39;segmentation tasks. Each `X` coordinate must be paired with a corresponding `Y` &#39;</span>
+            <span class="s1">&#39;coordinate to form a valid vertex. [SEGMENTATION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;Y&#39;</span><span class="p">,</span>
+        <span class="n">RedundantQuantityToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;A segmentation polygon y-coordinate. Used to define the vertices of a polygon for &#39;</span>
+            <span class="s1">&#39;segmentation tasks. Each `Y` coordinate must be paired with a corresponding `X` &#39;</span>
+            <span class="s1">&#39;coordinate to form a valid vertex. [SEGMENTATION]&#39;</span>
+    <span class="p">)</span>
+    <span class="n">POLYGON</span> <span class="o">=</span> <span class="n">DataType</span><span class="p">(</span>
+        <span class="s1">&#39;POLYGON&#39;</span><span class="p">,</span>
+        <span class="n">RedundantObjectToken</span><span class="p">(),</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;Should not be instantiated by the user as there is no way to parse it. However, it &#39;</span>
+            <span class="s1">&#39;is automatically created upon every `SegmentationObject` wrapper of `X` and `Y` &#39;</span>
+            <span class="s1">&#39;objects. This DataType is used internally for parsing. [SEGMENTATION]&#39;</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Anthony Tong.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

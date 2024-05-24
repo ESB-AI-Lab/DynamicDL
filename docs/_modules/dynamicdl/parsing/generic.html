@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../../">
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dynamicdl.data_items &mdash; DynamicDL 0.1.1-alpha documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+  <title>dynamicdl.parsing.generic &mdash; DynamicDL 0.1.1-alpha documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
   
   <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=e30984f2"></script>
-        <script src="../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e30984f2"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -30,11 +30,11 @@
 
           
           
-          <a href="../../index.html" class="icon icon-home">
+          <a href="../../../index.html" class="icon icon-home">
             DynamicDL
           </a>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -43,9 +43,9 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">DynamicData Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules.html">DynamicDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">DynamicData Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">DynamicDL</a></li>
 </ul>
 
         </div>
@@ -54,16 +54,16 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">DynamicDL</a>
+          <a href="../../../index.html">DynamicDL</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">dynamicdl.data_items</li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">dynamicdl.parsing.generic</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -72,150 +72,24 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for dynamicdl.data_items</h1><div class="highlight"><pre>
+  <h1>Source code for dynamicdl.parsing.generic</h1><div class="highlight"><pre>
 <span></span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">Module with main data items for creating dataset formats.</span>
+<span class="sd">Generic type objects.</span>
 <span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
 
-<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">union</span><span class="p">,</span> <span class="n">Warnings</span>
-<span class="kn">from</span> <span class="nn">.data.dataitem</span> <span class="kn">import</span> <span class="n">DataItem</span>
-<span class="kn">from</span> <span class="nn">.data.datatype</span> <span class="kn">import</span> <span class="n">DataType</span>
+<span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">union</span><span class="p">,</span> <span class="n">Warnings</span>
+<span class="kn">from</span> <span class="nn">..data.datatype</span> <span class="kn">import</span> <span class="n">DataType</span>
+<span class="kn">from</span> <span class="nn">..data.dataitem</span> <span class="kn">import</span> <span class="n">DataItem</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s1">&#39;Alias&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;Static&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;Generic&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;Folder&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;File&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;ImageFile&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;ImageEntry&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;SegmentationImage&#39;</span>
-<span class="p">]</span>
-<div class="viewcode-block" id="Alias">
-<a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.data_items.Alias">[docs]</a>
-<span class="k">class</span> <span class="nc">Alias</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Class used when a placeholder in `Generic` could be interpreted multiple ways. For example, if</span>
-<span class="sd">    `IMAGE_NAME` also contains `CLASS_NAME` and `IMAGE_ID`, we can extract all 3 tokens out using</span>
-<span class="sd">    `Alias`. Counts for a single wildcard token (`{}`) when supplied in `Generic`. </span>
-<span class="sd">    </span>
-<span class="sd">    Example:</span>
-<span class="sd">    </span>
-<span class="sd">    .. code-block:: python</span>
-<span class="sd">    </span>
-<span class="sd">        alias =  Alias([</span>
-<span class="sd">            DataTypes.IMAGE_NAME,</span>
-<span class="sd">            Generic(&#39;{}_{}&#39;, DataTypes.CLASS_NAME, DataTypes.IMAGE_ID)</span>
-<span class="sd">        ])</span>
-
-<span class="sd">    Now we can use `Generic(alias)` as a valid generic and it will obtain all contained DataTypes.</span>
-<span class="sd">    </span>
-<span class="sd">    :param generics: The list of Generic type objects which can be used for alias parsing.</span>
-<span class="sd">    :type generics: list[Generic | DataType]</span>
-<span class="sd">    :raises ValueError: There must be at least one item in the provided Generics</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="s1">&#39;Generic&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">generics</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;generics_missing&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">generics</span> <span class="o">=</span> <span class="p">[</span><span class="n">generic</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">generic</span><span class="p">,</span> <span class="n">Generic</span><span class="p">)</span>
-                         <span class="k">else</span> <span class="n">Generic</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">DataType</span><span class="p">)</span> <span class="k">for</span> <span class="n">generic</span> <span class="ow">in</span> <span class="n">generics</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">patterns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">generic</span><span class="o">.</span><span class="n">pattern</span> <span class="k">for</span> <span class="n">generic</span> <span class="ow">in</span> <span class="n">generics</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">DataType</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="n">generic</span><span class="o">.</span><span class="n">data</span> <span class="k">for</span> <span class="n">generic</span> <span class="ow">in</span> <span class="n">generics</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">token</span><span class="o">.</span><span class="n">desc</span> <span class="k">for</span> <span class="n">alias</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">aliases</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">alias</span><span class="p">])</span>
-
-<div class="viewcode-block" id="Alias.match">
-<a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.data_items.Alias.match">[docs]</a>
-    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataItem</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Return a list of DataItems if matched successfully. Used for internal processing functions.</span>
-<span class="sd">        </span>
-<span class="sd">        :param entry: The entry string to be matched to the alias pattern.</span>
-<span class="sd">        :type entry: str</span>
-<span class="sd">        :return: A boolean indicating success of the matching, and a list of the DataItems passed.</span>
-<span class="sd">        :rtype: tuple[bool, list[DataItem]]</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">result</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataItem</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">alias</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">patterns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="p">):</span>
-            <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;(.+)&#39;</span><span class="p">)</span>
-            <span class="n">matches</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">matches</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="p">[]</span>
-                <span class="c1"># if multiple token matching, extract first matching; else do nothing</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">):</span>
-                    <span class="n">matches</span> <span class="o">=</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="k">for</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">match</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">alias</span><span class="p">,</span> <span class="n">matches</span><span class="p">):</span>
-                    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DataItem</span><span class="p">(</span><span class="n">data_type</span><span class="p">,</span> <span class="n">match</span><span class="p">))</span>
-            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="p">[]</span>
-        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">result</span></div>
-
-
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">patterns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aliases</span><span class="p">)))</span></div>
-
-
-<div class="viewcode-block" id="Static">
-<a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.data_items.Static">[docs]</a>
-<span class="k">class</span> <span class="nc">Static</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Represents an object with a static name. Can contain data in the form of `DataItem` objects.</span>
-<span class="sd">    </span>
-<span class="sd">    Example:</span>
-<span class="sd">    </span>
-<span class="sd">    .. code-block:: python</span>
-<span class="sd">    </span>
-<span class="sd">        # instantiate a static with specific data item</span>
-<span class="sd">        Static(&#39;specific_name&#39;, DataItem(DataTypes.SOME_TYPE, &#39;some_other_specific_data&#39;))</span>
-<span class="sd">        </span>
-<span class="sd">        # instantiate a static with the name inferred as a data type</span>
-<span class="sd">        Static(&#39;specific_name_as_data&#39;, DataTypes.SOME_TYPE)</span>
-
-<span class="sd">    :param name: The value associated with the Static.</span>
-<span class="sd">    :type name: str</span>
-<span class="sd">    :param data: The data item(s) associated with the name. Alternatively, can provide a single</span>
-<span class="sd">        DataType which is inferred to be associated with `name`.</span>
-<span class="sd">    :type data: DataItem | list[DataItem] | DataType</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">DataItem</span><span class="p">],</span> <span class="n">DataItem</span><span class="p">,</span> <span class="n">DataType</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">DataItem</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataItem</span><span class="p">]</span> <span class="o">=</span> <span class="n">union</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-
-<div class="viewcode-block" id="Static.match">
-<a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.data_items.Static.match">[docs]</a>
-    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataItem</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Return status and DataItem objects (optional) if matched successfully. Used for internal</span>
-<span class="sd">        processing functions. The return values are to be consistent with internal processing by</span>
-<span class="sd">        Generics.</span>
-<span class="sd">        </span>
-<span class="sd">        :param entry: The entry string to be matched to the static pattern.</span>
-<span class="sd">        :type entry: str</span>
-<span class="sd">        :return: A boolean indicating success of the matching, and a list of the DataItems passed.</span>
-<span class="sd">        :rtype: tuple[bool, list[DataItem]]</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">matched</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">entry</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
-        <span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataItem</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="k">if</span> <span class="n">matched</span> <span class="k">else</span> <span class="p">[]</span>
-        <span class="k">return</span> <span class="n">matched</span><span class="p">,</span> <span class="n">data</span></div>
-
-
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;*-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">item</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">])</span><span class="si">}</span><span class="s1">)-*&#39;</span></div>
-
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">.alias</span> <span class="kn">import</span> <span class="n">Alias</span>
 
 <div class="viewcode-block" id="Generic">
-<a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.data_items.Generic">[docs]</a>
+<a class="viewcode-back" href="../../../dynamicdl.parsing.html#dynamicdl.parsing.generic.Generic">[docs]</a>
 <span class="k">class</span> <span class="nc">Generic</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    The `Generic` class is a basic building block for representing wildcard-optional data. It can be</span>
@@ -278,7 +152,7 @@
         <span class="o">*</span><span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataType</span><span class="p">,</span> <span class="n">Alias</span><span class="p">],</span>
         <span class="n">ignore</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="p">(</span><span class="n">DataType</span><span class="p">,</span> <span class="n">Alias</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">data</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">pattern</span><span class="p">])</span>
             <span class="n">pattern</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">):</span>
@@ -299,7 +173,7 @@
                                   <span class="k">for</span> <span class="n">ignore_pattern</span> <span class="ow">in</span> <span class="n">union</span><span class="p">(</span><span class="n">ignore</span><span class="p">)]</span>
 
 <div class="viewcode-block" id="Generic.match">
-<a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.data_items.Generic.match">[docs]</a>
+<a class="viewcode-back" href="../../../dynamicdl.parsing.html#dynamicdl.parsing.generic.Generic.match">[docs]</a>
     <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataItem</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Return a list of the tokens&#39; string values provided an entry string which follows the </span>
@@ -323,7 +197,7 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">):</span>
                 <span class="n">matches</span> <span class="o">=</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">match</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">matches</span><span class="p">):</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_type</span><span class="p">,</span> <span class="n">Alias</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_type</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
                     <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DataItem</span><span class="p">(</span><span class="n">data_type</span><span class="p">,</span> <span class="n">match</span><span class="p">))</span>
                     <span class="k">continue</span>
                 <span class="n">success</span><span class="p">,</span> <span class="n">matched</span> <span class="o">=</span> <span class="n">data_type</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">match</span><span class="p">)</span>
@@ -339,44 +213,8 @@
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">pattern</span><span class="si">}</span><span class="s1"> | </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="si">}</span><span class="s1">&#39;</span></div>
 
 
-<span class="k">class</span> <span class="nc">Namespace</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    The `Namespace` class functions as a collection of str, Static, and Generic objects which can</span>
-<span class="sd">    all be viable values in some given text.</span>
-<span class="sd">    </span>
-<span class="sd">    :param names: Arguments to be provided which are valid str/Static/Generic objects that are all</span>
-<span class="sd">        viable in the same key type.</span>
-<span class="sd">    :type names: str | Static | Generic</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">names</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Static</span><span class="p">,</span> <span class="n">Generic</span><span class="p">]):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="n">names</span>
-
-    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Return a list of the tokens&#39; string values provided an entry string which follows the </span>
-<span class="sd">        pattern.</span>
-<span class="sd">        </span>
-<span class="sd">        :param entry: The entry string to be matched to the namespace patterns.</span>
-<span class="sd">        :type entry: str</span>
-<span class="sd">        :return: A boolean indicating success of the matching, and a list of the DataItems passed.</span>
-<span class="sd">        :rtype: tuple[bool, list[DataItem]]</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">entry</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="p">[]</span>
-                <span class="k">continue</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">Static</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">entry</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">name</span><span class="o">.</span><span class="n">data</span>
-                <span class="k">continue</span>
-            <span class="n">res</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">res</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">res</span><span class="p">,</span> <span class="n">data</span>
-        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="p">[]</span>
-
 <div class="viewcode-block" id="Folder">
-<a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.data_items.Folder">[docs]</a>
+<a class="viewcode-back" href="../../../dynamicdl.parsing.html#dynamicdl.parsing.generic.Folder">[docs]</a>
 <span class="k">class</span> <span class="nc">Folder</span><span class="p">(</span><span class="n">Generic</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    A subclass of `Generic` which extends Generic pattern matching but for valid directories in the</span>
@@ -397,7 +235,7 @@
 
 
 <div class="viewcode-block" id="File">
-<a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.data_items.File">[docs]</a>
+<a class="viewcode-back" href="../../../dynamicdl.parsing.html#dynamicdl.parsing.generic.File">[docs]</a>
 <span class="k">class</span> <span class="nc">File</span><span class="p">(</span><span class="n">Generic</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    A subclass of `Generic` which extends Generic pattern matching but for valid files in the</span>
@@ -431,7 +269,7 @@
         <span class="n">disable_warnings</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">extensions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">union</span><span class="p">(</span><span class="n">extensions</span><span class="p">)))</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="p">(</span><span class="n">DataType</span><span class="p">,</span> <span class="n">Alias</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">data</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">pattern</span><span class="p">])</span>
             <span class="n">pattern</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;(.+)\.(.+)&#39;</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span>
@@ -441,7 +279,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="n">ignore</span><span class="p">)</span>
 
 <div class="viewcode-block" id="File.match">
-<a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.data_items.File.match">[docs]</a>
+<a class="viewcode-back" href="../../../dynamicdl.parsing.html#dynamicdl.parsing.generic.File.match">[docs]</a>
     <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataItem</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Return a list of the tokens&#39; string values provided an entry string which follows the </span>
@@ -462,7 +300,7 @@
 
 
 <div class="viewcode-block" id="ImageFile">
-<a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.data_items.ImageFile">[docs]</a>
+<a class="viewcode-back" href="../../../dynamicdl.parsing.html#dynamicdl.parsing.generic.ImageFile">[docs]</a>
 <span class="k">class</span> <span class="nc">ImageFile</span><span class="p">(</span><span class="n">File</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    A subclass of `File` which extends Generic pattern matching but for valid images in the</span>
@@ -508,36 +346,6 @@
             <span class="n">extensions</span><span class="o">=</span><span class="n">extensions</span><span class="p">,</span>
             <span class="n">disable_warnings</span><span class="o">=</span><span class="n">disable_warnings</span>
         <span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="ImageEntry">
-<a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.data_items.ImageEntry">[docs]</a>
-<span class="k">class</span> <span class="nc">ImageEntry</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Arbitrary image file to be used as a value in the key-value pairing of DynamicDL filestructure</span>
-<span class="sd">    formats. It is a dummy object which provides absolute file and image data during processing,</span>
-<span class="sd">    and is a marker object to recognize the presence of an image.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">pass</span>
-
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;ImageEntry&quot;</span></div>
-
-
-<div class="viewcode-block" id="SegmentationImage">
-<a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.data_items.SegmentationImage">[docs]</a>
-<span class="k">class</span> <span class="nc">SegmentationImage</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Arbitrary segmentation image file to be used as a value in the key-value pairing of DynamicDL</span>
-<span class="sd">    filestructure formats. It is a dummy object which provides absolute file and segmentation image</span>
-<span class="sd">    map data during processing, and is a marker object to recognize the presence of an image.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">pass</span>
-
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;SegmentationImage&quot;</span></div>
 
 </pre></div>
 

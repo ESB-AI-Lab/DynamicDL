@@ -1,24 +1,18 @@
 dynamicdl package
 =================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   dynamicdl.data
+   dynamicdl.parsing
+   dynamicdl.processing
+
 Submodules
 ----------
-
-dynamicdl.data module
----------------------
-
-.. automodule:: dynamicdl.data
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-dynamicdl.data\_items module
-----------------------------
-
-.. automodule:: dynamicdl.data_items
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 dynamicdl.dynamicdl module
 --------------------------
@@ -28,18 +22,10 @@ dynamicdl.dynamicdl module
    :undoc-members:
    :show-inheritance:
 
-dynamicdl.processing module
----------------------------
-
-.. automodule:: dynamicdl.processing
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-dynamicdl.tokens module
+dynamicdl.engine module
 -----------------------
 
-.. automodule:: dynamicdl.tokens
+.. automodule:: dynamicdl.engine
    :members:
    :undoc-members:
    :show-inheritance:

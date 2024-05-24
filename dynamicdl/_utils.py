@@ -1,6 +1,7 @@
 '''
 Private utility functions for DynamicData.
 '''
+import os
 import json
 from typing import Union, NoReturn
 
@@ -33,6 +34,11 @@ def get_str(data):
 def check_map(it, num):
     '''Check an iterator for num occurrences'''
     return sum(it) >= num
+
+def load_config():
+    '''Load config object'''
+    with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r', encoding='utf-8') as f:
+        return json.load(f)
 
 class MergeError(Exception):
     '''
@@ -113,6 +119,8 @@ class Warnings:
     empty_bbox = ('Bounding box is empty for image at {file}.', RuntimeError)
     no_images = ('Dataset has no image files. DynamicDL does not currently support non-image '
                  'datasets.', RuntimeError)
+    illegal_capturing_group = ('Illegal presence of a regex capturing group in the pattern. For '
+                               'reference, (.+) and (.*) are not allowed.', ValueError)
 
     @staticmethod
     def warn(name: str, **kwargs: str) -> None:

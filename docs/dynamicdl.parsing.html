@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dynamicdl.parsing package &mdash; DynamicDL 0.1.1-alpha documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e30984f2"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="dynamicdl.processing package" href="dynamicdl.processing.html" />
+    <link rel="prev" title="dynamicdl.data package" href="dynamicdl.data.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            DynamicDL
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">DynamicData Tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">DynamicDL</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="dynamicdl.html">dynamicdl package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="dynamicdl.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html">dynamicdl.data package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">dynamicdl.parsing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.processing.html">dynamicdl.processing package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.html#module-dynamicdl.dynamicdl">dynamicdl.dynamicdl module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.html#module-dynamicdl.engine">dynamicdl.engine module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.html#module-dynamicdl.transforms">dynamicdl.transforms module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.html#module-dynamicdl">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DynamicDL</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">DynamicDL</a></li>
+          <li class="breadcrumb-item"><a href="dynamicdl.html">dynamicdl package</a></li>
+      <li class="breadcrumb-item active">dynamicdl.parsing package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/dynamicdl.parsing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dynamicdl-parsing-package">
+<h1>dynamicdl.parsing package<a class="headerlink" href="#dynamicdl-parsing-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-dynamicdl.parsing.alias">
+<span id="dynamicdl-parsing-alias-module"></span><h2>dynamicdl.parsing.alias module<a class="headerlink" href="#module-dynamicdl.parsing.alias" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamicdl.parsing.alias.Alias">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.parsing.alias.</span></span><span class="sig-name descname"><span class="pre">Alias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><span class="pre">Generic</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/parsing/alias.html#Alias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.alias.Alias" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class used when a placeholder in <cite>Generic</cite> could be interpreted multiple ways. For example, if
+<cite>IMAGE_NAME</cite> also contains <cite>CLASS_NAME</cite> and <cite>IMAGE_ID</cite>, we can extract all 3 tokens out using
+<cite>Alias</cite>. Counts for a single wildcard token (<cite>{}</cite>) when supplied in <cite>Generic</cite>.</p>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">alias</span> <span class="o">=</span>  <span class="n">Alias</span><span class="p">([</span>
+    <span class="n">DataTypes</span><span class="o">.</span><span class="n">IMAGE_NAME</span><span class="p">,</span>
+    <span class="n">Generic</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">IMAGE_ID</span><span class="p">)</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+<p>Now we can use <cite>Generic(alias)</cite> as a valid generic and it will obtain all contained DataTypes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>generics</strong> (<em>list</em><em>[</em><a class="reference internal" href="#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><em>Generic</em></a><em> | </em><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><em>DataType</em></a><em>]</em>) – The list of Generic type objects which can be used for alias parsing.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – There must be at least one item in the provided Generics</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamicdl.parsing.alias.Alias.match">
+<span class="sig-name descname"><span class="pre">match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem" title="dynamicdl.data.dataitem.DataItem"><span class="pre">DataItem</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/parsing/alias.html#Alias.match"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.alias.Alias.match" title="Link to this definition"></a></dt>
+<dd><p>Return a list of DataItems if matched successfully. Used for internal processing functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entry</strong> (<em>str</em>) – The entry string to be matched to the alias pattern.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A boolean indicating success of the matching, and a list of the DataItems passed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[bool, list[<a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem" title="dynamicdl.data.dataitem.DataItem">DataItem</a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-dynamicdl.parsing.ambiguouslist">
+<span id="dynamicdl-parsing-ambiguouslist-module"></span><h2>dynamicdl.parsing.ambiguouslist module<a class="headerlink" href="#module-dynamicdl.parsing.ambiguouslist" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamicdl.parsing.ambiguouslist.AmbiguousList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.parsing.ambiguouslist.</span></span><span class="sig-name descname"><span class="pre">AmbiguousList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#dynamicdl.parsing.genericlist.GenericList" title="dynamicdl.parsing.genericlist.GenericList"><span class="pre">GenericList</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/parsing/ambiguouslist.html#AmbiguousList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.ambiguouslist.AmbiguousList" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Ambiguous List. Used to represent when an item could either be in a list, or a solo item.
+This is primarily used for XML files.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><cite>form</cite> (<cite>GenericList | list | Any</cite>): effectively wrapper for GenericList. Either provide with</dt><dd><p>GenericList instantiation values or provide a GenericList.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamicdl.parsing.ambiguouslist.AmbiguousList.expand">
+<span class="sig-name descname"><span class="pre">expand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/parsing/ambiguouslist.html#AmbiguousList.expand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.ambiguouslist.AmbiguousList.expand" title="Link to this definition"></a></dt>
+<dd><p>Expand potential list into dict of statics.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><cite>dataset</cite> (<cite>list[Any]</cite>): the dataset data, which should follow the syntax of </dt><dd><p><cite>DynamicData</cite> data.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-dynamicdl.parsing.generic">
+<span id="dynamicdl-parsing-generic-module"></span><h2>dynamicdl.parsing.generic module<a class="headerlink" href="#module-dynamicdl.parsing.generic" title="Link to this heading"></a></h2>
+<p>Generic type objects.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamicdl.parsing.generic.File">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.parsing.generic.</span></span><span class="sig-name descname"><span class="pre">File</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><span class="pre">Alias</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><span class="pre">Alias</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extensions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_warnings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/parsing/generic.html#File"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.generic.File" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code></a></p>
+<p>A subclass of <cite>Generic</cite> which extends Generic pattern matching but for valid files in the
+filesystem only. During parsing, <cite>File</cite> must be parsed as keys in the filestructure format.
+All behaviors are otherwise exactly alike. Also takes a list of valid extensions. In future
+versions, filetypes will be inferred from the corresponding value in the filestructure format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pattern</strong> (<em>str</em><em> | </em><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><em>DataType</em></a><em> | </em><a class="reference internal" href="#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><em>Alias</em></a>) – The pattern with which to match to, containing wildcards  of the <cite>{}</cite> format. It
+is assumed that the generic should be matched to the entire string. Regex expressions
+compatible with the <cite>re</cite> module are allowed except capture groups such as <cite>(.+)</cite>, which will
+throw an error. If <cite>DataType</cite> or <cite>Alias</cite> is specified, data is overriden and has no effect.</p></li>
+<li><p><strong>data</strong> (<a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><em>DataType</em></a><em> | </em><a class="reference internal" href="#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><em>Alias</em></a>) – Tokens that correspond to data types which each <cite>{}</cite> matches to.</p></li>
+<li><p><strong>ignore</strong> (<em>list</em><em>[</em><em>str</em><em>] </em><em>| </em><em>str</em>) – Values that match any item in <cite>ignore</cite> are not matched. Currently only supports
+str, in future versions will support Generic types.</p></li>
+<li><p><strong>extensions</strong> (<em>list</em><em>[</em><em>str</em><em>] </em><em>| </em><em>str</em>) – Valid extensions to match to. This will be whatever is after the <cite>.</cite>, i.e.
+<cite>txt</cite>. Files without extensions are not allowed, but can be instead parsed as a Generic.</p></li>
+<li><p><strong>disable_warnings</strong> (<em>bool</em>) – Disables the warnings that incur when <cite>pattern</cite> includes <cite>.</cite> in it.
+This may be useful when the filenames do indeed include <cite>.</cite> without it being the ext.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamicdl.parsing.generic.File.match">
+<span class="sig-name descname"><span class="pre">match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem" title="dynamicdl.data.dataitem.DataItem"><span class="pre">DataItem</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/parsing/generic.html#File.match"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.generic.File.match" title="Link to this definition"></a></dt>
+<dd><p>Return a list of the tokens’ string values provided an entry string which follows the 
+pattern.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entry</strong> (<em>str</em>) – The entry string to be matched to the generic pattern.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A boolean indicating success of the matching, and a list of the DataItems passed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[bool, list[<a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem" title="dynamicdl.data.dataitem.DataItem">DataItem</a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamicdl.parsing.generic.Folder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.parsing.generic.</span></span><span class="sig-name descname"><span class="pre">Folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><span class="pre">Alias</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><span class="pre">Alias</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/parsing/generic.html#Folder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.generic.Folder" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code></a></p>
+<p>A subclass of <cite>Generic</cite> which extends Generic pattern matching but for valid directories in the
+filesystem only. During parsing, <cite>Folder</cite> must be parsed as keys in the filestructure format.
+All behaviors are otherwise exactly alike.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pattern</strong> (<em>str</em><em> | </em><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><em>DataType</em></a><em> | </em><a class="reference internal" href="#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><em>Alias</em></a>) – The pattern with which to match to, containing wildcards  of the <cite>{}</cite> format. It
+is assumed that the generic should be matched to the entire string. Regex expressions
+compatible with the <cite>re</cite> module are allowed except capture groups such as <cite>(.+)</cite>, which will
+throw an error. If <cite>DataType</cite> or <cite>Alias</cite> is specified, data is overriden and has no effect.</p></li>
+<li><p><strong>data</strong> (<a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><em>DataType</em></a><em> | </em><a class="reference internal" href="#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><em>Alias</em></a>) – Tokens that correspond to data types which each <cite>{}</cite> matches to.</p></li>
+<li><p><strong>ignore</strong> (<em>list</em><em>[</em><em>str</em><em>] </em><em>| </em><em>str</em>) – Values that match any item in <cite>ignore</cite> are not matched. Currently only supports
+str, in future versions will support Generic types.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamicdl.parsing.generic.Generic">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.parsing.generic.</span></span><span class="sig-name descname"><span class="pre">Generic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><span class="pre">Alias</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><span class="pre">Alias</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/parsing/generic.html#Generic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.generic.Generic" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The <cite>Generic</cite> class is a basic building block for representing wildcard-optional data. It can be
+used anywhere in the DynamicDL dataset format and provides the structure needed to interpret
+data items and tokens.</p>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># example 1</span>
+<span class="n">gen</span> <span class="o">=</span> <span class="n">Generic</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">IMAGE_SET_NAME</span><span class="p">,</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">IMAGE_SET_ID</span><span class="p">)</span>
+
+<span class="n">my_data_type</span> <span class="o">=</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">GENERIC</span>
+<span class="c1"># example 2</span>
+<span class="n">Generic</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">my_data_type</span><span class="p">)</span>
+<span class="c1"># example 3</span>
+<span class="n">Generic</span><span class="p">(</span><span class="n">my_data_type</span><span class="p">)</span>
+<span class="c1"># example 4</span>
+<span class="n">my_data_type</span>
+
+<span class="c1"># example 5</span>
+<span class="n">Generic</span><span class="p">(</span>
+    <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span>
+    <span class="n">DataTypes</span><span class="o">.</span><span class="n">IMAGE_SET_NAME</span><span class="p">,</span>
+    <span class="n">DataTypes</span><span class="o">.</span><span class="n">IMAGE_SET_ID</span><span class="p">,</span>
+    <span class="n">ignore</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;invalid_line&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_invalidclasstype&#39;</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Above, we can see that example 1 allows items of <cite>“*_*”</cite> to be interpreted, where the first
+wildcard is interpreted as image set name, and the latter as image set id. The Generic class
+also accepts DataType, which is meant to encapsulate the full wildcard; in other words,
+example 2, 3, 4 are functionally the same.</p>
+<p><cite>Generic</cite> also accepts a <cite>ignore</cite> kwarg parameter which is either a string or list of strings
+containing patterns where anything which matches will be ignored, accepting regex patterns and
+also using <cite>{}</cite> as a valid wildcard. This is illustrated in example 5.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pattern</strong> (<em>str</em><em> | </em><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><em>DataType</em></a><em> | </em><a class="reference internal" href="#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><em>Alias</em></a>) – The pattern with which to match to, containing wildcards  of the <cite>{}</cite> format. It
+is assumed that the generic should be matched to the entire string. Regex expressions
+compatible with the <cite>re</cite> module are allowed except capture groups such as <cite>(.+)</cite>, which will
+throw an error. If <cite>DataType</cite> or <cite>Alias</cite> is specified, data is overriden and has no effect.</p></li>
+<li><p><strong>data</strong> (<a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><em>DataType</em></a><em> | </em><a class="reference internal" href="#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><em>Alias</em></a>) – Tokens that correspond to data types which each <cite>{}</cite> matches to.</p></li>
+<li><p><strong>ignore</strong> (<em>list</em><em>[</em><em>str</em><em>] </em><em>| </em><em>str</em>) – Values that match any item in <cite>ignore</cite> are not matched. Currently only supports
+str, in future versions will support Generic types.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>LengthMismatchError</strong> – The length of the <cite>{}</cite> wildcards must match the number of DataType
+or Alias values provided in <cite>data</cite>.</p></li>
+<li><p><strong>ValueError</strong> – (.+) and (.*) regex groups cannot be present in the pattern; use <cite>{}</cite> with
+an associated DataType instead.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamicdl.parsing.generic.Generic.match">
+<span class="sig-name descname"><span class="pre">match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem" title="dynamicdl.data.dataitem.DataItem"><span class="pre">DataItem</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/parsing/generic.html#Generic.match"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.generic.Generic.match" title="Link to this definition"></a></dt>
+<dd><p>Return a list of the tokens’ string values provided an entry string which follows the 
+pattern.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entry</strong> (<em>str</em>) – The entry string to be matched to the generic pattern.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A boolean indicating success of the matching, and a list of the DataItems passed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[bool, list[<a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem" title="dynamicdl.data.dataitem.DataItem">DataItem</a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamicdl.parsing.generic.ImageFile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.parsing.generic.</span></span><span class="sig-name descname"><span class="pre">ImageFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><span class="pre">Alias</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extensions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_warnings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/parsing/generic.html#ImageFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.generic.ImageFile" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dynamicdl.parsing.generic.File" title="dynamicdl.parsing.generic.File"><code class="xref py py-class docutils literal notranslate"><span class="pre">File</span></code></a></p>
+<p>A subclass of <cite>File</cite> which extends Generic pattern matching but for valid images in the
+filesystem only. During parsing, <cite>ImageFile</cite> must be parsed as keys in the filestructure format.
+All behaviors are otherwise exactly alike. Default image extensions are provided but can also be
+specified to restrict to a certain subset. In the future, this class may be deprecated to
+support automatic type inference.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pattern</strong> (<em>str</em><em> | </em><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><em>DataType</em></a><em> | </em><a class="reference internal" href="#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><em>Alias</em></a>) – The pattern with which to match to, containing wildcards  of the <cite>{}</cite> format. It
+is assumed that the generic should be matched to the entire string. Regex expressions
+compatible with the <cite>re</cite> module are allowed except capture groups such as <cite>(.+)</cite>, which will
+throw an error. If <cite>DataType</cite> or <cite>Alias</cite> is specified, data is overriden and has no effect.</p></li>
+<li><p><strong>data</strong> (<a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><em>DataType</em></a><em> | </em><a class="reference internal" href="#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><em>Alias</em></a>) – Tokens that correspond to data types which each <cite>{}</cite> matches to.</p></li>
+<li><p><strong>ignore</strong> (<em>list</em><em>[</em><em>str</em><em>] </em><em>| </em><em>str</em>) – Values that match any item in <cite>ignore</cite> are not matched. Currently only supports
+str, in future versions will support Generic types.</p></li>
+<li><p><strong>extensions</strong> (<em>list</em><em>[</em><em>str</em><em>] </em><em>| </em><em>str</em>) – Valid extensions to match to. This will be whatever is after the <cite>.</cite>, i.e.
+<cite>txt</cite>. Files without extensions are not allowed, but can be instead parsed as a Generic.</p></li>
+<li><p><strong>disable_warnings</strong> (<em>bool</em>) – Disables the warnings that incur when <cite>pattern</cite> includes <cite>.</cite> in it.
+This may be useful when the filenames do indeed include <cite>.</cite> without it being the ext.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-dynamicdl.parsing.genericlist">
+<span id="dynamicdl-parsing-genericlist-module"></span><h2>dynamicdl.parsing.genericlist module<a class="headerlink" href="#module-dynamicdl.parsing.genericlist" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamicdl.parsing.genericlist.GenericList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.parsing.genericlist.</span></span><span class="sig-name descname"><span class="pre">GenericList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/parsing/genericlist.html#GenericList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.genericlist.GenericList" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Generic list item. Items inside the list are expected to repeat mod <cite>len(form)</cite>.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><cite>form</cite> (<cite>list[Any] | Any</cite>): the form to stick to. Each entry in <cite>form</cite> must be some valid</dt><dd><p>form following the syntax of <cite>DynamicData</cite> forms.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamicdl.parsing.genericlist.GenericList.expand">
+<span class="sig-name descname"><span class="pre">expand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/parsing/genericlist.html#GenericList.expand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.genericlist.GenericList.expand" title="Link to this definition"></a></dt>
+<dd><p>Expand list into dict of statics.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><cite>dataset</cite> (<cite>list[Any]</cite>): the dataset data, which should follow the syntax of </dt><dd><p><cite>DynamicData</cite> data.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-dynamicdl.parsing.images">
+<span id="dynamicdl-parsing-images-module"></span><h2>dynamicdl.parsing.images module<a class="headerlink" href="#module-dynamicdl.parsing.images" title="Link to this heading"></a></h2>
+<p>Image dummy classes.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamicdl.parsing.images.ImageEntry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.parsing.images.</span></span><span class="sig-name descname"><span class="pre">ImageEntry</span></span><a class="reference internal" href="_modules/dynamicdl/parsing/images.html#ImageEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.images.ImageEntry" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Arbitrary image file to be used as a value in the key-value pairing of DynamicDL filestructure
+formats. It is a dummy object which provides absolute file and image data during processing,
+and is a marker object to recognize the presence of an image.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamicdl.parsing.images.SegmentationImage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.parsing.images.</span></span><span class="sig-name descname"><span class="pre">SegmentationImage</span></span><a class="reference internal" href="_modules/dynamicdl/parsing/images.html#SegmentationImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.images.SegmentationImage" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Arbitrary segmentation image file to be used as a value in the key-value pairing of DynamicDL
+filestructure formats. It is a dummy object which provides absolute file and segmentation image
+map data during processing, and is a marker object to recognize the presence of an image.</p>
+</dd></dl>
+
+</section>
+<section id="module-dynamicdl.parsing.namespace">
+<span id="dynamicdl-parsing-namespace-module"></span><h2>dynamicdl.parsing.namespace module<a class="headerlink" href="#module-dynamicdl.parsing.namespace" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamicdl.parsing.namespace.Namespace">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.parsing.namespace.</span></span><span class="sig-name descname"><span class="pre">Namespace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><span class="pre">Generic</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/parsing/namespace.html#Namespace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.namespace.Namespace" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The <cite>Namespace</cite> class functions as a collection of str, Static, and Generic objects which can
+all be viable values in some given text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>names</strong> (<em>str</em><em> | </em><a class="reference internal" href="#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><em>Static</em></a><em> | </em><a class="reference internal" href="#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><em>Generic</em></a>) – Arguments to be provided which are valid str/Static/Generic objects that are all
+viable in the same key type.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamicdl.parsing.namespace.Namespace.match">
+<span class="sig-name descname"><span class="pre">match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/parsing/namespace.html#Namespace.match"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.namespace.Namespace.match" title="Link to this definition"></a></dt>
+<dd><p>Return a list of the tokens’ string values provided an entry string which follows the 
+pattern.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entry</strong> (<em>str</em>) – The entry string to be matched to the namespace patterns.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A boolean indicating success of the matching, and a list of the DataItems passed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[bool, list[<a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem" title="dynamicdl.data.dataitem.DataItem">DataItem</a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-dynamicdl.parsing.pairing">
+<span id="dynamicdl-parsing-pairing-module"></span><h2>dynamicdl.parsing.pairing module<a class="headerlink" href="#module-dynamicdl.parsing.pairing" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamicdl.parsing.pairing.Pairing">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.parsing.pairing.</span></span><span class="sig-name descname"><span class="pre">Pairing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">paired</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/parsing/pairing.html#Pairing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.pairing.Pairing" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Used to specify when two nonunique datatypes should be associated together. Most commonly used
+to pair ID and name together.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><cite>form</cite> (<cite>Any</cite>): Whatever follows the DynamicData specified form as required. Pairing is a</dt><dd><p>wrapper class so let it behave as it should</p>
+</dd>
+</dl>
+</li>
+<li><p><cite>paired</cite> (<cite>DataType</cite>): Items which should be associated together.</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamicdl.parsing.pairing.Pairing.find_pairings">
+<span class="sig-name descname"><span class="pre">find_pairings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curr_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/dynamicdl/parsing/pairing.html#Pairing.find_pairings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.pairing.Pairing.find_pairings" title="Link to this definition"></a></dt>
+<dd><p>Similar to other processes’ <cite>expand</cite> function. Finds the pairing values and stores
+the data internally.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><cite>dataset</cite> (<cite>Any</cite>): the dataset data, which should follow the syntax of <cite>DynamicData</cite></dt><dd><p>data.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><cite>in_file</cite> (<cite>bool</cite>): distinguisher to check usage of either <cite>expand_generics</cite></dt><dd><p>or <cite>expand_file_generics</cite>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamicdl.parsing.pairing.Pairing.update_pairing">
+<span class="sig-name descname"><span class="pre">update_pairing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataentry.DataEntry" title="dynamicdl.data.dataentry.DataEntry"><span class="pre">DataEntry</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/dynamicdl/parsing/pairing.html#Pairing.update_pairing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.pairing.Pairing.update_pairing" title="Link to this definition"></a></dt>
+<dd><p>Update a data entry with pairing values, and does nothing if the pairing does not aplpy.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>entry</cite> (<cite>DataEntry</cite>): the entry to apply this pairing</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-dynamicdl.parsing.segmentationobject">
+<span id="dynamicdl-parsing-segmentationobject-module"></span><h2>dynamicdl.parsing.segmentationobject module<a class="headerlink" href="#module-dynamicdl.parsing.segmentationobject" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamicdl.parsing.segmentationobject.SegmentationObject">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.parsing.segmentationobject.</span></span><span class="sig-name descname"><span class="pre">SegmentationObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#dynamicdl.parsing.genericlist.GenericList" title="dynamicdl.parsing.genericlist.GenericList"><span class="pre">GenericList</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/parsing/segmentationobject.html#SegmentationObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.segmentationobject.SegmentationObject" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Object to represent a collection of polygonal coordinates for segmentation. Functionally serves
+the purpose of being a wrapper class for <cite>GenericList</cite> and should be instantiated when the only
+contents inside are <cite>DataTypes.X</cite> and <cite>DataTypes.Y</cite> items as well as non-data items.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>form</cite> (<cite>GenericList | list</cite>): either a GenericList object or a list which will create a GL.</p></li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamicdl.parsing.segmentationobject.SegmentationObject.expand">
+<span class="sig-name descname"><span class="pre">expand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/parsing/segmentationobject.html#SegmentationObject.expand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.segmentationobject.SegmentationObject.expand" title="Link to this definition"></a></dt>
+<dd><p>Evaluate object by expanding and merging, and extracting the corresponding X, Y values
+which define the SegmentationObject.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><cite>dataset</cite> (<cite>list[Any]</cite>): the dataset data, which should follow the syntax of </dt><dd><p><cite>DynamicData</cite> data.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-dynamicdl.parsing.static">
+<span id="dynamicdl-parsing-static-module"></span><h2>dynamicdl.parsing.static module<a class="headerlink" href="#module-dynamicdl.parsing.static" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamicdl.parsing.static.Static">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.parsing.static.</span></span><span class="sig-name descname"><span class="pre">Static</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem" title="dynamicdl.data.dataitem.DataItem"><span class="pre">DataItem</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem" title="dynamicdl.data.dataitem.DataItem"><span class="pre">DataItem</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/parsing/static.html#Static"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.static.Static" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Represents an object with a static name. Can contain data in the form of <cite>DataItem</cite> objects.</p>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># instantiate a static with specific data item</span>
+<span class="n">Static</span><span class="p">(</span><span class="s1">&#39;specific_name&#39;</span><span class="p">,</span> <span class="n">DataItem</span><span class="p">(</span><span class="n">DataTypes</span><span class="o">.</span><span class="n">SOME_TYPE</span><span class="p">,</span> <span class="s1">&#39;some_other_specific_data&#39;</span><span class="p">))</span>
+
+<span class="c1"># instantiate a static with the name inferred as a data type</span>
+<span class="n">Static</span><span class="p">(</span><span class="s1">&#39;specific_name_as_data&#39;</span><span class="p">,</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">SOME_TYPE</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The value associated with the Static.</p></li>
+<li><p><strong>data</strong> (<a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem" title="dynamicdl.data.dataitem.DataItem"><em>DataItem</em></a><em> | </em><em>list</em><em>[</em><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem" title="dynamicdl.data.dataitem.DataItem"><em>DataItem</em></a><em>] </em><em>| </em><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><em>DataType</em></a>) – The data item(s) associated with the name. Alternatively, can provide a single
+DataType which is inferred to be associated with <cite>name</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="dynamicdl.parsing.static.Static.match">
+<span class="sig-name descname"><span class="pre">match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem" title="dynamicdl.data.dataitem.DataItem"><span class="pre">DataItem</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/parsing/static.html#Static.match"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.static.Static.match" title="Link to this definition"></a></dt>
+<dd><p>Return status and DataItem objects (optional) if matched successfully. Used for internal
+processing functions. The return values are to be consistent with internal processing by
+Generics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entry</strong> (<em>str</em>) – The entry string to be matched to the static pattern.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A boolean indicating success of the matching, and a list of the DataItems passed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[bool, list[<a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem" title="dynamicdl.data.dataitem.DataItem">DataItem</a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-dynamicdl.parsing">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dynamicdl.parsing" title="Link to this heading"></a></h2>
+<p>Standard public imports</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dynamicdl.data.html" class="btn btn-neutral float-left" title="dynamicdl.data package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dynamicdl.processing.html" class="btn btn-neutral float-right" title="dynamicdl.processing package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Anthony Tong.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

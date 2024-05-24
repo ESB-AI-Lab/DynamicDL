@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dynamicdl.parsing.segmentationobject &mdash; DynamicDL 0.1.1-alpha documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e30984f2"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            DynamicDL
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">DynamicData Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">DynamicDL</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DynamicDL</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">dynamicdl.parsing.segmentationobject</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for dynamicdl.parsing.segmentationobject</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">load_config</span><span class="p">,</span> <span class="n">Warnings</span>
+<span class="kn">from</span> <span class="nn">..data.datatypes</span> <span class="kn">import</span> <span class="n">DataTypes</span>
+<span class="kn">from</span> <span class="nn">..data.dataitem</span> <span class="kn">import</span> <span class="n">DataItem</span>
+<span class="kn">from</span> <span class="nn">..data.dataentry</span> <span class="kn">import</span> <span class="n">DataEntry</span>
+<span class="kn">from</span> <span class="nn">.genericlist</span> <span class="kn">import</span> <span class="n">GenericList</span>
+<span class="kn">from</span> <span class="nn">.static</span> <span class="kn">import</span> <span class="n">Static</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SegmentationObject">
+<a class="viewcode-back" href="../../../dynamicdl.parsing.html#dynamicdl.parsing.segmentationobject.SegmentationObject">[docs]</a>
+<span class="k">class</span> <span class="nc">SegmentationObject</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Object to represent a collection of polygonal coordinates for segmentation. Functionally serves</span>
+<span class="sd">    the purpose of being a wrapper class for `GenericList` and should be instantiated when the only</span>
+<span class="sd">    contents inside are `DataTypes.X` and `DataTypes.Y` items as well as non-data items.</span>
+<span class="sd">    </span>
+<span class="sd">     - `form` (`GenericList | list`): either a GenericList object or a list which will create a GL.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">form</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GenericList</span><span class="p">,</span> <span class="nb">list</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">form</span> <span class="o">=</span> <span class="n">GenericList</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="n">form</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_merge</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Static</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataEntry</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Recursive process for merging data in segmentation object. Differs from main merge algorithm</span>
+<span class="sd">        because it can only process within unique values.</span>
+<span class="sd">        </span>
+<span class="sd">         - `data` (`dict[Static | int, Any] | Static`): the data to merge, from the expand call.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># base cases</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Static</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">DataEntry</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">recursive</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># get result</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">SegmentationObject</span><span class="o">.</span><span class="n">_merge</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="c1"># unique entry result</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">DataEntry</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Static</span><span class="p">):</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">DataEntry</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">DataEntry</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">data</span><span class="p">),</span> <span class="n">result</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">unique</span><span class="p">:</span>
+                    <span class="n">recursive</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">result</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">recursive</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="c1"># if inside unique loop, either can merge all together or result has multiple entries</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">DataEntry</span><span class="p">([])</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">recursive</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">DataEntry</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+<div class="viewcode-block" id="SegmentationObject.expand">
+<a class="viewcode-back" href="../../../dynamicdl.parsing.html#dynamicdl.parsing.segmentationobject.SegmentationObject.expand">[docs]</a>
+    <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">pbar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">tqdm</span><span class="p">],</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">list</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Evaluate object by expanding and merging, and extracting the corresponding X, Y values</span>
+<span class="sd">        which define the SegmentationObject.</span>
+<span class="sd">        </span>
+<span class="sd">         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of </span>
+<span class="sd">            `DynamicData` data.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;MAX_PBAR_DEPTH&#39;</span><span class="p">]:</span>
+            <span class="n">pbar</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expanding generics: </span><span class="si">{</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">item_dict</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span>
+            <span class="n">path</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">pbar</span><span class="p">,</span>
+            <span class="n">depth</span><span class="o">=</span><span class="n">depth</span>
+        <span class="p">)</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge</span><span class="p">(</span><span class="n">item_dict</span><span class="p">)</span>
+        <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;GENERIC&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span> <span class="s1">&#39;invalid_seg_object&#39;</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+            <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s1">&#39;row_mismatch&#39;</span><span class="p">,</span>
+                <span class="n">name1</span><span class="o">=</span><span class="s1">&#39;X&#39;</span><span class="p">,</span>
+                <span class="n">name2</span><span class="o">=</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span>
+                <span class="n">len1</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
+                <span class="n">len2</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">Static</span><span class="p">(</span><span class="s1">&#39;SegObject&#39;</span><span class="p">,</span> <span class="n">DataItem</span><span class="p">(</span><span class="n">DataTypes</span><span class="o">.</span><span class="n">POLYGON</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)))),</span> <span class="p">[]</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Anthony Tong.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

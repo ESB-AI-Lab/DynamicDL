@@ -47,7 +47,7 @@ import matplotlib.pyplot as plt
 from typing_extensions import Self
 
 from ._utils import next_avail_id, union, Warnings
-from .processing import populate_data
+from .engine import populate_data
 from .transforms import Transforms
 
 def _collate_classification(batch):

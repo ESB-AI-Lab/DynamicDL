@@ -21,6 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="dynamicdl.data package" href="dynamicdl.data.html" />
     <link rel="prev" title="DynamicDL" href="modules.html" /> 
 </head>
 
@@ -49,56 +50,22 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">DynamicData Tutorial</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">DynamicDL</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">dynamicdl package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html">dynamicdl.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html">dynamicdl.parsing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.processing.html">dynamicdl.processing package</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-dynamicdl.data">dynamicdl.data module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.DataEntry"><code class="docutils literal notranslate"><span class="pre">DataEntry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.DataItem"><code class="docutils literal notranslate"><span class="pre">DataItem</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.DataType"><code class="docutils literal notranslate"><span class="pre">DataType</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.DataTypes"><code class="docutils literal notranslate"><span class="pre">DataTypes</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-dynamicdl.data_items">dynamicdl.data_items module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data_items.Alias"><code class="docutils literal notranslate"><span class="pre">Alias</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data_items.File"><code class="docutils literal notranslate"><span class="pre">File</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data_items.Folder"><code class="docutils literal notranslate"><span class="pre">Folder</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data_items.Generic"><code class="docutils literal notranslate"><span class="pre">Generic</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data_items.Image"><code class="docutils literal notranslate"><span class="pre">Image</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data_items.ImageFile"><code class="docutils literal notranslate"><span class="pre">ImageFile</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data_items.SegmentationImage"><code class="docutils literal notranslate"><span class="pre">SegmentationImage</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data_items.Static"><code class="docutils literal notranslate"><span class="pre">Static</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-dynamicdl.dynamicdl">dynamicdl.dynamicdl module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicDS"><code class="docutils literal notranslate"><span class="pre">DynamicDS</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicData"><code class="docutils literal notranslate"><span class="pre">DynamicData</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-dynamicdl.processing">dynamicdl.processing module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.processing.AmbiguousList"><code class="docutils literal notranslate"><span class="pre">AmbiguousList</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.processing.GenericList"><code class="docutils literal notranslate"><span class="pre">GenericList</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.processing.JSONFile"><code class="docutils literal notranslate"><span class="pre">JSONFile</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.processing.Pairing"><code class="docutils literal notranslate"><span class="pre">Pairing</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.processing.SegmentationObject"><code class="docutils literal notranslate"><span class="pre">SegmentationObject</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.processing.TXTFile"><code class="docutils literal notranslate"><span class="pre">TXTFile</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.processing.XMLFile"><code class="docutils literal notranslate"><span class="pre">XMLFile</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.processing.YAMLFile"><code class="docutils literal notranslate"><span class="pre">YAMLFile</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-dynamicdl.tokens">dynamicdl.tokens module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.tokens.FilenameToken"><code class="docutils literal notranslate"><span class="pre">FilenameToken</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.tokens.IDToken"><code class="docutils literal notranslate"><span class="pre">IDToken</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.tokens.QuantityToken"><code class="docutils literal notranslate"><span class="pre">QuantityToken</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.tokens.RedundantIDToken"><code class="docutils literal notranslate"><span class="pre">RedundantIDToken</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.tokens.RedundantObjectToken"><code class="docutils literal notranslate"><span class="pre">RedundantObjectToken</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.tokens.RedundantQuantityToken"><code class="docutils literal notranslate"><span class="pre">RedundantQuantityToken</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.tokens.RedundantToken"><code class="docutils literal notranslate"><span class="pre">RedundantToken</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.tokens.Token"><code class="docutils literal notranslate"><span class="pre">Token</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.tokens.UniqueIDToken"><code class="docutils literal notranslate"><span class="pre">UniqueIDToken</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.tokens.UniqueToken"><code class="docutils literal notranslate"><span class="pre">UniqueToken</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.tokens.WildcardIntToken"><code class="docutils literal notranslate"><span class="pre">WildcardIntToken</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.tokens.WildcardQuantityToken"><code class="docutils literal notranslate"><span class="pre">WildcardQuantityToken</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.tokens.WildcardToken"><code class="docutils literal notranslate"><span class="pre">WildcardToken</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.tokens.WildcardWordToken"><code class="docutils literal notranslate"><span class="pre">WildcardWordToken</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-dynamicdl.engine">dynamicdl.engine module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.engine.expand_file_generics"><code class="docutils literal notranslate"><span class="pre">expand_file_generics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.engine.expand_generics"><code class="docutils literal notranslate"><span class="pre">expand_generics()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.engine.populate_data"><code class="docutils literal notranslate"><span class="pre">populate_data()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-dynamicdl.transforms">dynamicdl.transforms module</a><ul>
@@ -142,588 +109,244 @@
              
   <section id="dynamicdl-package">
 <h1>dynamicdl package<a class="headerlink" href="#dynamicdl-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dynamicdl.data.html">dynamicdl.data package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.data.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.data.html#module-dynamicdl.data.dataentry">dynamicdl.data.dataentry module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataentry.DataEntry"><code class="docutils literal notranslate"><span class="pre">DataEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataentry.DataEntry.apply_tokens"><code class="docutils literal notranslate"><span class="pre">DataEntry.apply_tokens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataentry.DataEntry.merge"><code class="docutils literal notranslate"><span class="pre">DataEntry.merge()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataentry.DataEntry.merge_inplace"><code class="docutils literal notranslate"><span class="pre">DataEntry.merge_inplace()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.data.html#module-dynamicdl.data.dataitem">dynamicdl.data.dataitem module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem"><code class="docutils literal notranslate"><span class="pre">DataItem</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem.add"><code class="docutils literal notranslate"><span class="pre">DataItem.add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem.copy"><code class="docutils literal notranslate"><span class="pre">DataItem.copy()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.data.html#module-dynamicdl.data.datatype">dynamicdl.data.datatype module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType"><code class="docutils literal notranslate"><span class="pre">DataType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType.verify_token"><code class="docutils literal notranslate"><span class="pre">DataType.verify_token()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.data.html#module-dynamicdl.data.datatypes">dynamicdl.data.datatypes module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes"><code class="docutils literal notranslate"><span class="pre">DataTypes</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.ABSOLUTE_FILE"><code class="docutils literal notranslate"><span class="pre">DataTypes.ABSOLUTE_FILE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.ABSOLUTE_FILE_SEG"><code class="docutils literal notranslate"><span class="pre">DataTypes.ABSOLUTE_FILE_SEG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.BBOX_CLASS_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.BBOX_CLASS_ID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.BBOX_CLASS_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.BBOX_CLASS_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.CLASS_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.CLASS_ID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.CLASS_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.CLASS_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.GENERIC"><code class="docutils literal notranslate"><span class="pre">DataTypes.GENERIC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.GENERIC_INT"><code class="docutils literal notranslate"><span class="pre">DataTypes.GENERIC_INT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.GENERIC_QUANTITY"><code class="docutils literal notranslate"><span class="pre">DataTypes.GENERIC_QUANTITY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.GENERIC_WORD"><code class="docutils literal notranslate"><span class="pre">DataTypes.GENERIC_WORD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.HEIGHT"><code class="docutils literal notranslate"><span class="pre">DataTypes.HEIGHT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.IMAGE_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_ID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.IMAGE_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.IMAGE_SET_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_SET_ID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.IMAGE_SET_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_SET_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.POLYGON"><code class="docutils literal notranslate"><span class="pre">DataTypes.POLYGON</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.SEG_CLASS_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.SEG_CLASS_ID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.SEG_CLASS_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.SEG_CLASS_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.WIDTH"><code class="docutils literal notranslate"><span class="pre">DataTypes.WIDTH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.X"><code class="docutils literal notranslate"><span class="pre">DataTypes.X</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.X1"><code class="docutils literal notranslate"><span class="pre">DataTypes.X1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.X2"><code class="docutils literal notranslate"><span class="pre">DataTypes.X2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.XMAX"><code class="docutils literal notranslate"><span class="pre">DataTypes.XMAX</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.XMID"><code class="docutils literal notranslate"><span class="pre">DataTypes.XMID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.XMIN"><code class="docutils literal notranslate"><span class="pre">DataTypes.XMIN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.Y"><code class="docutils literal notranslate"><span class="pre">DataTypes.Y</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.Y1"><code class="docutils literal notranslate"><span class="pre">DataTypes.Y1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.Y2"><code class="docutils literal notranslate"><span class="pre">DataTypes.Y2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.YMAX"><code class="docutils literal notranslate"><span class="pre">DataTypes.YMAX</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.YMID"><code class="docutils literal notranslate"><span class="pre">DataTypes.YMID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.YMIN"><code class="docutils literal notranslate"><span class="pre">DataTypes.YMIN</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.data.html#module-dynamicdl.data.tokens">dynamicdl.data.tokens module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.FilenameToken"><code class="docutils literal notranslate"><span class="pre">FilenameToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.FilenameToken.verify_token"><code class="docutils literal notranslate"><span class="pre">FilenameToken.verify_token()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.IDToken"><code class="docutils literal notranslate"><span class="pre">IDToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.IDToken.transform"><code class="docutils literal notranslate"><span class="pre">IDToken.transform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.IDToken.verify_token"><code class="docutils literal notranslate"><span class="pre">IDToken.verify_token()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.QuantityToken"><code class="docutils literal notranslate"><span class="pre">QuantityToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.QuantityToken.transform"><code class="docutils literal notranslate"><span class="pre">QuantityToken.transform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.QuantityToken.verify_token"><code class="docutils literal notranslate"><span class="pre">QuantityToken.verify_token()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantIDToken"><code class="docutils literal notranslate"><span class="pre">RedundantIDToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantIDToken.transform"><code class="docutils literal notranslate"><span class="pre">RedundantIDToken.transform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantIDToken.verify_token"><code class="docutils literal notranslate"><span class="pre">RedundantIDToken.verify_token()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantObjectToken"><code class="docutils literal notranslate"><span class="pre">RedundantObjectToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantObjectToken.transform"><code class="docutils literal notranslate"><span class="pre">RedundantObjectToken.transform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantObjectToken.verify_token"><code class="docutils literal notranslate"><span class="pre">RedundantObjectToken.verify_token()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantQuantityToken"><code class="docutils literal notranslate"><span class="pre">RedundantQuantityToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantQuantityToken.transform"><code class="docutils literal notranslate"><span class="pre">RedundantQuantityToken.transform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantQuantityToken.verify_token"><code class="docutils literal notranslate"><span class="pre">RedundantQuantityToken.verify_token()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantToken"><code class="docutils literal notranslate"><span class="pre">RedundantToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantToken.transform"><code class="docutils literal notranslate"><span class="pre">RedundantToken.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.Token"><code class="docutils literal notranslate"><span class="pre">Token</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.Token.transform"><code class="docutils literal notranslate"><span class="pre">Token.transform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.Token.verify_token"><code class="docutils literal notranslate"><span class="pre">Token.verify_token()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.UniqueIDToken"><code class="docutils literal notranslate"><span class="pre">UniqueIDToken</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.UniqueToken"><code class="docutils literal notranslate"><span class="pre">UniqueToken</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.WildcardIntToken"><code class="docutils literal notranslate"><span class="pre">WildcardIntToken</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.WildcardQuantityToken"><code class="docutils literal notranslate"><span class="pre">WildcardQuantityToken</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.WildcardToken"><code class="docutils literal notranslate"><span class="pre">WildcardToken</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.WildcardWordToken"><code class="docutils literal notranslate"><span class="pre">WildcardWordToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.WildcardWordToken.verify_token"><code class="docutils literal notranslate"><span class="pre">WildcardWordToken.verify_token()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.data.html#module-dynamicdl.data">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dynamicdl.parsing.html">dynamicdl.parsing package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing.alias">dynamicdl.parsing.alias module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.alias.Alias"><code class="docutils literal notranslate"><span class="pre">Alias</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.alias.Alias.match"><code class="docutils literal notranslate"><span class="pre">Alias.match()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing.ambiguouslist">dynamicdl.parsing.ambiguouslist module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.ambiguouslist.AmbiguousList"><code class="docutils literal notranslate"><span class="pre">AmbiguousList</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.ambiguouslist.AmbiguousList.expand"><code class="docutils literal notranslate"><span class="pre">AmbiguousList.expand()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing.generic">dynamicdl.parsing.generic module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.File"><code class="docutils literal notranslate"><span class="pre">File</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.File.match"><code class="docutils literal notranslate"><span class="pre">File.match()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.Folder"><code class="docutils literal notranslate"><span class="pre">Folder</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.Generic"><code class="docutils literal notranslate"><span class="pre">Generic</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.Generic.match"><code class="docutils literal notranslate"><span class="pre">Generic.match()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.ImageFile"><code class="docutils literal notranslate"><span class="pre">ImageFile</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing.genericlist">dynamicdl.parsing.genericlist module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.genericlist.GenericList"><code class="docutils literal notranslate"><span class="pre">GenericList</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.genericlist.GenericList.expand"><code class="docutils literal notranslate"><span class="pre">GenericList.expand()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing.images">dynamicdl.parsing.images module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.images.ImageEntry"><code class="docutils literal notranslate"><span class="pre">ImageEntry</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.images.SegmentationImage"><code class="docutils literal notranslate"><span class="pre">SegmentationImage</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing.namespace">dynamicdl.parsing.namespace module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.namespace.Namespace"><code class="docutils literal notranslate"><span class="pre">Namespace</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.namespace.Namespace.match"><code class="docutils literal notranslate"><span class="pre">Namespace.match()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing.pairing">dynamicdl.parsing.pairing module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.pairing.Pairing"><code class="docutils literal notranslate"><span class="pre">Pairing</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.pairing.Pairing.find_pairings"><code class="docutils literal notranslate"><span class="pre">Pairing.find_pairings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.pairing.Pairing.update_pairing"><code class="docutils literal notranslate"><span class="pre">Pairing.update_pairing()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing.segmentationobject">dynamicdl.parsing.segmentationobject module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.segmentationobject.SegmentationObject"><code class="docutils literal notranslate"><span class="pre">SegmentationObject</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.segmentationobject.SegmentationObject.expand"><code class="docutils literal notranslate"><span class="pre">SegmentationObject.expand()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing.static">dynamicdl.parsing.static module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.static.Static"><code class="docutils literal notranslate"><span class="pre">Static</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.static.Static.match"><code class="docutils literal notranslate"><span class="pre">Static.match()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dynamicdl.processing.html">dynamicdl.processing package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.processing.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.processing.html#module-dynamicdl.processing.datafile">dynamicdl.processing.datafile module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.datafile.DataFile"><code class="docutils literal notranslate"><span class="pre">DataFile</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.datafile.DataFile.parse"><code class="docutils literal notranslate"><span class="pre">DataFile.parse()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.processing.html#module-dynamicdl.processing.jsonfile">dynamicdl.processing.jsonfile module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.jsonfile.JSONFile"><code class="docutils literal notranslate"><span class="pre">JSONFile</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.jsonfile.JSONFile.parse"><code class="docutils literal notranslate"><span class="pre">JSONFile.parse()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.processing.html#module-dynamicdl.processing.txtfile">dynamicdl.processing.txtfile module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.txtfile.TXTFile"><code class="docutils literal notranslate"><span class="pre">TXTFile</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.txtfile.TXTFile.parse"><code class="docutils literal notranslate"><span class="pre">TXTFile.parse()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.processing.html#module-dynamicdl.processing.xmlfile">dynamicdl.processing.xmlfile module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.xmlfile.XMLFile"><code class="docutils literal notranslate"><span class="pre">XMLFile</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.xmlfile.XMLFile.parse"><code class="docutils literal notranslate"><span class="pre">XMLFile.parse()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.processing.html#module-dynamicdl.processing.yamlfile">dynamicdl.processing.yamlfile module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.yamlfile.YAMLFile"><code class="docutils literal notranslate"><span class="pre">YAMLFile</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.yamlfile.YAMLFile.parse"><code class="docutils literal notranslate"><span class="pre">YAMLFile.parse()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="dynamicdl.processing.html#module-dynamicdl.processing">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
-</section>
-<section id="module-dynamicdl.data">
-<span id="dynamicdl-data-module"></span><h2>dynamicdl.data module<a class="headerlink" href="#module-dynamicdl.data" title="Link to this heading"></a></h2>
-<p>Module with fundamental data classes for dataset parsing.</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.data.DataEntry">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.data.</span></span><span class="sig-name descname"><span class="pre">DataEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.data.DataItem" title="dynamicdl.data.DataItem"><span class="pre">DataItem</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data.DataItem" title="dynamicdl.data.DataItem"><span class="pre">DataItem</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/data.html#DataEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data.DataEntry" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Contains all items required for an entry in the dataset, a collection of DataItem objects. Most
-use is handled by internal merging processes, and is not to be instantiated by users.</p>
-<p>Constructor parameters:</p>
-<ul class="simple">
-<li><dl class="simple">
-<dt><cite>items</cite> (<cite>list[DataItem] | DataItem</cite>): a (list of) data items which are to be batched</dt><dd><p>together</p>
-</dd>
-</dl>
-</li>
-</ul>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.data.DataEntry.apply_tokens">
-<span class="sig-name descname"><span class="pre">apply_tokens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.data.DataItem" title="dynamicdl.data.DataItem"><span class="pre">DataItem</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data.DataItem" title="dynamicdl.data.DataItem"><span class="pre">DataItem</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/dynamicdl/data.html#DataEntry.apply_tokens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data.DataEntry.apply_tokens" title="Link to this definition"></a></dt>
-<dd><p>Apply new tokens to the item.</p>
-<ul class="simple">
-<li><dl class="simple">
-<dt><cite>items</cite> (<cite>list[DataItem] | DataItem</cite>): additional items to associate with this data</dt><dd><p>entry.</p>
-</dd>
-</dl>
-</li>
-</ul>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.data.DataEntry.merge">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="reference internal" href="_modules/dynamicdl/data.html#DataEntry.merge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data.DataEntry.merge" title="Link to this definition"></a></dt>
-<dd><p>Merge two data entries together, storing it in a new instance. For inplace operations see
-<cite>merge_inplace</cite>.</p>
-<ul class="simple">
-<li><p><cite>first</cite> (<cite>DataEntry</cite>): the first data entry to merge.</p></li>
-<li><p><cite>second</cite> (<cite>DataEntry</cite>): the second data entry to merge.</p></li>
-<li><p><cite>overlap</cite> (<cite>bool</cite>): whether to allow nonunique item overlapping. Default: True.</p></li>
-</ul>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.data.DataEntry.merge_inplace">
-<span class="sig-name descname"><span class="pre">merge_inplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/dynamicdl/data.html#DataEntry.merge_inplace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data.DataEntry.merge_inplace" title="Link to this definition"></a></dt>
-<dd><p>Merge two data entries together, storing it in this instance.</p>
-<ul class="simple">
-<li><p><cite>other</cite> (<cite>DataEntry</cite>): the other data entry to merge into this instance.</p></li>
-<li><p><cite>overlap</cite> (<cite>bool</cite>): whether to allow nonunique item overlapping. Default: True.</p></li>
-</ul>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.data.DataItem">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.data.</span></span><span class="sig-name descname"><span class="pre">DataItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#dynamicdl.data.DataType" title="dynamicdl.data.DataType"><span class="pre">DataType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/data.html#DataItem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data.DataItem" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>The <cite>DataItem</cite> class represents a value associated with a particular <cite>DataType</cite>. DataItem
-objects are regularly handled and created by internal processes, but can be used in
-instantiating <cite>Static</cite> variables with certain values.</p>
-<p>Example:
-<cite>my_static = Static(‘my_image_set_name’, DataItem(DataTypes.IMAGE_SET_NAME), ‘my_set’)</cite>
-The above example creates a static which contains the value <cite>my_set</cite> as an image set name for
-its hierarchical children to inherit.</p>
-<p>Constructor parameters:
-- <cite>delimiter</cite> (<cite>DataType</cite>): the type of the DataItem.
-- <cite>value</cite> (<cite>Any</cite>): the value associated with the DataType, must be compatible.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.data.DataItem.add">
-<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/dynamicdl/data.html#DataItem.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data.DataItem.add" title="Link to this definition"></a></dt>
-<dd><p>Add an item to current data if it is redundant. Used by internal merging processes.</p>
-<ul class="simple">
-<li><p><cite>item</cite> (<cite>Self</cite>): an item to add to itself.</p></li>
-</ul>
-<p>Throws <cite>ValueError</cite> if either <cite>self</cite> or <cite>item</cite> are not redundant.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.data.DataItem.copy">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="reference internal" href="_modules/dynamicdl/data.html#DataItem.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data.DataItem.copy" title="Link to this definition"></a></dt>
-<dd><p>Shallow copy self’s data into new instance. Used by internal merging processes.</p>
-<ul class="simple">
-<li><p><cite>first</cite> (<cite>Self</cite>): item to copy.</p></li>
-</ul>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.data.DataType">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.data.</span></span><span class="sig-name descname"><span class="pre">DataType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">desc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#dynamicdl.tokens.Token" title="dynamicdl.tokens.Token"><span class="pre">Token</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/data.html#DataType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data.DataType" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p><cite>DataType</cite> is a container class for storing relevant dataset items. As of 0.1.1-alpha, it is not
-yet supported for users to create their own <cite>DataType</cite> objects. Instead, currently usage is
-through the <cite>DataTypes</cite> module. This will change in future versions. Static objects and further
-documentation are provided in the <cite>DataTypes</cite> class.</p>
-<dl class="simple">
-<dt>Constructor parameters:</dt><dd><ul class="simple">
-<li><p><cite>desc</cite> (<cite>str</cite>): the purpose of the DataType. This should be unique for every new object.</p></li>
-<li><p><cite>token_type</cite> (<cite>Token</cite>): the token type of the DataType.</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.data.DataType.verify_token">
-<span class="sig-name descname"><span class="pre">verify_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/dynamicdl/data.html#DataType.verify_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data.DataType.verify_token" title="Link to this definition"></a></dt>
-<dd><p>Verify that a given value is valid for the datatype. Calls on internal Token
-functions for validation.</p>
-<ul class="simple">
-<li><p><cite>value</cite> (<cite>str</cite>): the value to check if it is compatible with the DataType.</p></li>
-</ul>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.data.</span></span><span class="sig-name descname"><span class="pre">DataTypes</span></span><a class="reference internal" href="_modules/dynamicdl/data.html#DataTypes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data.DataTypes" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>The <cite>DataTypes</cite> class contains static presets for <cite>DataType</cite> types. Below is a description of
-all presets currently available:</p>
-<section id="general-datatypes">
-<h3>General DataTypes<a class="headerlink" href="#general-datatypes" title="Link to this heading"></a></h3>
-<ul class="simple">
-<li><p><cite>IMAGE_SET_NAME</cite>: Represents the name of an image set. This includes any valid strings, but
-is not meant to store the ID of the image set; see <cite>IMAGE_SET_ID</cite>. Image sets are used to
-allocate specific entries to a group which can be split when dataloading. Most commonly
-image set names will be <cite>train</cite>, <cite>val</cite>, or <cite>test</cite>.</p></li>
-<li><p><cite>IMAGE_SET_ID</cite>: Represents the ID of an image set. This includes any valid integers. The named
-complement of this DataType is <cite>IMAGE_SET_NAME</cite>. See above for details.</p></li>
-<li><p><cite>ABSOLUTE_FILE</cite>: Represents the <strong>absolute</strong> filepath of an entry image only. This DataType is
-automatically generated in <cite>Image</cite> and <cite>File</cite> type objects when parsing, but can also be
-used to parse data. All valid values under <cite>ABSOLUTE_FILE</cite> must be a valid filepath on the
-user’s filesystem. <cite>RELATIVE_FILE</cite> is currently not supported, but may be in future versions.</p></li>
-<li><p><cite>ABSOLUTE_FILE_SEG</cite>: Represents the <strong>absolute</strong> filepath of an entry segmentation mask only.
-This DataType is also automatically generated in <cite>Image</cite> and <cite>File</cite> type objects when
-parsing, but can also be used to parse data. All valid values under <cite>ABSOLUTE_FILE</cite> must be
-a valid filepath on the user’s filesystem. <cite>RELATIVE_FILE_SEG</cite> is currently not supported,
-but may be in future versions.</p></li>
-<li><p><cite>IMAGE_NAME</cite>: Represents an identifier token for image entries via a string description.
-As of 0.1.1-alpha all <cite>IMAGE_NAME</cite> entries must be unique as it serves as a sole identifier
-for image entries. Accepts parsed strings. Its ID complement can be found under <cite>IMAGE_ID</cite>.</p></li>
-<li><p><cite>IMAGE_ID</cite>: The ID (parsed to int) complement for <cite>IMAGE_NAME</cite>. Behaves just like its
-complement.</p></li>
-<li><p><cite>GENERIC</cite>: A generic token with no significance that can be used as a wildcard token for
-parsing. Can represent anything, and any type.</p></li>
-<li><p><cite>GENERIC_INT</cite>: Same as <cite>GENERIC</cite>, except accepts only integer types.</p></li>
-<li><p><cite>GENERIC_QUANTITY</cite>: Same as <cite>GENERIC</cite>, except accepts only numeric types (i.e. float and int)</p></li>
-<li><p><cite>GENERIC_WORD</cite>: Same as <cite>GENERIC</cite>, except accepts only one word, i.e. no spaces allowed.</p></li>
-</ul>
-</section>
-<section id="classification-datatypes">
-<h3>Classification DataTypes<a class="headerlink" href="#classification-datatypes" title="Link to this heading"></a></h3>
-<ul class="simple">
-<li><p><cite>CLASS_NAME</cite>: Represents the classification class name of an image entry. There can only be
-one class per image entry, and accepts parsed strings. Its ID complement can be found under
-<cite>CLASS_ID</cite>.</p></li>
-<li><p><cite>CLASS_ID</cite>: The ID (parsed to int) complement for <cite>CLASS_NAME</cite>. Behaves just like its
-complement.</p></li>
-</ul>
-</section>
-<section id="detection-datatypes">
-<h3>Detection DataTypes<a class="headerlink" href="#detection-datatypes" title="Link to this heading"></a></h3>
-<ul class="simple">
-<li><p><cite>BBOX_CLASS_NAME</cite>: Represents the detection class name of an image entry. There can be
-multiple classes per image entry, and accepts parsed strings. Its ID complement can be found
-under <cite>BBOX_CLASS_ID</cite>. Each detection class must have a one-to-one correspondence to a valid
-bounding box when in the same hierarchy. When in different hierarchies it, just like other
-redundant types, will expand naturally to fit the existing length.</p></li>
-<li><p><cite>BBOX_CLASS_ID</cite>: The ID (parsed to int) complement for <cite>BBOX_CLASS_NAME</cite>. Behaves just like
-its complement.</p></li>
-<li><p><cite>XMIN</cite>: The minimum x-coordinate in the bounding box. Must be accompanied with <cite>YMIN</cite> or else
-has no effect, and must be accompanied either with <cite>XMAX</cite> or <cite>WIDTH</cite> and their y-counterparts.</p></li>
-<li><p><cite>YMIN</cite>: The minimum y-coordinate in the bounding box. Must be accompanied with <cite>XMIN</cite> or else
-has no effect, and must be accompanied either with <cite>YMAX</cite> or <cite>HEIGHT</cite> and their
-x-counterparts.</p></li>
-<li><p><cite>XMAX</cite>: The maximum x-coordinate in the bounding box. Must be accompanied with <cite>YMAX</cite> or else
-has no effect, and must be accompanied either with <cite>XMIN</cite> or <cite>WIDTH</cite> and their y-counterparts.</p></li>
-<li><p><cite>YMAX</cite>: The maximum y-coordinate in the bounding box. Must be accompanied with <cite>XMAX</cite> or else
-has no effect, and must be accompanied either with <cite>YMIN</cite> or <cite>HEIGHT</cite> and their
-x-counterparts.</p></li>
-<li><p><cite>XMID</cite>: The midpoint x-coordinate in the bounding box. Used to denote the horizontal center of
-the bounding box. Must be accompanied with <cite>YMID</cite> to define a central point.</p></li>
-<li><p><cite>YMID</cite>: The midpoint y-coordinate in the bounding box. Used to denote the vertical center of
-the bounding box. Must be accompanied with XMID to define a central point.</p></li>
-<li><p><cite>X1</cite>: A bounding box x-coordinate. Can be in any order as long as it forms a valid bounding
-box with <cite>Y1</cite>, <cite>X2</cite>, and <cite>Y2</cite>.</p></li>
-<li><p><cite>Y1</cite>: A bounding box y-coordinate. Can be in any order as long as it forms a valid bounding
-box with <cite>X1</cite>, <cite>X2</cite>, and <cite>Y2</cite>.</p></li>
-<li><p><cite>X2</cite>: A bounding box x-coordinate. Can be in any order as long as it forms a valid bounding
-box with <cite>Y1</cite>, <cite>X1</cite>, and <cite>Y2</cite>.</p></li>
-<li><p><cite>Y2</cite>: A bounding box y-coordinate. Can be in any order as long as it forms a valid bounding
-box with <cite>X1</cite>, <cite>X2</cite>, and <cite>Y1</cite>.</p></li>
-<li><p><cite>WIDTH</cite>: The width of the bounding box. Must be accompanied with <cite>HEIGHT</cite> or else has no
-effect. Can be used as an alternative to defining <cite>XMAX</cite> and <cite>XMIN</cite>.</p></li>
-<li><p><cite>HEIGHT</cite>: The height of the bounding box. Must be accompanied with <cite>WIDTH</cite> or else has no
-effect. Can be used as an alternative to defining <cite>YMAX</cite> and <cite>YMIN</cite>.</p></li>
-</ul>
-</section>
-<section id="segmentation-datatypes">
-<h3>Segmentation DataTypes<a class="headerlink" href="#segmentation-datatypes" title="Link to this heading"></a></h3>
-<ul class="simple">
-<li><p><cite>SEG_CLASS_NAME</cite>: Represents the segmentation class name of an image entry. There can be
-multiple classes per image entry, and accepts parsed strings. Its ID complement can be found
-under <cite>SEG_CLASS_ID</cite>. Each detection class must have a one-to-one correspondence to a valid
-bounding box when in the same hierarchy. When in different hierarchies it, just like other
-redundant types, will expand naturally to fit the existing length.</p></li>
-<li><p><cite>SEG_CLASS_ID</cite>: The ID (parsed to int) complement for <cite>SEG_CLASS_NAME</cite>. Behaves just like
-its complement.</p></li>
-<li><p><cite>X</cite>: A segmentation polygon x-coordinate. Used to define the vertices of a polygon for
-segmentation tasks. Each <cite>X</cite> coordinate must be paired with a corresponding <cite>Y</cite> coordinate
-to form a valid vertex.</p></li>
-<li><p><cite>Y</cite>: A segmentation polygon y-coordinate. Used to define the vertices of a polygon for
-segmentation tasks. Each <cite>Y</cite> coordinate must be paired with a corresponding <cite>X</cite> coordinate
-to form a valid vertex.</p></li>
-<li><p><cite>POLYGON</cite>: Should not be instantiated by the user as there is no way to parse it. However, it
-is automatically created upon every <cite>SegmentationObject</cite> wrapper of <cite>X</cite> and <cite>Y</cite> objects.
-This DataType is used internally for parsing.</p></li>
-</ul>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.ABSOLUTE_FILE">
-<span class="sig-name descname"><span class="pre">ABSOLUTE_FILE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ABSOLUTE_FILE&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.ABSOLUTE_FILE" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.ABSOLUTE_FILE_SEG">
-<span class="sig-name descname"><span class="pre">ABSOLUTE_FILE_SEG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ABSOLUTE_FILE_SEG&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.ABSOLUTE_FILE_SEG" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.BBOX_CLASS_ID">
-<span class="sig-name descname"><span class="pre">BBOX_CLASS_ID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;BBOX_CLASS_ID&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.BBOX_CLASS_ID" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.BBOX_CLASS_NAME">
-<span class="sig-name descname"><span class="pre">BBOX_CLASS_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;BBOX_CLASS_NAME&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.BBOX_CLASS_NAME" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.CLASS_ID">
-<span class="sig-name descname"><span class="pre">CLASS_ID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;CLASS_ID&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.CLASS_ID" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.CLASS_NAME">
-<span class="sig-name descname"><span class="pre">CLASS_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;CLASS_NAME&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.CLASS_NAME" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.GENERIC">
-<span class="sig-name descname"><span class="pre">GENERIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;GENERIC&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.GENERIC" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.GENERIC_INT">
-<span class="sig-name descname"><span class="pre">GENERIC_INT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;GENERIC_INT&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.GENERIC_INT" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.GENERIC_QUANTITY">
-<span class="sig-name descname"><span class="pre">GENERIC_QUANTITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;GENERIC_QUANTITY&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.GENERIC_QUANTITY" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.GENERIC_WORD">
-<span class="sig-name descname"><span class="pre">GENERIC_WORD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;GENERIC_WORD&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.GENERIC_WORD" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.HEIGHT">
-<span class="sig-name descname"><span class="pre">HEIGHT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;HEIGHT&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.HEIGHT" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.IMAGE_ID">
-<span class="sig-name descname"><span class="pre">IMAGE_ID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;IMAGE_ID&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.IMAGE_ID" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.IMAGE_NAME">
-<span class="sig-name descname"><span class="pre">IMAGE_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;IMAGE_NAME&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.IMAGE_NAME" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.IMAGE_SET_ID">
-<span class="sig-name descname"><span class="pre">IMAGE_SET_ID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;IMAGE_SET_ID&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.IMAGE_SET_ID" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.IMAGE_SET_NAME">
-<span class="sig-name descname"><span class="pre">IMAGE_SET_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;IMAGE_SET_NAME&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.IMAGE_SET_NAME" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.POLYGON">
-<span class="sig-name descname"><span class="pre">POLYGON</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;POLYGON&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.POLYGON" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.SEG_CLASS_ID">
-<span class="sig-name descname"><span class="pre">SEG_CLASS_ID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SEG_CLASS_ID&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.SEG_CLASS_ID" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.SEG_CLASS_NAME">
-<span class="sig-name descname"><span class="pre">SEG_CLASS_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;SEG_CLASS_NAME&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.SEG_CLASS_NAME" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.WIDTH">
-<span class="sig-name descname"><span class="pre">WIDTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;WIDTH&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.WIDTH" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.X">
-<span class="sig-name descname"><span class="pre">X</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;X&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.X" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.X1">
-<span class="sig-name descname"><span class="pre">X1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;X1&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.X1" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.X2">
-<span class="sig-name descname"><span class="pre">X2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;X2&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.X2" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.XMAX">
-<span class="sig-name descname"><span class="pre">XMAX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;XMAX&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.XMAX" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.XMID">
-<span class="sig-name descname"><span class="pre">XMID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;XMID&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.XMID" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.XMIN">
-<span class="sig-name descname"><span class="pre">XMIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;XMIN&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.XMIN" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.Y">
-<span class="sig-name descname"><span class="pre">Y</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;Y&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.Y" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.Y1">
-<span class="sig-name descname"><span class="pre">Y1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;Y1&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.Y1" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.Y2">
-<span class="sig-name descname"><span class="pre">Y2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;Y2&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.Y2" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.YMAX">
-<span class="sig-name descname"><span class="pre">YMAX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;YMAX&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.YMAX" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.YMID">
-<span class="sig-name descname"><span class="pre">YMID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;YMID&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.YMID" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.data.DataTypes.YMIN">
-<span class="sig-name descname"><span class="pre">YMIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;YMIN&gt;</span></em><a class="headerlink" href="#dynamicdl.data.DataTypes.YMIN" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</section>
-</dd></dl>
-
-</section>
-<section id="module-dynamicdl.data_items">
-<span id="dynamicdl-data-items-module"></span><h2>dynamicdl.data_items module<a class="headerlink" href="#module-dynamicdl.data_items" title="Link to this heading"></a></h2>
-<p>Module with main data items for creating dataset formats.</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.data_items.Alias">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.data_items.</span></span><span class="sig-name descname"><span class="pre">Alias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">generics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.data_items.Generic" title="dynamicdl.data_items.Generic"><span class="pre">Generic</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data.DataType" title="dynamicdl.data.DataType"><span class="pre">DataType</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/data_items.html#Alias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data_items.Alias" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class used when a placeholder in <cite>Generic</cite> could be interpreted multiple ways. For example, if
-<cite>IMAGE_NAME</cite> also contains <cite>CLASS_NAME</cite> and <cite>IMAGE_ID</cite>, we can extract all 3 tokens out using
-<cite>Alias</cite>. Counts for a single wildcard token (<cite>{}</cite>) when supplied in <cite>Generic</cite>.</p>
-<p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">alias</span> <span class="o">=</span>  <span class="n">Alias</span><span class="p">([</span>
-    <span class="n">DataTypes</span><span class="o">.</span><span class="n">IMAGE_NAME</span><span class="p">,</span>
-    <span class="n">Generic</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">CLASS_NAME</span><span class="p">,</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">IMAGE_ID</span><span class="p">)</span>
-<span class="p">])</span>
-</pre></div>
-</div>
-<p>Now we can use <cite>Generic(alias)</cite> as a valid generic and it will obtain all contained DataTypes.</p>
-<dl class="simple">
-<dt>Constructor parameters:</dt><dd><ul class="simple">
-<li><dl class="simple">
-<dt><cite>generics</cite> (<cite>list[Generic | DataType]</cite>): the list of Generic type objects which can be used</dt><dd><p>for alias parsing.</p>
-</dd>
-</dl>
-</li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.data_items.Alias.match">
-<span class="sig-name descname"><span class="pre">match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.data.DataItem" title="dynamicdl.data.DataItem"><span class="pre">DataItem</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/data_items.html#Alias.match"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data_items.Alias.match" title="Link to this definition"></a></dt>
-<dd><p>Return a list of DataItems if matched successfully. Used for internal processing functions.</p>
-<ul class="simple">
-<li><p><cite>entry</cite> (<cite>str</cite>): the entry to be matched with for the alias.</p></li>
-</ul>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.data_items.File">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.data_items.</span></span><span class="sig-name descname"><span class="pre">File</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data.DataType" title="dynamicdl.data.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data_items.Alias" title="dynamicdl.data_items.Alias"><span class="pre">Alias</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#dynamicdl.data.DataType" title="dynamicdl.data.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data_items.Alias" title="dynamicdl.data_items.Alias"><span class="pre">Alias</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extensions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_warnings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/data_items.html#File"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data_items.File" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#dynamicdl.data_items.Generic" title="dynamicdl.data_items.Generic"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code></a></p>
-<p>Generic for files only.</p>
-<blockquote>
-<div><ul class="simple">
-<li><dl class="simple">
-<dt><cite>pattern</cite> (<cite>str | DataType | Alias</cite>): the pattern with which to match to, containing</dt><dd><p>wildcards of the <cite>{}</cite> format. It is assumed that the generic should be matched to the entire
-string. Regex expressions compatible with the <cite>re</cite> module are allowed except capture groups
-such as <cite>(.+)</cite>, which will throw an error.</p>
-</dd>
-</dl>
-</li>
-<li><p><cite>data</cite> (<cite>DataType | Alias</cite>): tokens that correspond to data types which each <cite>{}</cite> matches to.</p></li>
-<li><dl class="simple">
-<dt><cite>ignore</cite> (<cite>list[str] | str</cite>): values that begin with any item in <cite>ignore</cite> are not matched.</dt><dd><p>For filenames, this should not include the file extension.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>extensions</cite> (<cite>list[str] | str</cite>): valid extensions to match to. This will be whatever is</dt><dd><p>after the <cite>.</cite>, i.e. <cite>txt</cite>. Files without extensions are not allowed, but can be used as a
-Generic.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>disable_warnings</cite> (<cite>bool</cite>): disables the warnings that incur when <cite>pattern</cite> includes <cite>.</cite> in</dt><dd><p>it. This may be useful when the filenames do indeed include <cite>.</cite> without it being the ext.</p>
-</dd>
-</dl>
-</li>
-</ul>
-</div></blockquote>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.data_items.File.match">
-<span class="sig-name descname"><span class="pre">match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.data.DataItem" title="dynamicdl.data.DataItem"><span class="pre">DataItem</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/data_items.html#File.match"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data_items.File.match" title="Link to this definition"></a></dt>
-<dd><p>Return a list of the tokens’ string values provided an entry string which follows the 
-pattern.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>entry</cite> (<cite>str</cite>): the string to match to the pattern, assuming it does match</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.data_items.Folder">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.data_items.</span></span><span class="sig-name descname"><span class="pre">Folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data.DataType" title="dynamicdl.data.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data_items.Alias" title="dynamicdl.data_items.Alias"><span class="pre">Alias</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#dynamicdl.data.DataType" title="dynamicdl.data.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data_items.Alias" title="dynamicdl.data_items.Alias"><span class="pre">Alias</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/data_items.html#Folder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data_items.Folder" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#dynamicdl.data_items.Generic" title="dynamicdl.data_items.Generic"><code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code></a></p>
-<p>Generic for directories only.</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.data_items.Generic">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.data_items.</span></span><span class="sig-name descname"><span class="pre">Generic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data.DataType" title="dynamicdl.data.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data_items.Alias" title="dynamicdl.data_items.Alias"><span class="pre">Alias</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#dynamicdl.data.DataType" title="dynamicdl.data.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data_items.Alias" title="dynamicdl.data_items.Alias"><span class="pre">Alias</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/data_items.html#Generic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data_items.Generic" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>The <cite>Generic</cite> class is a basic building block for representing wildcard-optional data. It can be
-used anywhere in the DynamicDL dataset format and provides the structure needed to interpret
-data items and tokens.</p>
-<p>Example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># example 1</span>
-<span class="n">gen</span> <span class="o">=</span> <span class="n">Generic</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">IMAGE_SET_NAME</span><span class="p">,</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">IMAGE_SET_ID</span><span class="p">)</span>
-
-<span class="n">my_data_type</span> <span class="o">=</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">GENERIC</span>
-<span class="c1"># example 2</span>
-<span class="n">Generic</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">my_data_type</span><span class="p">)</span>
-<span class="c1"># example 3</span>
-<span class="n">Generic</span><span class="p">(</span><span class="n">my_data_type</span><span class="p">)</span>
-<span class="c1"># example 4</span>
-<span class="n">my_data_type</span>
-
-<span class="c1"># example 5</span>
-<span class="n">Generic</span><span class="p">(</span>
-    <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span>
-    <span class="n">DataTypes</span><span class="o">.</span><span class="n">IMAGE_SET_NAME</span><span class="p">,</span>
-    <span class="n">DataTypes</span><span class="o">.</span><span class="n">IMAGE_SET_ID</span><span class="p">,</span>
-    <span class="n">ignore</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s1">&#39;invalid_line&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_invalidclasstype&#39;</span>
-    <span class="p">]</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<p>Above, we can see that example 1 allows items of <cite>“*_*”</cite> to be interpreted, where the first
-wildcard is interpreted as image set name, and the latter as image set id. The Generic class
-also accepts DataType, which is meant to encapsulate the full wildcard; in other words,
-example 2, 3, 4 are functionally the same.</p>
-<p><cite>Generic</cite> also accepts a <cite>ignore</cite> kwarg parameter which is either a string or list of strings
-containing patterns where anything which matches will be ignored, accepting regex patterns and
-also using <cite>{}</cite> as a valid wildcard. This is illustrated in example 5.</p>
-<p><strong>Constructor parameters:</strong></p>
-<ul class="simple">
-<li><p><cite>pattern</cite> (<cite>str | DataType | Alias</cite>): the pattern with which to match to, containing wildcards
-of the <cite>{}</cite> format. It is assumed that the generic should be matched to the entire string.
-Regex expressions compatible with the <cite>re</cite> module are allowed except capture groups such as
-<cite>(.+)</cite>, which will throw an error.</p></li>
-<li><p><cite>data</cite> (<cite>DataType | Alias</cite>): tokens that correspond to data types which each <cite>{}</cite> matches to.</p></li>
-<li><p><cite>ignore</cite> (<cite>list[str] | str</cite>): values that begin with any item in <cite>ignore</cite> are not matched.</p></li>
-</ul>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.data_items.Generic.match">
-<span class="sig-name descname"><span class="pre">match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.data.DataItem" title="dynamicdl.data.DataItem"><span class="pre">DataItem</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/data_items.html#Generic.match"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data_items.Generic.match" title="Link to this definition"></a></dt>
-<dd><p>Return a list of the tokens’ string values provided an entry string which follows the 
-pattern.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>entry</cite> (<cite>str</cite>): the string to match to the pattern, assuming it does match</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.data_items.Image">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.data_items.</span></span><span class="sig-name descname"><span class="pre">Image</span></span><a class="reference internal" href="_modules/dynamicdl/data_items.html#Image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data_items.Image" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Generic image, used as a value in the dict to represent Image objects.</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.data_items.ImageFile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.data_items.</span></span><span class="sig-name descname"><span class="pre">ImageFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#dynamicdl.data.DataType" title="dynamicdl.data.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data_items.Alias" title="dynamicdl.data_items.Alias"><span class="pre">Alias</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extensions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/data_items.html#ImageFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data_items.ImageFile" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#dynamicdl.data_items.File" title="dynamicdl.data_items.File"><code class="xref py py-class docutils literal notranslate"><span class="pre">File</span></code></a></p>
-<p>Generic with special matching for images. Uses a sublist of valid image extensions which are
-supported by the <cite>PIL.Image</cite> library.</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.data_items.SegmentationImage">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.data_items.</span></span><span class="sig-name descname"><span class="pre">SegmentationImage</span></span><a class="reference internal" href="_modules/dynamicdl/data_items.html#SegmentationImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data_items.SegmentationImage" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Segmentation mask image. The image should contain pixels which refer to a mask for segmentation.</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.data_items.Static">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.data_items.</span></span><span class="sig-name descname"><span class="pre">Static</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.data.DataItem" title="dynamicdl.data.DataItem"><span class="pre">DataItem</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data.DataItem" title="dynamicdl.data.DataItem"><span class="pre">DataItem</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/data_items.html#Static"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data_items.Static" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Represents an object with a static name. Can contain data in the form of <cite>DataItem</cite> objects.</p>
-<dl class="simple">
-<dt>Constructor parameters:</dt><dd><ul class="simple">
-<li><p><cite>name</cite> (<cite>str</cite>): the value associated with the Static.</p></li>
-<li><p><cite>data</cite> (<cite>DataItem | list[DataItem]</cite>): the data item(s) associated with the name.</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.data_items.Static.match">
-<span class="sig-name descname"><span class="pre">match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.data.DataItem" title="dynamicdl.data.DataItem"><span class="pre">DataItem</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/data_items.html#Static.match"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data_items.Static.match" title="Link to this definition"></a></dt>
-<dd><p>Return status and DataItem objects (optional) if matched successfully. Used for internal
-processing functions.</p>
-<ul class="simple">
-<li><p><cite>entry</cite> (<cite>str</cite>): the entry to be matched with for the static.</p></li>
-</ul>
-</dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="module-dynamicdl.dynamicdl">
 <span id="dynamicdl-dynamicdl-module"></span><h2>dynamicdl.dynamicdl module<a class="headerlink" href="#module-dynamicdl.dynamicdl" title="Link to this heading"></a></h2>
@@ -1158,521 +781,43 @@ set. Default: False.</p>
 </dd></dl>
 
 </section>
-<section id="module-dynamicdl.processing">
-<span id="dynamicdl-processing-module"></span><h2>dynamicdl.processing module<a class="headerlink" href="#module-dynamicdl.processing" title="Link to this heading"></a></h2>
-<p>Module <cite>processing</cite></p>
-<p>Module with all processing-related data items and algorithms for expand and merge.</p>
-<dl class="simple">
-<dt>File processing classes:</dt><dd><ul class="simple">
-<li><p><cite>DataFile</cite> (abstract base class)
-- <cite>JSONFile</cite> (json parser)
-- <cite>TXTFile</cite> (txt parser)
-- <cite>XMLFile</cite> (xml parser)
-- <cite>YAMLFile</cite> (yaml parser, untested)</p></li>
+<section id="module-dynamicdl.engine">
+<span id="dynamicdl-engine-module"></span><h2>dynamicdl.engine module<a class="headerlink" href="#module-dynamicdl.engine" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dynamicdl.engine.expand_file_generics">
+<span class="sig-prename descclassname"><span class="pre">dynamicdl.engine.</span></span><span class="sig-name descname"><span class="pre">expand_file_generics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curr_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><span class="pre">Generic</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/dynamicdl/engine.html#expand_file_generics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.engine.expand_file_generics" title="Link to this definition"></a></dt>
+<dd><p>Variant of the expand_generics function above. Also contains path tracking.’</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>path</cite> (<cite>str</cite>): the absolute filepath up to the root/dataset provided</p></li>
+<li><p><cite>dataset</cite> (<cite>Any</cite>): the dataset true values, in nested blocks containing values</p></li>
+<li><p><cite>root</cite> (<cite>Any</cite>): the format of the dataset, in accordance with valid DynamicData syntax</p></li>
 </ul>
-</dd>
-<dt>Other classes:</dt><dd><ul class="simple">
-<li><p><cite>GenericList</cite></p></li>
-<li><p><cite>SegmentationObject</cite></p></li>
-<li><p><cite>AmbiguousList</cite></p></li>
-<li><p><cite>Pairing</cite></p></li>
-</ul>
-</dd>
-<dt>Methods (pseudo-private):</dt><dd><ul class="simple">
-<li><p><cite>_get_files</cite> (recursive filestructure getter)</p></li>
-<li><p><cite>_add_to_hashmap</cite> (helper for <cite>_merge_lists</cite>)</p></li>
-<li><p><cite>_merge_lists</cite> (list merge handler algorithm)</p></li>
-<li><p><cite>_merge</cite> (high level merge handler after expanding generics)</p></li>
-<li><p><cite>expand_generics</cite> (expand generics inside annotation files)</p></li>
-<li><p><cite>expand_file_generics</cite> (expand generics in directory filestructure)</p></li>
-<li><p><cite>populate_data</cite> (main algorithm)</p></li>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dynamicdl.engine.expand_generics">
+<span class="sig-prename descclassname"><span class="pre">dynamicdl.engine.</span></span><span class="sig-name descname"><span class="pre">expand_generics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a></span></span><a class="reference internal" href="_modules/dynamicdl/engine.html#expand_generics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.engine.expand_generics" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Expand all generics and replace with statics, inplace.</dt><dd><ul class="simple">
+<li><p><cite>dataset</cite> (<cite>Any</cite>): the dataset true values, in nested blocks containing values</p></li>
+<li><p><cite>root</cite> (<cite>Any</cite>): the format of the dataset, in accordance with valid DynamicData syntax</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.processing.AmbiguousList">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.</span></span><span class="sig-name descname"><span class="pre">AmbiguousList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#dynamicdl.processing.GenericList" title="dynamicdl.processing.GenericList"><span class="pre">GenericList</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing.html#AmbiguousList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.AmbiguousList" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Ambiguous List. Used to represent when an item could either be in a list, or a solo item.
-This is primarily used for XML files.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dynamicdl.engine.populate_data">
+<span class="sig-prename descclassname"><span class="pre">dynamicdl.engine.</span></span><span class="sig-name descname"><span class="pre">populate_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataentry.DataEntry" title="dynamicdl.data.dataentry.DataEntry"><span class="pre">DataEntry</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/engine.html#populate_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.engine.populate_data" title="Link to this definition"></a></dt>
+<dd><p>Parent process for parsing algorithm.</p>
 <blockquote>
 <div><ul class="simple">
-<li><dl class="simple">
-<dt><cite>form</cite> (<cite>GenericList | list | Any</cite>): effectively wrapper for GenericList. Either provide with</dt><dd><p>GenericList instantiation values or provide a GenericList.</p>
-</dd>
-</dl>
-</li>
+<li><p><cite>root</cite> (<cite>str</cite>): the file path of the root of the data</p></li>
+<li><p><cite>form</cite> (<cite>dict</cite>): the form of the data, in accordance with DynamicData syntax.</p></li>
 </ul>
 </div></blockquote>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.processing.AmbiguousList.expand">
-<span class="sig-name descname"><span class="pre">expand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.data_items.Static" title="dynamicdl.data_items.Static"><span class="pre">Static</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/processing.html#AmbiguousList.expand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.AmbiguousList.expand" title="Link to this definition"></a></dt>
-<dd><p>Expand potential list into dict of statics.</p>
-<blockquote>
-<div><ul class="simple">
-<li><dl class="simple">
-<dt><cite>dataset</cite> (<cite>list[Any]</cite>): the dataset data, which should follow the syntax of </dt><dd><p><cite>DynamicData</cite> data.</p>
-</dd>
-</dl>
-</li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.processing.GenericList">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.</span></span><span class="sig-name descname"><span class="pre">GenericList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing.html#GenericList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.GenericList" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Generic list item. Items inside the list are expected to repeat mod <cite>len(form)</cite>.</p>
-<blockquote>
-<div><ul class="simple">
-<li><dl class="simple">
-<dt><cite>form</cite> (<cite>list[Any] | Any</cite>): the form to stick to. Each entry in <cite>form</cite> must be some valid</dt><dd><p>form following the syntax of <cite>DynamicData</cite> forms.</p>
-</dd>
-</dl>
-</li>
-</ul>
-</div></blockquote>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.processing.GenericList.expand">
-<span class="sig-name descname"><span class="pre">expand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.data_items.Static" title="dynamicdl.data_items.Static"><span class="pre">Static</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/processing.html#GenericList.expand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.GenericList.expand" title="Link to this definition"></a></dt>
-<dd><p>Expand list into dict of statics.</p>
-<blockquote>
-<div><ul class="simple">
-<li><dl class="simple">
-<dt><cite>dataset</cite> (<cite>list[Any]</cite>): the dataset data, which should follow the syntax of </dt><dd><p><cite>DynamicData</cite> data.</p>
-</dd>
-</dl>
-</li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.processing.JSONFile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.</span></span><span class="sig-name descname"><span class="pre">JSONFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.data_items.Static" title="dynamicdl.data_items.Static"><span class="pre">Static</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data_items.Generic" title="dynamicdl.data_items.Generic"><span class="pre">Generic</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing.html#JSONFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.JSONFile" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFile</span></code></p>
-<p>Utility functions for parsing json files.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.processing.JSONFile.parse">
-<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curr_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/dynamicdl/processing.html#JSONFile.parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.JSONFile.parse" title="Link to this definition"></a></dt>
-<dd><p>Parses a file.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>path</cite> (<cite>str</cite>): the path to the file.</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.processing.Pairing">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.</span></span><span class="sig-name descname"><span class="pre">Pairing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">paired</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#dynamicdl.data.DataType" title="dynamicdl.data.DataType"><span class="pre">DataType</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing.html#Pairing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.Pairing" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Used to specify when two nonunique datatypes should be associated together. Most commonly used
-to pair ID and name together.</p>
-<ul class="simple">
-<li><dl class="simple">
-<dt><cite>form</cite> (<cite>Any</cite>): Whatever follows the DynamicData specified form as required. Pairing is a</dt><dd><p>wrapper class so let it behave as it should</p>
-</dd>
-</dl>
-</li>
-<li><p><cite>paired</cite> (<cite>DataType</cite>): Items which should be associated together.</p></li>
-</ul>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.processing.Pairing.find_pairings">
-<span class="sig-name descname"><span class="pre">find_pairings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curr_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/dynamicdl/processing.html#Pairing.find_pairings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.Pairing.find_pairings" title="Link to this definition"></a></dt>
-<dd><p>Similar to other processes’ <cite>expand</cite> function. Finds the pairing values and stores
-the data internally.</p>
-<blockquote>
-<div><ul class="simple">
-<li><dl class="simple">
-<dt><cite>dataset</cite> (<cite>Any</cite>): the dataset data, which should follow the syntax of <cite>DynamicData</cite></dt><dd><p>data.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>in_file</cite> (<cite>bool</cite>): distinguisher to check usage of either <cite>expand_generics</cite></dt><dd><p>or <cite>expand_file_generics</cite>.</p>
-</dd>
-</dl>
-</li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.processing.Pairing.update_pairing">
-<span class="sig-name descname"><span class="pre">update_pairing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#dynamicdl.data.DataEntry" title="dynamicdl.data.DataEntry"><span class="pre">DataEntry</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/dynamicdl/processing.html#Pairing.update_pairing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.Pairing.update_pairing" title="Link to this definition"></a></dt>
-<dd><p>Update a data entry with pairing values, and does nothing if the pairing does not aplpy.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>entry</cite> (<cite>DataEntry</cite>): the entry to apply this pairing</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.processing.SegmentationObject">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.</span></span><span class="sig-name descname"><span class="pre">SegmentationObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#dynamicdl.processing.GenericList" title="dynamicdl.processing.GenericList"><span class="pre">GenericList</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing.html#SegmentationObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.SegmentationObject" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Object to represent a collection of polygonal coordinates for segmentation. Functionally serves
-the purpose of being a wrapper class for <cite>GenericList</cite> and should be instantiated when the only
-contents inside are <cite>DataTypes.X</cite> and <cite>DataTypes.Y</cite> items as well as non-data items.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>form</cite> (<cite>GenericList | list</cite>): either a GenericList object or a list which will create a GL.</p></li>
-</ul>
-</div></blockquote>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.processing.SegmentationObject.expand">
-<span class="sig-name descname"><span class="pre">expand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.data_items.Static" title="dynamicdl.data_items.Static"><span class="pre">Static</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/processing.html#SegmentationObject.expand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.SegmentationObject.expand" title="Link to this definition"></a></dt>
-<dd><p>Evaluate object by expanding and merging, and extracting the corresponding X, Y values
-which define the SegmentationObject.</p>
-<blockquote>
-<div><ul class="simple">
-<li><dl class="simple">
-<dt><cite>dataset</cite> (<cite>list[Any]</cite>): the dataset data, which should follow the syntax of </dt><dd><p><cite>DynamicData</cite> data.</p>
-</dd>
-</dl>
-</li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.processing.TXTFile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.</span></span><span class="sig-name descname"><span class="pre">TXTFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.data_items.Generic" title="dynamicdl.data_items.Generic"><span class="pre">Generic</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data_items.Generic" title="dynamicdl.data_items.Generic"><span class="pre">Generic</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing.html#TXTFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.TXTFile" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFile</span></code></p>
-<p>Utility functions for parsing txt files.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.processing.TXTFile.parse">
-<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curr_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/dynamicdl/processing.html#TXTFile.parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.TXTFile.parse" title="Link to this definition"></a></dt>
-<dd><p>Parses a file.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>path</cite> (<cite>str</cite>): the path to the file.</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.processing.XMLFile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.</span></span><span class="sig-name descname"><span class="pre">XMLFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.data_items.Static" title="dynamicdl.data_items.Static"><span class="pre">Static</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data_items.Generic" title="dynamicdl.data_items.Generic"><span class="pre">Generic</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing.html#XMLFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.XMLFile" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFile</span></code></p>
-<p>Utility functions for parsing xml files.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.processing.XMLFile.parse">
-<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curr_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/dynamicdl/processing.html#XMLFile.parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.XMLFile.parse" title="Link to this definition"></a></dt>
-<dd><p>Parses a file.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>path</cite> (<cite>str</cite>): the path to the file.</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.processing.YAMLFile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.</span></span><span class="sig-name descname"><span class="pre">YAMLFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.data_items.Static" title="dynamicdl.data_items.Static"><span class="pre">Static</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data_items.Generic" title="dynamicdl.data_items.Generic"><span class="pre">Generic</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing.html#YAMLFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.YAMLFile" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFile</span></code></p>
-<p>Utility functions for parsing yaml files.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.processing.YAMLFile.parse">
-<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curr_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/dynamicdl/processing.html#YAMLFile.parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.YAMLFile.parse" title="Link to this definition"></a></dt>
-<dd><p>Parses a file.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>path</cite> (<cite>str</cite>): the path to the file.</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-dynamicdl.tokens">
-<span id="dynamicdl-tokens-module"></span><h2>dynamicdl.tokens module<a class="headerlink" href="#module-dynamicdl.tokens" title="Link to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.tokens.FilenameToken">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.tokens.</span></span><span class="sig-name descname"><span class="pre">FilenameToken</span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#FilenameToken"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.FilenameToken" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#dynamicdl.tokens.UniqueToken" title="dynamicdl.tokens.UniqueToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">UniqueToken</span></code></a></p>
-<p>The FilenameToken class is a Token which checks for valid absolute filenames.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.tokens.FilenameToken.verify_token">
-<span class="sig-name descname"><span class="pre">verify_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#FilenameToken.verify_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.FilenameToken.verify_token" title="Link to this definition"></a></dt>
-<dd><p>Checks whether the token is in valid format in accordance with the identifier.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>token</cite>: the token to check</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.tokens.IDToken">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.tokens.</span></span><span class="sig-name descname"><span class="pre">IDToken</span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#IDToken"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.IDToken" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#dynamicdl.tokens.Token" title="dynamicdl.tokens.Token"><code class="xref py py-class docutils literal notranslate"><span class="pre">Token</span></code></a></p>
-<p>Represents an ID. Items must be integers.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.tokens.IDToken.transform">
-<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#IDToken.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.IDToken.transform" title="Link to this definition"></a></dt>
-<dd><p>Transform the token from a string value to token type.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>token</cite>: the token to transform</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.tokens.IDToken.verify_token">
-<span class="sig-name descname"><span class="pre">verify_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#IDToken.verify_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.IDToken.verify_token" title="Link to this definition"></a></dt>
-<dd><p>Checks whether the token is in valid format in accordance with the identifier.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>token</cite>: the token to check</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.tokens.QuantityToken">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.tokens.</span></span><span class="sig-name descname"><span class="pre">QuantityToken</span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#QuantityToken"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.QuantityToken" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#dynamicdl.tokens.Token" title="dynamicdl.tokens.Token"><code class="xref py py-class docutils literal notranslate"><span class="pre">Token</span></code></a></p>
-<p>Represents a numeric quantity. Can be int or float.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.tokens.QuantityToken.transform">
-<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#QuantityToken.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.QuantityToken.transform" title="Link to this definition"></a></dt>
-<dd><p>Transform the token from a string value to token type.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>token</cite>: the token to transform</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.tokens.QuantityToken.verify_token">
-<span class="sig-name descname"><span class="pre">verify_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#QuantityToken.verify_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.QuantityToken.verify_token" title="Link to this definition"></a></dt>
-<dd><p>Checks whether the token is in valid format in accordance with the identifier.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>token</cite>: the token to check</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.tokens.RedundantIDToken">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.tokens.</span></span><span class="sig-name descname"><span class="pre">RedundantIDToken</span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#RedundantIDToken"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.RedundantIDToken" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#dynamicdl.tokens.IDToken" title="dynamicdl.tokens.IDToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">IDToken</span></code></a>, <a class="reference internal" href="#dynamicdl.tokens.RedundantToken" title="dynamicdl.tokens.RedundantToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">RedundantToken</span></code></a></p>
-<p>Represents a redundant ID.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.tokens.RedundantIDToken.transform">
-<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#RedundantIDToken.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.RedundantIDToken.transform" title="Link to this definition"></a></dt>
-<dd><p>Transform the token from a string value to token type.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>token</cite>: the token to transform</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.tokens.RedundantIDToken.verify_token">
-<span class="sig-name descname"><span class="pre">verify_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#RedundantIDToken.verify_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.RedundantIDToken.verify_token" title="Link to this definition"></a></dt>
-<dd><p>Checks whether the token is in valid format in accordance with the identifier.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>token</cite>: the token to check</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.tokens.RedundantObjectToken">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.tokens.</span></span><span class="sig-name descname"><span class="pre">RedundantObjectToken</span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#RedundantObjectToken"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.RedundantObjectToken" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#dynamicdl.tokens.RedundantToken" title="dynamicdl.tokens.RedundantToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">RedundantToken</span></code></a></p>
-<p>Represents a segmentation object.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.tokens.RedundantObjectToken.transform">
-<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#RedundantObjectToken.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.RedundantObjectToken.transform" title="Link to this definition"></a></dt>
-<dd><p>Transform the token from a string value to token type.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>token</cite>: the token to transform</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.tokens.RedundantObjectToken.verify_token">
-<span class="sig-name descname"><span class="pre">verify_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#RedundantObjectToken.verify_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.RedundantObjectToken.verify_token" title="Link to this definition"></a></dt>
-<dd><p>Checks whether the token is in valid format in accordance with the identifier.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>token</cite>: the token to check</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.tokens.RedundantQuantityToken">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.tokens.</span></span><span class="sig-name descname"><span class="pre">RedundantQuantityToken</span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#RedundantQuantityToken"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.RedundantQuantityToken" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#dynamicdl.tokens.QuantityToken" title="dynamicdl.tokens.QuantityToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">QuantityToken</span></code></a>, <a class="reference internal" href="#dynamicdl.tokens.RedundantToken" title="dynamicdl.tokens.RedundantToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">RedundantToken</span></code></a></p>
-<p>Represents a redundant numeric quantity.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.tokens.RedundantQuantityToken.transform">
-<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#RedundantQuantityToken.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.RedundantQuantityToken.transform" title="Link to this definition"></a></dt>
-<dd><p>Transform the token from a string value to token type.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>token</cite>: the token to transform</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.tokens.RedundantQuantityToken.verify_token">
-<span class="sig-name descname"><span class="pre">verify_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#RedundantQuantityToken.verify_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.RedundantQuantityToken.verify_token" title="Link to this definition"></a></dt>
-<dd><p>Checks whether the token is in valid format in accordance with the identifier.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>token</cite>: the token to check</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.tokens.RedundantToken">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.tokens.</span></span><span class="sig-name descname"><span class="pre">RedundantToken</span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#RedundantToken"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.RedundantToken" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#dynamicdl.tokens.Token" title="dynamicdl.tokens.Token"><code class="xref py py-class docutils literal notranslate"><span class="pre">Token</span></code></a></p>
-<p>RedundantToken items are used for when a data item stores multiple values of itself per image
-or unique item. Cases like these include multiple bounding boxes or segmentation objects.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.tokens.RedundantToken.transform">
-<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#RedundantToken.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.RedundantToken.transform" title="Link to this definition"></a></dt>
-<dd><p>Transform the token from a string value to token type.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>token</cite>: the token to transform</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.tokens.Token">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.tokens.</span></span><span class="sig-name descname"><span class="pre">Token</span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#Token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.Token" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>The Token class is the base class which carries important information into Data objects for data
-parsing functions. Subclasses of this class may have specific requirements for content.</p>
-<p>All implementations of the Token class should not be static but also not use self, for
-compatibility reasons (may be changed in the future)</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.tokens.Token.transform">
-<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#Token.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.Token.transform" title="Link to this definition"></a></dt>
-<dd><p>Transform the token from a string value to token type.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>token</cite>: the token to transform</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.tokens.Token.verify_token">
-<span class="sig-name descname"><span class="pre">verify_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#Token.verify_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.Token.verify_token" title="Link to this definition"></a></dt>
-<dd><p>Checks whether the token is in valid format in accordance with the identifier.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>token</cite>: the token to check</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.tokens.UniqueIDToken">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.tokens.</span></span><span class="sig-name descname"><span class="pre">UniqueIDToken</span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#UniqueIDToken"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.UniqueIDToken" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#dynamicdl.tokens.IDToken" title="dynamicdl.tokens.IDToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">IDToken</span></code></a>, <a class="reference internal" href="#dynamicdl.tokens.UniqueToken" title="dynamicdl.tokens.UniqueToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">UniqueToken</span></code></a></p>
-<p>Represents a unique ID.</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.tokens.UniqueToken">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.tokens.</span></span><span class="sig-name descname"><span class="pre">UniqueToken</span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#UniqueToken"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.UniqueToken" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#dynamicdl.tokens.Token" title="dynamicdl.tokens.Token"><code class="xref py py-class docutils literal notranslate"><span class="pre">Token</span></code></a></p>
-<p>UniqueToken items are used when an identifier is a unique item pertaining to any property of an
-image or entry. Unique tokens serve as valid IDs for identifying each data entry in the dataset.</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.tokens.WildcardIntToken">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.tokens.</span></span><span class="sig-name descname"><span class="pre">WildcardIntToken</span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#WildcardIntToken"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.WildcardIntToken" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#dynamicdl.tokens.IDToken" title="dynamicdl.tokens.IDToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">IDToken</span></code></a>, <a class="reference internal" href="#dynamicdl.tokens.WildcardToken" title="dynamicdl.tokens.WildcardToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">WildcardToken</span></code></a></p>
-<p>Wildcards for only integers.</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.tokens.WildcardQuantityToken">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.tokens.</span></span><span class="sig-name descname"><span class="pre">WildcardQuantityToken</span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#WildcardQuantityToken"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.WildcardQuantityToken" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#dynamicdl.tokens.QuantityToken" title="dynamicdl.tokens.QuantityToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">QuantityToken</span></code></a>, <a class="reference internal" href="#dynamicdl.tokens.WildcardToken" title="dynamicdl.tokens.WildcardToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">WildcardToken</span></code></a></p>
-<p>Wildcards for only quantities.</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.tokens.WildcardToken">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.tokens.</span></span><span class="sig-name descname"><span class="pre">WildcardToken</span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#WildcardToken"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.WildcardToken" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#dynamicdl.tokens.Token" title="dynamicdl.tokens.Token"><code class="xref py py-class docutils literal notranslate"><span class="pre">Token</span></code></a></p>
-<p>The WildcardToken class represents a generic wildcard which can stand for anything and will not 
-be used for any identifiers. The key difference is that these tokens are not affected by merge
-operations.</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.tokens.WildcardWordToken">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.tokens.</span></span><span class="sig-name descname"><span class="pre">WildcardWordToken</span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#WildcardWordToken"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.WildcardWordToken" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#dynamicdl.tokens.WildcardToken" title="dynamicdl.tokens.WildcardToken"><code class="xref py py-class docutils literal notranslate"><span class="pre">WildcardToken</span></code></a></p>
-<p>Disallows spaces in the wildcard.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.tokens.WildcardWordToken.verify_token">
-<span class="sig-name descname"><span class="pre">verify_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/dynamicdl/tokens.html#WildcardWordToken.verify_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.tokens.WildcardWordToken.verify_token" title="Link to this definition"></a></dt>
-<dd><p>Checks whether the token is in valid format in accordance with the identifier.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>token</cite>: the token to check</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -1819,6 +964,7 @@ registered hooks while the latter silently ignores them.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="modules.html" class="btn btn-neutral float-left" title="DynamicDL" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dynamicdl.data.html" class="btn btn-neutral float-right" title="dynamicdl.data package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
