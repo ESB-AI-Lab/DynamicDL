@@ -390,28 +390,6 @@ This may be useful when the filenames do indeed include <cite>.</cite> without i
 </dd></dl>
 
 </section>
-<section id="module-dynamicdl.parsing.images">
-<span id="dynamicdl-parsing-images-module"></span><h2>dynamicdl.parsing.images module<a class="headerlink" href="#module-dynamicdl.parsing.images" title="Link to this heading"></a></h2>
-<p>Image dummy classes.</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.parsing.images.ImageEntry">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.parsing.images.</span></span><span class="sig-name descname"><span class="pre">ImageEntry</span></span><a class="reference internal" href="_modules/dynamicdl/parsing/images.html#ImageEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.images.ImageEntry" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Arbitrary image file to be used as a value in the key-value pairing of DynamicDL filestructure
-formats. It is a dummy object which provides absolute file and image data during processing,
-and is a marker object to recognize the presence of an image.</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.parsing.images.SegmentationImage">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.parsing.images.</span></span><span class="sig-name descname"><span class="pre">SegmentationImage</span></span><a class="reference internal" href="_modules/dynamicdl/parsing/images.html#SegmentationImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.images.SegmentationImage" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Arbitrary segmentation image file to be used as a value in the key-value pairing of DynamicDL
-filestructure formats. It is a dummy object which provides absolute file and segmentation image
-map data during processing, and is a marker object to recognize the presence of an image.</p>
-</dd></dl>
-
-</section>
 <section id="module-dynamicdl.parsing.namespace">
 <span id="dynamicdl-parsing-namespace-module"></span><h2>dynamicdl.parsing.namespace module<a class="headerlink" href="#module-dynamicdl.parsing.namespace" title="Link to this heading"></a></h2>
 <dl class="py class">
@@ -579,7 +557,22 @@ Generics.</p>
 </section>
 <section id="module-dynamicdl.parsing">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dynamicdl.parsing" title="Link to this heading"></a></h2>
-<p>Standard public imports</p>
+<p>The <cite>dynamicdl.parsing</cite> module handles the objects used for DynamicDL format creation. These objects
+are to be used in the form when constructing the DynamicDL loader.</p>
+<p>Classes:</p>
+<ul class="simple">
+<li><p>Static</p></li>
+<li><p>Generic</p></li>
+<li><p>Folder</p></li>
+<li><p>File</p></li>
+<li><p>ImageFile</p></li>
+<li><p>Alias</p></li>
+<li><p>Namespace</p></li>
+<li><p>GenericList</p></li>
+<li><p>SegmentationObject</p></li>
+<li><p>AmbiguousList</p></li>
+<li><p>Pairing</p></li>
+</ul>
 </section>
 </section>
 

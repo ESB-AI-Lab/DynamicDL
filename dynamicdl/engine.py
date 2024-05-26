@@ -3,7 +3,7 @@ import heapq
 from typing import Any, Optional, Union
 from tqdm import tqdm
 
-from ._utils import Warnings, check_map
+from ._utils import Warnings, check_map, load_config
 from .data.tokens import UniqueToken
 from .data.datatype import DataType
 from .data.datatypes import DataTypes
@@ -12,14 +12,14 @@ from .data.dataentry import DataEntry
 from .parsing.static import Static
 from .parsing.generic import Generic, Folder, File
 from .parsing.namespace import Namespace
-from .parsing.images import ImageEntry, SegmentationImage
 from .parsing.genericlist import GenericList
 from .parsing.segmentationobject import SegmentationObject
 from .parsing.pairing import Pairing
 from .parsing.ambiguouslist import AmbiguousList
+from .processing.images import ImageEntry, SegmentationImage
 from .processing.datafile import DataFile
 
-MAX_PBAR_DEPTH = 4
+config = load_config()
 
 def expand_generics(
     path: list[str],
@@ -53,7 +53,7 @@ def expand_generics(
     generics: list[Generic] = []
     names: set[Static] = set()
     pairings: list[Pairing] = []
-    if depth >= MAX_PBAR_DEPTH:
+    if depth >= config['MAX_PBAR_DEPTH']:
         pbar = None
     if pbar:
         pbar.set_description(f'Expanding generics: {"/".join(path)}')
@@ -174,7 +174,7 @@ def expand_file_generics(
     generics: list[Generic] = []
     names: set[Static] = set()
     pairings: list[Pairing] = []
-    if depth >= MAX_PBAR_DEPTH:
+    if depth >= config['MAX_PBAR_DEPTH']:
         pbar = None
     if pbar:
         pbar.set_description(f'Expanding generics: {"/".join(curr_path)}')

@@ -14,9 +14,12 @@ class SegmentationObject:
     '''
     Object to represent a collection of polygonal coordinates for segmentation. Functionally serves
     the purpose of being a wrapper class for `GenericList` and should be instantiated when the only
-    contents inside are `DataTypes.X` and `DataTypes.Y` items as well as non-data items.
+    contents inside are `DataTypes.X` and `DataTypes.Y` items as well as non-data items. This
+    class therefore provides a way to bundle together POLYGON data types with variable length points
+    for handling thereafter.
     
-     - `form` (`GenericList | list`): either a GenericList object or a list which will create a GL.
+    :param form: Either a GenericList object or a list which will create a GL.
+    :type form: GenericList | list
     '''
     def __init__(
         self,
@@ -30,12 +33,6 @@ class SegmentationObject:
     def _merge(
         data: Union[dict[Union[Static, int], Any], Static]
     ) -> DataEntry:
-        '''
-        Recursive process for merging data in segmentation object. Differs from main merge algorithm
-        because it can only process within unique values.
-        
-         - `data` (`dict[Static | int, Any] | Static`): the data to merge, from the expand call.
-        '''
         # base cases
         if isinstance(data, Static):
             return DataEntry(data.data)
@@ -70,8 +67,8 @@ class SegmentationObject:
         Evaluate object by expanding and merging, and extracting the corresponding X, Y values
         which define the SegmentationObject.
         
-         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of 
-            `DynamicData` data.
+        :param dataset: The dataset data, which should follow the syntax of `DynamicData` data.
+        :type dataset: list[Any]
         '''
         if depth >= config['MAX_PBAR_DEPTH']:
             pbar = None

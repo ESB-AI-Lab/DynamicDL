@@ -118,6 +118,28 @@
 </dd></dl>
 
 </section>
+<section id="module-dynamicdl.processing.images">
+<span id="dynamicdl-processing-images-module"></span><h2>dynamicdl.processing.images module<a class="headerlink" href="#module-dynamicdl.processing.images" title="Link to this heading"></a></h2>
+<p>Image dummy classes.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamicdl.processing.images.ImageEntry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.images.</span></span><span class="sig-name descname"><span class="pre">ImageEntry</span></span><a class="reference internal" href="_modules/dynamicdl/processing/images.html#ImageEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.images.ImageEntry" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Arbitrary image file to be used as a value in the key-value pairing of DynamicDL filestructure
+formats. It is a dummy object which provides absolute file and image data during processing,
+and is a marker object to recognize the presence of an image.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dynamicdl.processing.images.SegmentationImage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.images.</span></span><span class="sig-name descname"><span class="pre">SegmentationImage</span></span><a class="reference internal" href="_modules/dynamicdl/processing/images.html#SegmentationImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.images.SegmentationImage" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Arbitrary segmentation image file to be used as a value in the key-value pairing of DynamicDL
+filestructure formats. It is a dummy object which provides absolute file and segmentation image
+map data during processing, and is a marker object to recognize the presence of an image.</p>
+</dd></dl>
+
+</section>
 <section id="module-dynamicdl.processing.jsonfile">
 <span id="dynamicdl-processing-jsonfile-module"></span><h2>dynamicdl.processing.jsonfile module<a class="headerlink" href="#module-dynamicdl.processing.jsonfile" title="Link to this heading"></a></h2>
 <dl class="py class">
@@ -204,6 +226,18 @@
 </section>
 <section id="module-dynamicdl.processing">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dynamicdl.processing" title="Link to this heading"></a></h2>
+<p>The <cite>dynamicdl.processing</cite> module handles file processing, including annotation files and
+image files. These are to be used in describing DynamicDL dataset formats as values following
+a File key indicator.</p>
+<p>Classes:</p>
+<ul class="simple">
+<li><p>JSONFile</p></li>
+<li><p>TXTFile</p></li>
+<li><p>XMLFile</p></li>
+<li><p>YAMLFile</p></li>
+<li><p>ImageEntry</p></li>
+<li><p>SegmentationImage</p></li>
+</ul>
 </section>
 </section>
 

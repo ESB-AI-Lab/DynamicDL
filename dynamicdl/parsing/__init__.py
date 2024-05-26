@@ -1,11 +1,36 @@
 '''
-Standard public imports
+The `dynamicdl.parsing` module handles the objects used for DynamicDL format creation. These objects
+are to be used in the form when constructing the DynamicDL loader.
+
+Classes:
+
+* Static
+
+* Generic
+
+* Folder
+   
+* File
+   
+* ImageFile
+   
+* Alias
+
+* Namespace
+
+* GenericList
+
+* SegmentationObject
+
+* AmbiguousList
+
+* Pairing
+
 '''
 from .static import Static
 from .generic import Generic, Folder, File, ImageFile
 from .alias import Alias
 from .namespace import Namespace
-from .images import ImageEntry, SegmentationImage
 from .genericlist import GenericList
 from .segmentationobject import SegmentationObject
 from .ambiguouslist import AmbiguousList

@@ -13,8 +13,8 @@ config = load_config()
 
 class Pairing:
     '''
-    Used to specify when two nonunique datatypes should be associated together. Most commonly used
-    to pair ID and name together.
+    Pairing is a wrapper class used to specify when two or more nonunique datatypes should be
+    associated together. Most commonly used to pair ID and name together. 
 
     - `form` (`Any`): Whatever follows the DynamicData specified form as required. Pairing is a
         wrapper class so let it behave as it should

@@ -121,6 +121,10 @@ class Warnings:
                  'datasets.', RuntimeError)
     illegal_capturing_group = ('Illegal presence of a regex capturing group in the pattern. For '
                                'reference, (.+) and (.*) are not allowed.', ValueError)
+    invalid_csv_cols = ('CSV column length detected to be {n}, which is not equal to expected form '
+                        'which has length {exp}', RuntimeError)
+    invalid_csv_value = ('Invalid data {item} encountered, failed to fit into generic {form}',
+                         ValueError)
 
     @staticmethod
     def warn(name: str, **kwargs: str) -> None:

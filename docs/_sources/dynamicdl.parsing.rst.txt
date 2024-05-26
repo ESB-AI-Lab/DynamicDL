@@ -36,14 +36,6 @@ dynamicdl.parsing.genericlist module
    :undoc-members:
    :show-inheritance:
 
-dynamicdl.parsing.images module
--------------------------------
-
-.. automodule:: dynamicdl.parsing.images
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 dynamicdl.parsing.namespace module
 ----------------------------------
 

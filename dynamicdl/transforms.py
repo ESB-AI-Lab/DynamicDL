@@ -147,9 +147,9 @@ class Transforms:
     '''
     CLASSIFICATION = (ImageClassification(crop_size=224), None)
     DETECTION = (ObjectDetection(), None)
-    SEGMENTATION = (SemanticSegmentation(resize_size=520, normalize=True), 
+    SEGMENTATION = (SemanticSegmentation(resize_size=520, normalize=True),
                     SemanticSegmentation(resize_size=520, normalize=False))
-    SEGMENTATION_NORESIZE = (SemanticSegmentation(resize_size=None, normalize=True), 
+    SEGMENTATION_NORESIZE = (SemanticSegmentation(resize_size=None, normalize=True),
                              SemanticSegmentation(resize_size=None, normalize=False))
 
     @staticmethod

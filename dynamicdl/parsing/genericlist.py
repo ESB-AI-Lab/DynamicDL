@@ -1,4 +1,3 @@
-
 from typing import Union, Any, Optional
 from tqdm import tqdm
 
@@ -11,8 +10,68 @@ class GenericList:
     '''
     Generic list item. Items inside the list are expected to repeat mod `len(form)`.
     
-     - `form` (`list[Any] | Any`): the form to stick to. Each entry in `form` must be some valid
-        form following the syntax of `DynamicData` forms.
+    Example:
+    
+    .. code-block:: json
+
+        {
+            "bounding_box": [
+                1.0,
+                2.0,
+                3.0,
+                4.0,
+                5.0,
+                6.0,
+                7.0,
+                8.0
+            ]
+        }
+        
+    Suppose that we wish to parse the bounding boxes for this particular json file. Let each value
+    represent X1, Y1, X2, Y2 as needed. Then we can parse the form as follows:
+    
+    .. code-block:: python
+
+        form = {
+            "bounding_box": [
+                DataTypes.X1,
+                DataTypes.Y1,
+                DataTypes.X2,
+                DataTypes.Y2
+            ]
+        }
+        
+    Suppose the format was changed to x, y pairs:
+    
+    .. code-block:: json
+
+        {
+            "bounding_box": [
+                [1.0, 2.0],
+                [3.0, 4.0],
+                [5.0, 6.0],
+                [7.0, 8.0]
+            ]
+        }
+    
+    Its corresponding form:
+    
+    .. code-block:: python
+
+        form = {
+            "bounding_box": [
+                [DataTypes.X1, DataTypes.Y1],
+                [DataTypes.X2, DataTypes.Y2]
+            ]
+        }
+        
+    During parsing, the standard python list is always inferred to be a `GenericList`. When the list
+    items are 1:1, `GenericList` parses properly regardless.
+    
+    :param form: The form to stick to. Each entry in `form` must be some valid generic-like form,
+        and all items inside the `form` list will be combined into one object upon parsing.
+        Further lines in the list are expected to conform to the same scheme as the first entry.
+    :type form: list[Any] | Any
     '''
     def __init__(
         self,
@@ -28,10 +87,10 @@ class GenericList:
         depth: int = 0
     ) -> tuple[dict[Static, Any], list]:
         '''
-        Expand list into dict of statics.
+        Expand list into dict of statics, for internal processing.
         
-         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of 
-            `DynamicData` data.
+        :param dataset: The dataset data, which should follow the syntax of `DynamicData` data.
+        :type dataset: list[Any]
         '''
         from ..engine import expand_generics
         if depth >= config['MAX_PBAR_DEPTH']:

@@ -12,6 +12,14 @@ dynamicdl.processing.datafile module
    :undoc-members:
    :show-inheritance:
 
+dynamicdl.processing.images module
+----------------------------------
+
+.. automodule:: dynamicdl.processing.images
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dynamicdl.processing.jsonfile module
 ------------------------------------
 
