@@ -45,7 +45,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">DynamicData Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">DynamicDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamicdl.html">DynamicDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html">Data Items</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parsing.html">Parsing Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../processing.html">File Processing</a></li>
 </ul>
 
         </div>
@@ -73,15 +76,21 @@
            <div itemprop="articleBody">
              
   <h1>Source code for dynamicdl.data.dataentry</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Iterable</span>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">.. module:: DataEntry</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Iterable</span>
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
 
-<span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">union</span><span class="p">,</span> <span class="n">Warnings</span>
+<span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">union</span>
+<span class="kn">from</span> <span class="nn">.._warnings</span> <span class="kn">import</span> <span class="n">Warnings</span>
 <span class="kn">from</span> <span class="nn">.tokens</span> <span class="kn">import</span> <span class="n">UniqueToken</span><span class="p">,</span> <span class="n">WildcardToken</span><span class="p">,</span> <span class="n">RedundantToken</span>
 <span class="kn">from</span> <span class="nn">.dataitem</span> <span class="kn">import</span> <span class="n">DataItem</span>
 
 <div class="viewcode-block" id="DataEntry">
-<a class="viewcode-back" href="../../../dynamicdl.data.html#dynamicdl.data.dataentry.DataEntry">[docs]</a>
+<a class="viewcode-back" href="../../../data.html#dynamicdl.data.dataentry.DataEntry">[docs]</a>
 <span class="k">class</span> <span class="nc">DataEntry</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Contains all items required for an entry in the dataset, a collection of DataItem objects. Most</span>
@@ -109,7 +118,7 @@
             <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
 <div class="viewcode-block" id="DataEntry.merge">
-<a class="viewcode-back" href="../../../dynamicdl.data.html#dynamicdl.data.dataentry.DataEntry.merge">[docs]</a>
+<a class="viewcode-back" href="../../../data.html#dynamicdl.data.dataentry.DataEntry.merge">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">first</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">second</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
@@ -157,7 +166,7 @@
 
 
 <div class="viewcode-block" id="DataEntry.merge_inplace">
-<a class="viewcode-back" href="../../../dynamicdl.data.html#dynamicdl.data.dataentry.DataEntry.merge_inplace">[docs]</a>
+<a class="viewcode-back" href="../../../data.html#dynamicdl.data.dataentry.DataEntry.merge_inplace">[docs]</a>
     <span class="k">def</span> <span class="nf">merge_inplace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Merge two data entries together, storing it in this instance.</span>
@@ -199,7 +208,7 @@
 
 
 <div class="viewcode-block" id="DataEntry.apply_tokens">
-<a class="viewcode-back" href="../../../dynamicdl.data.html#dynamicdl.data.dataentry.DataEntry.apply_tokens">[docs]</a>
+<a class="viewcode-back" href="../../../data.html#dynamicdl.data.dataentry.DataEntry.apply_tokens">[docs]</a>
     <span class="k">def</span> <span class="nf">apply_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">DataItem</span><span class="p">],</span> <span class="n">DataItem</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Apply new tokens to the item.</span>

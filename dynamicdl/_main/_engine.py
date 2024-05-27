@@ -3,21 +3,22 @@ import heapq
 from typing import Any, Optional, Union
 from tqdm import tqdm
 
-from ._utils import Warnings, load_config, MergeError
-from .data.tokens import UniqueToken
-from .data.datatype import DataType
-from .data.datatypes import DataTypes
-from .data.dataitem import DataItem
-from .data.dataentry import DataEntry
-from .parsing.static import Static
-from .parsing.generic import Generic, Folder, File
-from .parsing.namespace import Namespace
-from .parsing.genericlist import GenericList
-from .parsing.segmentationobject import SegmentationObject
-from .parsing.pairing import Pairing
-from .parsing.ambiguouslist import AmbiguousList
-from .processing.images import ImageEntry, SegmentationImage
-from .processing.datafile import DataFile
+from .._utils import load_config
+from .._warnings import Warnings, MergeError
+from ..data.tokens import UniqueToken
+from ..data.datatype import DataType
+from ..data.datatypes import DataTypes
+from ..data.dataitem import DataItem
+from ..data.dataentry import DataEntry
+from ..parsing.static import Static
+from ..parsing.generic import Generic, Folder, File
+from ..parsing.namespace import Namespace
+from ..parsing.genericlist import GenericList
+from ..parsing.segmentationobject import SegmentationObject
+from ..parsing.pairing import Pairing
+from ..parsing.ambiguouslist import AmbiguousList
+from ..processing.images import ImageEntry, SegmentationImage
+from ..processing.datafile import DataFile
 
 config = load_config()
 

@@ -36,7 +36,7 @@ class TXTFile(DataFile):
         pbar: Optional[tqdm],
         depth: int = 0
     ) -> dict:
-        from ..engine import expand_generics
+        from .._main._engine import expand_generics
         def filter_ignores(line: str):
             for ignore_type in self.ignore_type:
                 if ignore_type.match(line)[0]:

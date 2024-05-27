@@ -1,7 +1,8 @@
 from typing import Any, Optional, Union
 from tqdm import tqdm
 
-from .._utils import load_config, Warnings
+from .._utils import load_config
+from .._warnings import Warnings
 from ..data.tokens import RedundantToken
 from ..data.datatype import DataType
 from ..data.datatypes import DataTypes
@@ -115,7 +116,7 @@ class Pairing:
          - `in_file` (`bool`): distinguisher to check usage of either `expand_generics`
             or `expand_file_generics`.
         '''
-        from ..engine import expand_generics, expand_file_generics
+        from .._main._engine import expand_generics, expand_file_generics
         if depth >= config['MAX_PBAR_DEPTH']:
             pbar = None
         if pbar:

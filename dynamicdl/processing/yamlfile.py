@@ -24,7 +24,7 @@ class YAMLFile(DataFile):
         pbar: Optional[tqdm],
         depth: int = 0
     ) -> dict:
-        from ..engine import expand_generics
+        from .._main._engine import expand_generics
         if depth >= config['MAX_PBAR_DEPTH']:
             pbar = None
         if pbar:

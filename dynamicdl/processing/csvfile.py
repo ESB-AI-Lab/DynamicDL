@@ -2,7 +2,8 @@ from typing import Union, Optional, Iterable
 import csv
 from tqdm import tqdm
 
-from .._utils import load_config, Warnings
+from .._utils import load_config
+from .._warnings import Warnings
 from ..data.datatype import DataType
 from ..data.dataentry import DataEntry
 from ..parsing.static import Static

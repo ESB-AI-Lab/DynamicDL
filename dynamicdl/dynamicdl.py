@@ -36,9 +36,8 @@ from pandas import DataFrame
 from pandas import isna
 from pandas.core.series import Series
 from torch.utils.data import DataLoader
-from torch import Tensor, LongTensor, FloatTensor
+from torch import FloatTensor
 import torch
-from torchvision.datasets.vision import VisionDataset
 from torchvision.utils import draw_bounding_boxes
 import torchvision.transforms.functional as F
 from torchvision import transforms as T
@@ -46,91 +45,41 @@ from PIL.Image import open as open_image
 import matplotlib.pyplot as plt
 from typing_extensions import Self
 
-from ._utils import next_avail_id, union, Warnings
-from .engine import populate_data
-from .transforms import Transforms
-
-def _collate_classification(batch):
-    images, labels = zip(*batch)
-    try:
-        return torch.stack(images), torch.IntTensor(list(labels))
-    except RuntimeError as e:
-        if 'stack expects each tensor to be equal size, but got' in str(e):
-            Warnings.error('invalid_shape', mode='classification')
-        raise
-
-def _collate_classification_dim(batch):
-    images, labels = zip(*batch)
-    labels = {'label': torch.IntTensor([label['label'] for label in labels]),
-              'dim': [label['dim'] for label in labels]}
-    try:
-        return torch.stack(images), labels
-    except RuntimeError as e:
-        if 'stack expects each tensor to be equal size, but got' in str(e):
-            Warnings.error('invalid_shape', mode='classification')
-        raise
-
-def _collate_detection(batch):
-    return list(zip(*batch))
-
-def _collate_detection_dim(batch):
-    images, labels = zip(*batch)
-    labels = {'label': torch.IntTensor([label['label'] for label in labels]),
-              'dim': [label['dim'] for label in labels]}
-    return tuple(images), tuple(labels)
-
-def _collate_segmentation(batch):
-    images, labels = zip(*batch)
-    try:
-        return torch.stack(images), torch.stack(labels)
-    except RuntimeError as e:
-        if 'stack expects each tensor to be equal size, but got' in str(e):
-            Warnings.error('invalid_shape', mode='segmentation')
-        raise
-
-def _collate_segmentation_dim(batch):
-    images, labels = zip(*batch)
-    labels = {'label': torch.stack([label['label'] for label in labels]),
-              'dim': [label['dim'] for label in labels]}
-    try:
-        return torch.stack(images), labels
-    except RuntimeError as e:
-        if 'stack expects each tensor to be equal size, but got' in str(e):
-            Warnings.error('invalid_shape', mode='segmentation')
-        raise
-
-def _collate_default(batch):
-    return list(zip(*batch))
-
-def _collate(mode: str, store_dim: bool) -> Callable:
-    '''
-    Getters for all preset collate functions.
-    '''
-    if mode == 'classification':
-        return _collate_classification_dim if store_dim else _collate_classification
-    if mode == 'segmentation':
-        return _collate_segmentation_dim if store_dim else _collate_segmentation
-    if mode == 'detection':
-        return _collate_detection_dim if store_dim else _collate_detection
-    return _collate_default
+from ._utils import next_avail_id, union
+from ._warnings import Warnings
+from ._main._engine import populate_data
+from ._main._transforms import Transforms
+from ._main._collate import _collate
+from .dynamicds import DynamicDS
 
 class DynamicData:
     '''
     Main dataset class. Accepts root directory path and dictionary form of the structure.
+    DynamicDL expands a generic dataset form and interprets it through a series of recursive
+    hierarchical inheritances, to flatten the dataset into a list of entries fit for image
+    processing.
     
-    Args:
-     - `root` (`str`): the root directory to access the dataset.
-     - `form` (`dict`): the form of the dataset. See documentation for further details on valid
-        forms.
-     - `bbox_scale_option` (`str`): choose from either 'auto', 'zeroone', or 'full' scale options to
-        define, or leave empty for automatic. Default: 'auto'
-     - `seg_scale_option` (`str`): choose from either 'auto', 'zeroone', or 'full' scale options to
-        define, or leave empty for automatic. Default: 'auto'
-     - `get_md5_hashes` (`bool`): when set to True, create a new column which finds md5 hashes for
-        each image available, and makes sure there are no duplicates. Default: False
-     - `purge_duplicates` (`Optional[bool]`): when set to True, remove all duplicate image entries.
-        Duplicate images are defined by having the same md5 hash, so this has no effect when
-        get_md5_hashes is False. When set to False, do not purge duplicates. Default: None
+    :param root: The root directory to access the dataset.
+    :type root: str
+    :param form: The form of the dataset. See documentation for further details on valid forms.
+    :type form: dict
+    :param bbox_scale_option: Choose from either `auto`, `zeroone`, or `full` scale options to
+        define, or leave empty for automatic. `zeroone` assumes detection coordinates to be
+        interpreted on a 0-1 scale as ratios dependent on image size. `full` leaves coordinates
+        as is. `auto` for auto-detection. Default: `auto`
+    :type bbox_scale_option: str
+    :param seg_scale_option: Choose from either `auto`, `zeroone`, or `full` scale options to
+        define, or leave empty for automatic. `zeroone` assumes segmentation coordinates to be
+        interpreted on a 0-1 scale as ratios dependent on image size. `full` leaves coordinates
+        as is. `auto` for auto-detection. Default: `auto`
+    :type seg_scale_option: str
+    :param get_md5_hashes: When set to True, create a new column which finds md5 hashes for each
+        image available, and makes sure there are no duplicates. Default: `False`
+    :type get_md5_hashes: bool
+    :param purge_duplicates: When set to True, remove all duplicate image entries. Duplicate images
+        are defined by having the same md5 hash, so this has no effect when `get_md5_hashes` is 
+        `False`. When set to `False`, do not purge duplicates. Default: `None`
+    :type purge_duplicates: Optional[bool]
     '''
 
     _inference_cols = {'ABSOLUTE_FILE', 'IMAGE_ID', 'IMAGE_DIM'}
@@ -1223,138 +1172,3 @@ class DynamicData:
             axarr[1].imshow(mask.permute(1, 2, 0))
         else:
             plt.imshow(image.permute(1, 2, 0))
-
-class DynamicDS(VisionDataset):
-    '''
-    Dataset implementation for the DynamicData environment.
-    
-    Args:
-    - `df` (`DataFrame`): the dataframe from DynamicData.
-    - `root` (`str`): the root of the dataset folder.
-    - `mode` (`str`): the mode of the data to retrieve, i.e. classification, segmentation, etc.
-    - `id_mapping` (`dict[int, int]`): the id mapping from the dataframe to retrieve class names.
-    This is used primarily as a safety feature in order to make sure that used IDs are provided
-    in order starting from 0 without holes so that training works properly.
-    - `image_type` (`str`): the type of the image to export, to convert PIL images to.
-    Default: 'RGB'. Also accepts 'L' and 'CMYK'.
-    - `normalization` (`str`): the type of normalization that the dataset currently is formatted in,
-    for box and polygon items. Accepts 'full' or 'zeroone'.
-    - `normalize_to` (`str`): the type of normalization that the dataset is to be resized to, for
-    box and polygon items. Accepts 'full' or 'zeroone'.
-    - `transform` (`Optional[Callable]`): the transform operation to apply to the images.
-    - `target_transform` (`Optional[Callable]`): the transform operation on the labels.
-    '''
-    def __init__(
-        self,
-        df: DataFrame,
-        root: str,
-        mode: str,
-        id_mapping: Optional[dict[int, int]],
-        image_type: str = 'RGB',
-        normalization: str = 'full',
-        store_dim: bool = False,
-        resize: Optional[tuple[int, int]] = None,
-        normalize_to: Optional[str] = None,
-        transform: Optional[Callable] = None,
-        target_transform: Optional[Callable] = None
-    ):
-        self.dataframe = df
-        self.data = self.dataframe.to_dict('records')
-        self.mode = mode
-        self.image_type = image_type
-        self.id_mapping = id_mapping
-        self.store_dim = store_dim
-        self.resize = resize
-        self.normalize_to = normalize_to
-        self.normalization = normalization
-        if self.mode == 'segmentation':
-            self.default = len(self.id_mapping)
-        super().__init__(
-            root,
-            transforms=None,
-            transform=transform,
-            target_transform=target_transform
-        )
-
-    def __len__(self):
-        return len(self.dataframe)
-
-    def _get_class_labels(self, item: Series) -> Tensor:
-        return self.id_mapping[int(item['CLASS_ID'])]
-
-    def _get_bbox_labels(self, item: Series) -> dict[str, Tensor]:
-        # execute checks
-        assert len(item['BOX']) == len(item['BBOX_CLASS_ID']), \
-            'BOX and BBOX_CLASS_ID len mismatch'
-        class_ids = list(map(lambda x: self.id_mapping[x], item['BBOX_CLASS_ID']))
-        boxes = item['BOX']
-        if self.resize:
-            factor_resize = self.resize
-        else:
-            factor_resize = (1, 1)
-        if self.normalization == 'full':
-            factor_norm = item['IMAGE_DIM']
-        else:
-            factor_norm = (1, 1)
-        apply_resize = lambda p: (p[0] * factor_resize[0] / factor_norm[0],
-                                  p[1] * factor_resize[1] / factor_norm[1],
-                                  p[2] * factor_resize[0] / factor_norm[0],
-                                  p[3] * factor_resize[1] / factor_norm[1])
-        bbox_tensors = [FloatTensor(apply_resize(box)) for box in boxes]
-        if not bbox_tensors:
-            Warnings.error('empty_bbox', file=item['ABSOLUTE_FILE'])
-        if self.store_dim:
-            return {
-                'label': {'boxes': torch.stack(bbox_tensors), 'labels': LongTensor(class_ids)},
-                'dim': item['IMAGE_DIM']
-            }
-        return {'boxes': torch.stack(bbox_tensors), 'labels': LongTensor(class_ids)}
-
-    def _get_seg_labels(self, item: Series) -> Tensor:
-        if 'ABSOLUTE_FILE_SEG' in item:
-            mask = F.to_tensor(open_image(item['ABSOLUTE_FILE_SEG']))
-            if self.resize:
-                return F.resize(mask, [self.resize[1], self.resize[0]])
-            return mask
-        assert len(item['POLYGON']) == len(item['SEG_CLASS_ID']), \
-            'SEG_CLASS_ID and POLYGON len mismatch'
-        if self.resize is not None:
-            mask = np.full(self.resize, self.default, dtype=np.int32)
-            factor_resize = self.resize
-        else:
-            mask = np.full(item['IMAGE_DIM'], self.default, dtype=np.int32)
-            factor_resize = (1, 1)
-        if self.normalization == 'full':
-            factor_norm = item['IMAGE_DIM']
-        else: factor_norm = (1, 1)
-        apply_resize = lambda p: (p[0] * factor_resize[0] / factor_norm[0],
-                                  p[1] * factor_resize[1] / factor_norm[1])
-        for class_id, polygon in zip(item['SEG_CLASS_ID'], item['POLYGON']):
-            if self.resize is not None:
-                polygon = list(map(apply_resize, polygon))
-            mask = cv2.fillPoly(mask, pts=[np.asarray(polygon, dtype=np.int32)],
-                            color=self.id_mapping[class_id])
-        mask = torch.from_numpy(np.asarray(mask)).unsqueeze(-1).permute(2, 0, 1)
-        return mask
-
-    def __getitem__(self, idx):
-        item: dict = self.data[idx]
-        image: Tensor = F.to_tensor(open_image(item.get('ABSOLUTE_FILE')).convert(self.image_type))
-        if self.resize:
-            image = F.resize(image, [self.resize[1], self.resize[0]])
-        label: dict[str, Tensor]
-        if self.mode in {'inference', 'diffusion'}:
-            if self.transform:
-                image = self.transform(image)
-            return image, {'dim': item['IMAGE_DIM']}
-        if self.mode == 'classification':
-            label = self._get_class_labels(item)
-        elif self.mode == 'detection':
-            label = self._get_bbox_labels(item)
-        elif self.mode == 'segmentation':
-            label = self._get_seg_labels(item)
-        if self.transforms:
-            image, label = self.transforms(image, label)
-        if self.store_dim:
-            return image, {'label': label, 'dim': item['IMAGE_DIM']}
-        return image, label

@@ -6,7 +6,8 @@ from __future__ import annotations
 import re
 from typing import Union, Optional, TYPE_CHECKING
 
-from .._utils import union, Warnings
+from .._utils import union
+from .._warnings import Warnings
 from ..data.datatype import DataType
 from ..data.dataitem import DataItem
 

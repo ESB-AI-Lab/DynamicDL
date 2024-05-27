@@ -45,7 +45,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">DynamicData Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">DynamicDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamicdl.html">DynamicDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html">Data Items</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parsing.html">Parsing Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../processing.html">File Processing</a></li>
 </ul>
 
         </div>
@@ -76,13 +79,14 @@
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
-<span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">union</span><span class="p">,</span> <span class="n">load_config</span><span class="p">,</span> <span class="n">Warnings</span>
+<span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">union</span><span class="p">,</span> <span class="n">load_config</span>
+<span class="kn">from</span> <span class="nn">.._warnings</span> <span class="kn">import</span> <span class="n">Warnings</span>
 <span class="kn">from</span> <span class="nn">.static</span> <span class="kn">import</span> <span class="n">Static</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
 
 <div class="viewcode-block" id="GenericList">
-<a class="viewcode-back" href="../../../dynamicdl.parsing.html#dynamicdl.parsing.genericlist.GenericList">[docs]</a>
+<a class="viewcode-back" href="../../../parsing.html#dynamicdl.parsing.genericlist.GenericList">[docs]</a>
 <span class="k">class</span> <span class="nc">GenericList</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Generic list item. Items inside the list are expected to repeat mod `len(form)`.</span>
@@ -157,7 +161,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="n">union</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
 
 <div class="viewcode-block" id="GenericList.expand">
-<a class="viewcode-back" href="../../../dynamicdl.parsing.html#dynamicdl.parsing.genericlist.GenericList.expand">[docs]</a>
+<a class="viewcode-back" href="../../../parsing.html#dynamicdl.parsing.genericlist.GenericList.expand">[docs]</a>
     <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
@@ -171,7 +175,7 @@
 <span class="sd">        :param dataset: The dataset data, which should follow the syntax of `DynamicData` data.</span>
 <span class="sd">        :type dataset: list[Any]</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="kn">from</span> <span class="nn">..engine</span> <span class="kn">import</span> <span class="n">expand_generics</span>
+        <span class="kn">from</span> <span class="nn">.._main._engine</span> <span class="kn">import</span> <span class="n">expand_generics</span>
         <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;MAX_PBAR_DEPTH&#39;</span><span class="p">]:</span>
             <span class="n">pbar</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">pbar</span><span class="p">:</span>

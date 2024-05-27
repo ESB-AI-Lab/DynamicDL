@@ -1,43 +1,31 @@
-dynamicdl.data package
-======================
+Data Items
+==========
 
-Submodules
-----------
-
-dynamicdl.data.dataentry module
--------------------------------
+Data
+----
 
 .. automodule:: dynamicdl.data.dataentry
    :members:
    :undoc-members:
    :show-inheritance:
 
-dynamicdl.data.dataitem module
-------------------------------
-
 .. automodule:: dynamicdl.data.dataitem
    :members:
    :undoc-members:
    :show-inheritance:
-
-dynamicdl.data.datatype module
-------------------------------
 
 .. automodule:: dynamicdl.data.datatype
    :members:
    :undoc-members:
    :show-inheritance:
 
-dynamicdl.data.datatypes module
--------------------------------
-
 .. automodule:: dynamicdl.data.datatypes
    :members:
    :undoc-members:
    :show-inheritance:
 
-dynamicdl.data.tokens module
-----------------------------
+Tokens
+------
 
 .. automodule:: dynamicdl.data.tokens
    :members:

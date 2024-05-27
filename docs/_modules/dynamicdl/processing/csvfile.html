@@ -45,7 +45,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">DynamicData Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">DynamicDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamicdl.html">DynamicDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html">Data Items</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parsing.html">Parsing Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../processing.html">File Processing</a></li>
 </ul>
 
         </div>
@@ -77,7 +80,8 @@
 <span class="kn">import</span> <span class="nn">csv</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
-<span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">load_config</span><span class="p">,</span> <span class="n">Warnings</span>
+<span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">load_config</span>
+<span class="kn">from</span> <span class="nn">.._warnings</span> <span class="kn">import</span> <span class="n">Warnings</span>
 <span class="kn">from</span> <span class="nn">..data.datatype</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">..data.dataentry</span> <span class="kn">import</span> <span class="n">DataEntry</span>
 <span class="kn">from</span> <span class="nn">..parsing.static</span> <span class="kn">import</span> <span class="n">Static</span>
@@ -88,7 +92,7 @@
 <span class="n">config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
 
 <div class="viewcode-block" id="CSVFile">
-<a class="viewcode-back" href="../../../dynamicdl.processing.html#dynamicdl.processing.csvfile.CSVFile">[docs]</a>
+<a class="viewcode-back" href="../../../processing.html#dynamicdl.processing.csvfile.CSVFile">[docs]</a>
 <span class="k">class</span> <span class="nc">CSVFile</span><span class="p">(</span><span class="n">DataFile</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Utility functions for parsing csv files.</span>
@@ -107,7 +111,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="n">header</span>
 
 <div class="viewcode-block" id="CSVFile.parse">
-<a class="viewcode-back" href="../../../dynamicdl.processing.html#dynamicdl.processing.csvfile.CSVFile.parse">[docs]</a>
+<a class="viewcode-back" href="../../../processing.html#dynamicdl.processing.csvfile.CSVFile.parse">[docs]</a>
     <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>

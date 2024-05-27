@@ -1,7 +1,7 @@
 import re
 from typing import Union
 
-from .._utils import Warnings
+from .._warnings import Warnings
 from ..data.datatype import DataType
 from ..data.dataitem import DataItem
 from .generic import Generic

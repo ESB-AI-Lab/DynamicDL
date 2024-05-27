@@ -1,67 +1,45 @@
-dynamicdl.parsing package
-=========================
-
-Submodules
-----------
-
-dynamicdl.parsing.alias module
-------------------------------
+Parsing Structures
+==================
 
 .. automodule:: dynamicdl.parsing.alias
    :members:
    :undoc-members:
    :show-inheritance:
 
-dynamicdl.parsing.ambiguouslist module
---------------------------------------
-
 .. automodule:: dynamicdl.parsing.ambiguouslist
    :members:
    :undoc-members:
    :show-inheritance:
-
-dynamicdl.parsing.generic module
---------------------------------
 
 .. automodule:: dynamicdl.parsing.generic
    :members:
    :undoc-members:
    :show-inheritance:
 
-dynamicdl.parsing.genericlist module
-------------------------------------
-
 .. automodule:: dynamicdl.parsing.genericlist
    :members:
    :undoc-members:
    :show-inheritance:
 
-dynamicdl.parsing.namespace module
-----------------------------------
+.. automodule:: dynamicdl.parsing.impliedlist
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 .. automodule:: dynamicdl.parsing.namespace
    :members:
    :undoc-members:
    :show-inheritance:
 
-dynamicdl.parsing.pairing module
---------------------------------
-
 .. automodule:: dynamicdl.parsing.pairing
    :members:
    :undoc-members:
    :show-inheritance:
 
-dynamicdl.parsing.segmentationobject module
--------------------------------------------
-
 .. automodule:: dynamicdl.parsing.segmentationobject
    :members:
    :undoc-members:
    :show-inheritance:
-
-dynamicdl.parsing.static module
--------------------------------
 
 .. automodule:: dynamicdl.parsing.static
    :members:

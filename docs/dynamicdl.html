@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dynamicdl package &mdash; DynamicDL 0.1.1-alpha documentation</title>
+  <title>DynamicDL &mdash; DynamicDL 0.1.1-alpha documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -21,8 +21,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="dynamicdl.data package" href="dynamicdl.data.html" />
-    <link rel="prev" title="DynamicDL" href="modules.html" /> 
+    <link rel="next" title="Data Items" href="data.html" />
+    <link rel="prev" title="DynamicData Tutorial" href="tutorial.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -48,38 +48,28 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">DynamicData Tutorial</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">DynamicDL</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">dynamicdl package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html">dynamicdl.data package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html">dynamicdl.parsing package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.processing.html">dynamicdl.processing package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">DynamicDL</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicData"><code class="docutils literal notranslate"><span class="pre">DynamicData</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicData.clear_image_sets"><code class="docutils literal notranslate"><span class="pre">DynamicData.clear_image_sets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicData.delete_image_set"><code class="docutils literal notranslate"><span class="pre">DynamicData.delete_image_set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicData.get_dataloader"><code class="docutils literal notranslate"><span class="pre">DynamicData.get_dataloader()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicData.get_dataset"><code class="docutils literal notranslate"><span class="pre">DynamicData.get_dataset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicData.get_image_set"><code class="docutils literal notranslate"><span class="pre">DynamicData.get_image_set()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicData.get_transforms"><code class="docutils literal notranslate"><span class="pre">DynamicData.get_transforms()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicData.inference"><code class="docutils literal notranslate"><span class="pre">DynamicData.inference()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicData.load"><code class="docutils literal notranslate"><span class="pre">DynamicData.load()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicData.parse"><code class="docutils literal notranslate"><span class="pre">DynamicData.parse()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicData.sample_image"><code class="docutils literal notranslate"><span class="pre">DynamicData.sample_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicData.save"><code class="docutils literal notranslate"><span class="pre">DynamicData.save()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicData.split_image_set"><code class="docutils literal notranslate"><span class="pre">DynamicData.split_image_set()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-dynamicdl.dynamicdl">dynamicdl.dynamicdl module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicDS"><code class="docutils literal notranslate"><span class="pre">DynamicDS</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicData"><code class="docutils literal notranslate"><span class="pre">DynamicData</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dynamicdl.dynamicds.DynamicDS"><code class="docutils literal notranslate"><span class="pre">DynamicDS</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-dynamicdl.engine">dynamicdl.engine module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.engine.expand_file_generics"><code class="docutils literal notranslate"><span class="pre">expand_file_generics()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.engine.expand_generics"><code class="docutils literal notranslate"><span class="pre">expand_generics()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.engine.populate_data"><code class="docutils literal notranslate"><span class="pre">populate_data()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-dynamicdl.transforms">dynamicdl.transforms module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.transforms.ImageClassification"><code class="docutils literal notranslate"><span class="pre">ImageClassification</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.transforms.ObjectDetection"><code class="docutils literal notranslate"><span class="pre">ObjectDetection</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.transforms.SemanticSegmentation"><code class="docutils literal notranslate"><span class="pre">SemanticSegmentation</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.transforms.Transforms"><code class="docutils literal notranslate"><span class="pre">Transforms</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-dynamicdl">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="data.html">Data Items</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parsing.html">Parsing Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processing.html">File Processing</a></li>
 </ul>
 
         </div>
@@ -96,8 +86,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="modules.html">DynamicDL</a></li>
-      <li class="breadcrumb-item active">dynamicdl package</li>
+      <li class="breadcrumb-item active">DynamicDL</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/dynamicdl.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -107,256 +96,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="dynamicdl-package">
-<h1>dynamicdl package<a class="headerlink" href="#dynamicdl-package" title="Link to this heading"></a></h1>
-<section id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="dynamicdl.data.html">dynamicdl.data package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.data.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.data.html#module-dynamicdl.data.dataentry">dynamicdl.data.dataentry module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataentry.DataEntry"><code class="docutils literal notranslate"><span class="pre">DataEntry</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataentry.DataEntry.apply_tokens"><code class="docutils literal notranslate"><span class="pre">DataEntry.apply_tokens()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataentry.DataEntry.merge"><code class="docutils literal notranslate"><span class="pre">DataEntry.merge()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataentry.DataEntry.merge_inplace"><code class="docutils literal notranslate"><span class="pre">DataEntry.merge_inplace()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.data.html#module-dynamicdl.data.dataitem">dynamicdl.data.dataitem module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem"><code class="docutils literal notranslate"><span class="pre">DataItem</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem.add"><code class="docutils literal notranslate"><span class="pre">DataItem.add()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataitem.DataItem.copy"><code class="docutils literal notranslate"><span class="pre">DataItem.copy()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.data.html#module-dynamicdl.data.datatype">dynamicdl.data.datatype module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType"><code class="docutils literal notranslate"><span class="pre">DataType</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType.verify_token"><code class="docutils literal notranslate"><span class="pre">DataType.verify_token()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.data.html#module-dynamicdl.data.datatypes">dynamicdl.data.datatypes module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes"><code class="docutils literal notranslate"><span class="pre">DataTypes</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.ABSOLUTE_FILE"><code class="docutils literal notranslate"><span class="pre">DataTypes.ABSOLUTE_FILE</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.ABSOLUTE_FILE_SEG"><code class="docutils literal notranslate"><span class="pre">DataTypes.ABSOLUTE_FILE_SEG</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.BBOX_CLASS_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.BBOX_CLASS_ID</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.BBOX_CLASS_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.BBOX_CLASS_NAME</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.CLASS_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.CLASS_ID</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.CLASS_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.CLASS_NAME</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.GENERIC"><code class="docutils literal notranslate"><span class="pre">DataTypes.GENERIC</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.GENERIC_INT"><code class="docutils literal notranslate"><span class="pre">DataTypes.GENERIC_INT</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.GENERIC_QUANTITY"><code class="docutils literal notranslate"><span class="pre">DataTypes.GENERIC_QUANTITY</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.GENERIC_WORD"><code class="docutils literal notranslate"><span class="pre">DataTypes.GENERIC_WORD</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.HEIGHT"><code class="docutils literal notranslate"><span class="pre">DataTypes.HEIGHT</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.IMAGE_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_ID</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.IMAGE_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_NAME</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.IMAGE_SET_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_SET_ID</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.IMAGE_SET_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_SET_NAME</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.POLYGON"><code class="docutils literal notranslate"><span class="pre">DataTypes.POLYGON</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.SEG_CLASS_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.SEG_CLASS_ID</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.SEG_CLASS_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.SEG_CLASS_NAME</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.WIDTH"><code class="docutils literal notranslate"><span class="pre">DataTypes.WIDTH</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.X"><code class="docutils literal notranslate"><span class="pre">DataTypes.X</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.X1"><code class="docutils literal notranslate"><span class="pre">DataTypes.X1</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.X2"><code class="docutils literal notranslate"><span class="pre">DataTypes.X2</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.XMAX"><code class="docutils literal notranslate"><span class="pre">DataTypes.XMAX</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.XMID"><code class="docutils literal notranslate"><span class="pre">DataTypes.XMID</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.XMIN"><code class="docutils literal notranslate"><span class="pre">DataTypes.XMIN</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.Y"><code class="docutils literal notranslate"><span class="pre">DataTypes.Y</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.Y1"><code class="docutils literal notranslate"><span class="pre">DataTypes.Y1</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.Y2"><code class="docutils literal notranslate"><span class="pre">DataTypes.Y2</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.YMAX"><code class="docutils literal notranslate"><span class="pre">DataTypes.YMAX</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.YMID"><code class="docutils literal notranslate"><span class="pre">DataTypes.YMID</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatypes.DataTypes.YMIN"><code class="docutils literal notranslate"><span class="pre">DataTypes.YMIN</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.data.html#module-dynamicdl.data.tokens">dynamicdl.data.tokens module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.FilenameToken"><code class="docutils literal notranslate"><span class="pre">FilenameToken</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.FilenameToken.verify_token"><code class="docutils literal notranslate"><span class="pre">FilenameToken.verify_token()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.IDToken"><code class="docutils literal notranslate"><span class="pre">IDToken</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.IDToken.transform"><code class="docutils literal notranslate"><span class="pre">IDToken.transform()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.IDToken.verify_token"><code class="docutils literal notranslate"><span class="pre">IDToken.verify_token()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.QuantityToken"><code class="docutils literal notranslate"><span class="pre">QuantityToken</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.QuantityToken.transform"><code class="docutils literal notranslate"><span class="pre">QuantityToken.transform()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.QuantityToken.verify_token"><code class="docutils literal notranslate"><span class="pre">QuantityToken.verify_token()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantIDToken"><code class="docutils literal notranslate"><span class="pre">RedundantIDToken</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantIDToken.transform"><code class="docutils literal notranslate"><span class="pre">RedundantIDToken.transform()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantIDToken.verify_token"><code class="docutils literal notranslate"><span class="pre">RedundantIDToken.verify_token()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantObjectToken"><code class="docutils literal notranslate"><span class="pre">RedundantObjectToken</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantObjectToken.transform"><code class="docutils literal notranslate"><span class="pre">RedundantObjectToken.transform()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantObjectToken.verify_token"><code class="docutils literal notranslate"><span class="pre">RedundantObjectToken.verify_token()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantQuantityToken"><code class="docutils literal notranslate"><span class="pre">RedundantQuantityToken</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantQuantityToken.transform"><code class="docutils literal notranslate"><span class="pre">RedundantQuantityToken.transform()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantQuantityToken.verify_token"><code class="docutils literal notranslate"><span class="pre">RedundantQuantityToken.verify_token()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantToken"><code class="docutils literal notranslate"><span class="pre">RedundantToken</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.RedundantToken.transform"><code class="docutils literal notranslate"><span class="pre">RedundantToken.transform()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.Token"><code class="docutils literal notranslate"><span class="pre">Token</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.Token.transform"><code class="docutils literal notranslate"><span class="pre">Token.transform()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.Token.verify_token"><code class="docutils literal notranslate"><span class="pre">Token.verify_token()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.UniqueIDToken"><code class="docutils literal notranslate"><span class="pre">UniqueIDToken</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.UniqueToken"><code class="docutils literal notranslate"><span class="pre">UniqueToken</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.WildcardIntToken"><code class="docutils literal notranslate"><span class="pre">WildcardIntToken</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.WildcardQuantityToken"><code class="docutils literal notranslate"><span class="pre">WildcardQuantityToken</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.WildcardToken"><code class="docutils literal notranslate"><span class="pre">WildcardToken</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.WildcardWordToken"><code class="docutils literal notranslate"><span class="pre">WildcardWordToken</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.tokens.WildcardWordToken.verify_token"><code class="docutils literal notranslate"><span class="pre">WildcardWordToken.verify_token()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.data.html#module-dynamicdl.data">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="dynamicdl.parsing.html">dynamicdl.parsing package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing.alias">dynamicdl.parsing.alias module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.alias.Alias"><code class="docutils literal notranslate"><span class="pre">Alias</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.alias.Alias.match"><code class="docutils literal notranslate"><span class="pre">Alias.match()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing.ambiguouslist">dynamicdl.parsing.ambiguouslist module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.ambiguouslist.AmbiguousList"><code class="docutils literal notranslate"><span class="pre">AmbiguousList</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.ambiguouslist.AmbiguousList.expand"><code class="docutils literal notranslate"><span class="pre">AmbiguousList.expand()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing.generic">dynamicdl.parsing.generic module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.File"><code class="docutils literal notranslate"><span class="pre">File</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.File.match"><code class="docutils literal notranslate"><span class="pre">File.match()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.Folder"><code class="docutils literal notranslate"><span class="pre">Folder</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.Generic"><code class="docutils literal notranslate"><span class="pre">Generic</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.Generic.match"><code class="docutils literal notranslate"><span class="pre">Generic.match()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.ImageFile"><code class="docutils literal notranslate"><span class="pre">ImageFile</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing.genericlist">dynamicdl.parsing.genericlist module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.genericlist.GenericList"><code class="docutils literal notranslate"><span class="pre">GenericList</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.genericlist.GenericList.expand"><code class="docutils literal notranslate"><span class="pre">GenericList.expand()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing.namespace">dynamicdl.parsing.namespace module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.namespace.Namespace"><code class="docutils literal notranslate"><span class="pre">Namespace</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.namespace.Namespace.match"><code class="docutils literal notranslate"><span class="pre">Namespace.match()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing.pairing">dynamicdl.parsing.pairing module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.pairing.Pairing"><code class="docutils literal notranslate"><span class="pre">Pairing</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.pairing.Pairing.find_pairings"><code class="docutils literal notranslate"><span class="pre">Pairing.find_pairings()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.pairing.Pairing.update_pairing"><code class="docutils literal notranslate"><span class="pre">Pairing.update_pairing()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing.segmentationobject">dynamicdl.parsing.segmentationobject module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.segmentationobject.SegmentationObject"><code class="docutils literal notranslate"><span class="pre">SegmentationObject</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.segmentationobject.SegmentationObject.expand"><code class="docutils literal notranslate"><span class="pre">SegmentationObject.expand()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing.static">dynamicdl.parsing.static module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.static.Static"><code class="docutils literal notranslate"><span class="pre">Static</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.static.Static.match"><code class="docutils literal notranslate"><span class="pre">Static.match()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.parsing.html#module-dynamicdl.parsing">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="dynamicdl.processing.html">dynamicdl.processing package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.processing.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.processing.html#module-dynamicdl.processing.csvfile">dynamicdl.processing.csvfile module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.csvfile.CSVFile"><code class="docutils literal notranslate"><span class="pre">CSVFile</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.csvfile.CSVFile.parse"><code class="docutils literal notranslate"><span class="pre">CSVFile.parse()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.processing.html#module-dynamicdl.processing.datafile">dynamicdl.processing.datafile module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.datafile.DataFile"><code class="docutils literal notranslate"><span class="pre">DataFile</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.datafile.DataFile.parse"><code class="docutils literal notranslate"><span class="pre">DataFile.parse()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.processing.html#module-dynamicdl.processing.images">dynamicdl.processing.images module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.images.ImageEntry"><code class="docutils literal notranslate"><span class="pre">ImageEntry</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.images.SegmentationImage"><code class="docutils literal notranslate"><span class="pre">SegmentationImage</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.processing.html#module-dynamicdl.processing.jsonfile">dynamicdl.processing.jsonfile module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.jsonfile.JSONFile"><code class="docutils literal notranslate"><span class="pre">JSONFile</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.jsonfile.JSONFile.parse"><code class="docutils literal notranslate"><span class="pre">JSONFile.parse()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.processing.html#module-dynamicdl.processing.txtfile">dynamicdl.processing.txtfile module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.txtfile.TXTFile"><code class="docutils literal notranslate"><span class="pre">TXTFile</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.txtfile.TXTFile.parse"><code class="docutils literal notranslate"><span class="pre">TXTFile.parse()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.processing.html#module-dynamicdl.processing.xmlfile">dynamicdl.processing.xmlfile module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.xmlfile.XMLFile"><code class="docutils literal notranslate"><span class="pre">XMLFile</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.xmlfile.XMLFile.parse"><code class="docutils literal notranslate"><span class="pre">XMLFile.parse()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.processing.html#module-dynamicdl.processing.yamlfile">dynamicdl.processing.yamlfile module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.yamlfile.YAMLFile"><code class="docutils literal notranslate"><span class="pre">YAMLFile</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.processing.html#dynamicdl.processing.yamlfile.YAMLFile.parse"><code class="docutils literal notranslate"><span class="pre">YAMLFile.parse()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="dynamicdl.processing.html#module-dynamicdl.processing">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
-</section>
-<section id="module-dynamicdl.dynamicdl">
-<span id="dynamicdl-dynamicdl-module"></span><h2>dynamicdl.dynamicdl module<a class="headerlink" href="#module-dynamicdl.dynamicdl" title="Link to this heading"></a></h2>
+  <section id="module-dynamicdl.dynamicdl">
+<span id="dynamicdl"></span><h1>DynamicDL<a class="headerlink" href="#module-dynamicdl.dynamicdl" title="Link to this heading"></a></h1>
 <p>Main module for processing datasets. Collects all parsed objects into the DynamicData object, and
 maintains the DynamicDL class for PyTorch Dataset and DataLoader functionalities.</p>
 <p>Collate functions (pseudo-private)</p>
@@ -379,61 +120,31 @@ maintains the DynamicDL class for PyTorch Dataset and DataLoader functionalities
 </dl>
 <p>DynamicDS class (VisionDataset extension)</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.dynamicdl.DynamicDS">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.dynamicdl.</span></span><span class="sig-name descname"><span class="pre">DynamicDS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_mapping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'RGB'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'full'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/dynamicdl.html#DynamicDS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicdl.DynamicDS" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">VisionDataset</span></code></p>
-<p>Dataset implementation for the DynamicData environment.</p>
-<p>Args:
-- <cite>df</cite> (<cite>DataFrame</cite>): the dataframe from DynamicData.
-- <cite>root</cite> (<cite>str</cite>): the root of the dataset folder.
-- <cite>mode</cite> (<cite>str</cite>): the mode of the data to retrieve, i.e. classification, segmentation, etc.
-- <cite>id_mapping</cite> (<cite>dict[int, int]</cite>): the id mapping from the dataframe to retrieve class names.
-This is used primarily as a safety feature in order to make sure that used IDs are provided
-in order starting from 0 without holes so that training works properly.
-- <cite>image_type</cite> (<cite>str</cite>): the type of the image to export, to convert PIL images to.
-Default: ‘RGB’. Also accepts ‘L’ and ‘CMYK’.
-- <cite>normalization</cite> (<cite>str</cite>): the type of normalization that the dataset currently is formatted in,
-for box and polygon items. Accepts ‘full’ or ‘zeroone’.
-- <cite>normalize_to</cite> (<cite>str</cite>): the type of normalization that the dataset is to be resized to, for
-box and polygon items. Accepts ‘full’ or ‘zeroone’.
-- <cite>transform</cite> (<cite>Optional[Callable]</cite>): the transform operation to apply to the images.
-- <cite>target_transform</cite> (<cite>Optional[Callable]</cite>): the transform operation on the labels.</p>
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="dynamicdl.dynamicdl.DynamicData">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.dynamicdl.</span></span><span class="sig-name descname"><span class="pre">DynamicData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbox_scale_option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seg_scale_option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_md5_hashes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">purge_duplicates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/dynamicdl.html#DynamicData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicdl.DynamicData" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Main dataset class. Accepts root directory path and dictionary form of the structure.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><ul class="simple">
-<li><p><cite>root</cite> (<cite>str</cite>): the root directory to access the dataset.</p></li>
-<li><dl class="simple">
-<dt><cite>form</cite> (<cite>dict</cite>): the form of the dataset. See documentation for further details on valid</dt><dd><p>forms.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>bbox_scale_option</cite> (<cite>str</cite>): choose from either ‘auto’, ‘zeroone’, or ‘full’ scale options to</dt><dd><p>define, or leave empty for automatic. Default: ‘auto’</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>seg_scale_option</cite> (<cite>str</cite>): choose from either ‘auto’, ‘zeroone’, or ‘full’ scale options to</dt><dd><p>define, or leave empty for automatic. Default: ‘auto’</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>get_md5_hashes</cite> (<cite>bool</cite>): when set to True, create a new column which finds md5 hashes for</dt><dd><p>each image available, and makes sure there are no duplicates. Default: False</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>purge_duplicates</cite> (<cite>Optional[bool]</cite>): when set to True, remove all duplicate image entries.</dt><dd><p>Duplicate images are defined by having the same md5 hash, so this has no effect when
-get_md5_hashes is False. When set to False, do not purge duplicates. Default: None</p>
-</dd>
-</dl>
-</li>
+<p>Main dataset class. Accepts root directory path and dictionary form of the structure.
+DynamicDL expands a generic dataset form and interprets it through a series of recursive
+hierarchical inheritances, to flatten the dataset into a list of entries fit for image
+processing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>root</strong> (<em>str</em>) – The root directory to access the dataset.</p></li>
+<li><p><strong>form</strong> (<em>dict</em>) – The form of the dataset. See documentation for further details on valid forms.</p></li>
+<li><p><strong>bbox_scale_option</strong> (<em>str</em>) – Choose from either <cite>auto</cite>, <cite>zeroone</cite>, or <cite>full</cite> scale options to
+define, or leave empty for automatic. <cite>zeroone</cite> assumes detection coordinates to be
+interpreted on a 0-1 scale as ratios dependent on image size. <cite>full</cite> leaves coordinates
+as is. <cite>auto</cite> for auto-detection. Default: <cite>auto</cite></p></li>
+<li><p><strong>seg_scale_option</strong> (<em>str</em>) – Choose from either <cite>auto</cite>, <cite>zeroone</cite>, or <cite>full</cite> scale options to
+define, or leave empty for automatic. <cite>zeroone</cite> assumes segmentation coordinates to be
+interpreted on a 0-1 scale as ratios dependent on image size. <cite>full</cite> leaves coordinates
+as is. <cite>auto</cite> for auto-detection. Default: <cite>auto</cite></p></li>
+<li><p><strong>get_md5_hashes</strong> (<em>bool</em>) – When set to True, create a new column which finds md5 hashes for each
+image available, and makes sure there are no duplicates. Default: <cite>False</cite></p></li>
+<li><p><strong>purge_duplicates</strong> (<em>Optional</em><em>[</em><em>bool</em><em>]</em>) – When set to True, remove all duplicate image entries. Duplicate images
+are defined by having the same md5 hash, so this has no effect when <cite>get_md5_hashes</cite> is 
+<cite>False</cite>. When set to <cite>False</cite>, do not purge duplicates. Default: <cite>None</cite></p></li>
 </ul>
 </dd>
 </dl>
@@ -546,7 +257,7 @@ CVTransforms class.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dynamicdl.dynamicdl.DynamicData.get_dataset">
-<span class="sig-name descname"><span class="pre">get_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_invalid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preset_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_stats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#dynamicdl.dynamicdl.DynamicDS" title="dynamicdl.dynamicdl.DynamicDS"><span class="pre">DynamicDS</span></a></span></span><a class="reference internal" href="_modules/dynamicdl/dynamicdl.html#DynamicData.get_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicdl.DynamicData.get_dataset" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_invalid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preset_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_stats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#dynamicdl.dynamicds.DynamicDS" title="dynamicdl.dynamicds.DynamicDS"><span class="pre">DynamicDS</span></a></span></span><a class="reference internal" href="_modules/dynamicdl/dynamicdl.html#DynamicData.get_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicdl.DynamicData.get_dataset" title="Link to this definition"></a></dt>
 <dd><p>Retrieve the PyTorch dataset (torch.utils.data.Dataset) of a specific mode and image set.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><ul class="simple">
@@ -787,191 +498,36 @@ set. Default: False.</p>
 
 </dd></dl>
 
-</section>
-<section id="module-dynamicdl.engine">
-<span id="dynamicdl-engine-module"></span><h2>dynamicdl.engine module<a class="headerlink" href="#module-dynamicdl.engine" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="dynamicdl.engine.expand_file_generics">
-<span class="sig-prename descclassname"><span class="pre">dynamicdl.engine.</span></span><span class="sig-name descname"><span class="pre">expand_file_generics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curr_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><span class="pre">Generic</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/dynamicdl/engine.html#expand_file_generics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.engine.expand_file_generics" title="Link to this definition"></a></dt>
-<dd><p>Variant of the expand_generics function above. Also contains path tracking.’</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>path</cite> (<cite>str</cite>): the absolute filepath up to the root/dataset provided</p></li>
-<li><p><cite>dataset</cite> (<cite>Any</cite>): the dataset true values, in nested blocks containing values</p></li>
-<li><p><cite>root</cite> (<cite>Any</cite>): the format of the dataset, in accordance with valid DynamicData syntax</p></li>
-</ul>
-</div></blockquote>
+<dl class="py class" id="module-dynamicdl.dynamicds">
+<dt class="sig sig-object py" id="dynamicdl.dynamicds.DynamicDS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.dynamicds.</span></span><span class="sig-name descname"><span class="pre">DynamicDS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_mapping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'RGB'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'full'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/dynamicds.html#DynamicDS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicds.DynamicDS" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">VisionDataset</span></code></p>
+<p>Dataset implementation for the DynamicData environment.</p>
+<p>Args:
+- <cite>df</cite> (<cite>DataFrame</cite>): the dataframe from DynamicData.
+- <cite>root</cite> (<cite>str</cite>): the root of the dataset folder.
+- <cite>mode</cite> (<cite>str</cite>): the mode of the data to retrieve, i.e. classification, segmentation, etc.
+- <cite>id_mapping</cite> (<cite>dict[int, int]</cite>): the id mapping from the dataframe to retrieve class names.
+This is used primarily as a safety feature in order to make sure that used IDs are provided
+in order starting from 0 without holes so that training works properly.
+- <cite>image_type</cite> (<cite>str</cite>): the type of the image to export, to convert PIL images to.
+Default: ‘RGB’. Also accepts ‘L’ and ‘CMYK’.
+- <cite>normalization</cite> (<cite>str</cite>): the type of normalization that the dataset currently is formatted in,
+for box and polygon items. Accepts ‘full’ or ‘zeroone’.
+- <cite>normalize_to</cite> (<cite>str</cite>): the type of normalization that the dataset is to be resized to, for
+box and polygon items. Accepts ‘full’ or ‘zeroone’.
+- <cite>transform</cite> (<cite>Optional[Callable]</cite>): the transform operation to apply to the images.
+- <cite>target_transform</cite> (<cite>Optional[Callable]</cite>): the transform operation on the labels.</p>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="dynamicdl.engine.expand_generics">
-<span class="sig-prename descclassname"><span class="pre">dynamicdl.engine.</span></span><span class="sig-name descname"><span class="pre">expand_generics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a></span></span><a class="reference internal" href="_modules/dynamicdl/engine.html#expand_generics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.engine.expand_generics" title="Link to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Expand all generics and replace with statics, inplace.</dt><dd><ul class="simple">
-<li><p><cite>dataset</cite> (<cite>Any</cite>): the dataset true values, in nested blocks containing values</p></li>
-<li><p><cite>root</cite> (<cite>Any</cite>): the format of the dataset, in accordance with valid DynamicData syntax</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dynamicdl.engine.populate_data">
-<span class="sig-prename descclassname"><span class="pre">dynamicdl.engine.</span></span><span class="sig-name descname"><span class="pre">populate_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.dataentry.DataEntry" title="dynamicdl.data.dataentry.DataEntry"><span class="pre">DataEntry</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/engine.html#populate_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.engine.populate_data" title="Link to this definition"></a></dt>
-<dd><p>Parent process for parsing algorithm.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>root</cite> (<cite>str</cite>): the file path of the root of the data</p></li>
-<li><p><cite>form</cite> (<cite>dict</cite>): the form of the data, in accordance with DynamicData syntax.</p></li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
-</section>
-<section id="module-dynamicdl.transforms">
-<span id="dynamicdl-transforms-module"></span><h2>dynamicdl.transforms module<a class="headerlink" href="#module-dynamicdl.transforms" title="Link to this heading"></a></h2>
-<p>Adapted from torchvision:
-<a class="reference external" href="https://github.com/pytorch/vision/blob/main/torchvision/transforms/_presets.py">https://github.com/pytorch/vision/blob/main/torchvision/transforms/_presets.py</a></p>
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.transforms.ImageClassification">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.transforms.</span></span><span class="sig-name descname"><span class="pre">ImageClassification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">InterpolationMode</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">InterpolationMode.BILINEAR</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">antialias</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/transforms.html#ImageClassification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.transforms.ImageClassification" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.transforms.ImageClassification.describe">
-<span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/dynamicdl/transforms.html#ImageClassification.describe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.transforms.ImageClassification.describe" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.transforms.ImageClassification.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/dynamicdl/transforms.html#ImageClassification.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.transforms.ImageClassification.forward" title="Link to this definition"></a></dt>
-<dd><p>Define the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</div>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.transforms.ObjectDetection">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.transforms.</span></span><span class="sig-name descname"><span class="pre">ObjectDetection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/transforms.html#ObjectDetection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.transforms.ObjectDetection" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.transforms.ObjectDetection.describe">
-<span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/dynamicdl/transforms.html#ObjectDetection.describe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.transforms.ObjectDetection.describe" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.transforms.ObjectDetection.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/dynamicdl/transforms.html#ObjectDetection.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.transforms.ObjectDetection.forward" title="Link to this definition"></a></dt>
-<dd><p>Define the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</div>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.transforms.SemanticSegmentation">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.transforms.</span></span><span class="sig-name descname"><span class="pre">SemanticSegmentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">InterpolationMode</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">InterpolationMode.BILINEAR</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">antialias</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/transforms.html#SemanticSegmentation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.transforms.SemanticSegmentation" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.transforms.SemanticSegmentation.describe">
-<span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/dynamicdl/transforms.html#SemanticSegmentation.describe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.transforms.SemanticSegmentation.describe" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.transforms.SemanticSegmentation.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/dynamicdl/transforms.html#SemanticSegmentation.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.transforms.SemanticSegmentation.forward" title="Link to this definition"></a></dt>
-<dd><p>Define the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</div>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.transforms.Transforms">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.transforms.</span></span><span class="sig-name descname"><span class="pre">Transforms</span></span><a class="reference internal" href="_modules/dynamicdl/transforms.html#Transforms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.transforms.Transforms" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Standard transforms presets for computer vision. Adapted from torchvision 0.17.2</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.transforms.Transforms.CLASSIFICATION">
-<span class="sig-name descname"><span class="pre">CLASSIFICATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(ImageClassification(</span>&#160;&#160;&#160;&#160; <span class="pre">crop_size=[224]</span>&#160;&#160;&#160;&#160; <span class="pre">resize_size=[256]</span>&#160;&#160;&#160;&#160; <span class="pre">mean=[0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406]</span>&#160;&#160;&#160;&#160; <span class="pre">std=[0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225]</span>&#160;&#160;&#160;&#160; <span class="pre">interpolation=InterpolationMode.BILINEAR</span> <span class="pre">),</span> <span class="pre">None)</span></em><a class="headerlink" href="#dynamicdl.transforms.Transforms.CLASSIFICATION" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.transforms.Transforms.DETECTION">
-<span class="sig-name descname"><span class="pre">DETECTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(ObjectDetection(),</span> <span class="pre">None)</span></em><a class="headerlink" href="#dynamicdl.transforms.Transforms.DETECTION" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.transforms.Transforms.SEGMENTATION">
-<span class="sig-name descname"><span class="pre">SEGMENTATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(SemanticSegmentation(</span>&#160;&#160;&#160;&#160; <span class="pre">resize_size=[520]</span>&#160;&#160;&#160;&#160; <span class="pre">mean=[0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406]</span>&#160;&#160;&#160;&#160; <span class="pre">std=[0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225]</span>&#160;&#160;&#160;&#160; <span class="pre">interpolation=InterpolationMode.BILINEAR</span> <span class="pre">),</span> <span class="pre">SemanticSegmentation(</span>&#160;&#160;&#160;&#160; <span class="pre">resize_size=[520]</span>&#160;&#160;&#160;&#160; <span class="pre">mean=[0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406]</span>&#160;&#160;&#160;&#160; <span class="pre">std=[0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225]</span>&#160;&#160;&#160;&#160; <span class="pre">interpolation=InterpolationMode.BILINEAR</span> <span class="pre">))</span></em><a class="headerlink" href="#dynamicdl.transforms.Transforms.SEGMENTATION" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="dynamicdl.transforms.Transforms.SEGMENTATION_NORESIZE">
-<span class="sig-name descname"><span class="pre">SEGMENTATION_NORESIZE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(SemanticSegmentation(</span>&#160;&#160;&#160;&#160; <span class="pre">resize_size=None</span>&#160;&#160;&#160;&#160; <span class="pre">mean=[0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406]</span>&#160;&#160;&#160;&#160; <span class="pre">std=[0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225]</span>&#160;&#160;&#160;&#160; <span class="pre">interpolation=InterpolationMode.BILINEAR</span> <span class="pre">),</span> <span class="pre">SemanticSegmentation(</span>&#160;&#160;&#160;&#160; <span class="pre">resize_size=None</span>&#160;&#160;&#160;&#160; <span class="pre">mean=[0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406]</span>&#160;&#160;&#160;&#160; <span class="pre">std=[0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225]</span>&#160;&#160;&#160;&#160; <span class="pre">interpolation=InterpolationMode.BILINEAR</span> <span class="pre">))</span></em><a class="headerlink" href="#dynamicdl.transforms.Transforms.SEGMENTATION_NORESIZE" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="dynamicdl.transforms.Transforms.get">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/transforms.html#Transforms.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.transforms.Transforms.get" title="Link to this definition"></a></dt>
-<dd><p>Retrieve the standard transforms for classification, detection, and segmentation.</p>
-<ul class="simple">
-<li><p><cite>mode</cite> (<cite>str</cite>): choose between classification, detection, and segmentation.</p></li>
-<li><p><cite>resize</cite> (<cite>bool</cite>): True if planning to resize. Default: False.</p></li>
-<li><dl class="simple">
-<dt><cite>normalize</cite> (<cite>bool</cite>): True for normalized transforms according to mean and std, False</dt><dd><p>otherwise. Default: True.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>mean</cite> (<cite>Tuple[float, …]</cite>): the mean to use for normalization. Has no effect when</dt><dd><p>normalize is false. Default is ImageNet dataset statistics.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>std</cite> (<cite>Tuple[float, …]</cite>): the std to use for normalization. Has no effect when</dt><dd><p>normalize is false. Default is ImageNet dataset statistics.</p>
-</dd>
-</dl>
-</li>
-</ul>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-dynamicdl">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dynamicdl" title="Link to this heading"></a></h2>
-<p>Standard imports</p>
-</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="modules.html" class="btn btn-neutral float-left" title="DynamicDL" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="dynamicdl.data.html" class="btn btn-neutral float-right" title="dynamicdl.data package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="tutorial.html" class="btn btn-neutral float-left" title="DynamicData Tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data.html" class="btn btn-neutral float-right" title="Data Items" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

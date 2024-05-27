@@ -45,7 +45,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">DynamicData Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">DynamicDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamicdl.html">DynamicDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html">Data Items</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parsing.html">Parsing Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../processing.html">File Processing</a></li>
 </ul>
 
         </div>
@@ -76,7 +79,8 @@
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
-<span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">load_config</span><span class="p">,</span> <span class="n">Warnings</span>
+<span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">load_config</span>
+<span class="kn">from</span> <span class="nn">.._warnings</span> <span class="kn">import</span> <span class="n">Warnings</span>
 <span class="kn">from</span> <span class="nn">..data.datatypes</span> <span class="kn">import</span> <span class="n">DataTypes</span>
 <span class="kn">from</span> <span class="nn">..data.dataitem</span> <span class="kn">import</span> <span class="n">DataItem</span>
 <span class="kn">from</span> <span class="nn">..data.dataentry</span> <span class="kn">import</span> <span class="n">DataEntry</span>
@@ -86,7 +90,7 @@
 <span class="n">config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
 
 <div class="viewcode-block" id="SegmentationObject">
-<a class="viewcode-back" href="../../../dynamicdl.parsing.html#dynamicdl.parsing.segmentationobject.SegmentationObject">[docs]</a>
+<a class="viewcode-back" href="../../../parsing.html#dynamicdl.parsing.segmentationobject.SegmentationObject">[docs]</a>
 <span class="k">class</span> <span class="nc">SegmentationObject</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Object to represent a collection of polygonal coordinates for segmentation. Functionally serves</span>
@@ -134,7 +138,7 @@
         <span class="k">return</span> <span class="n">result</span>
 
 <div class="viewcode-block" id="SegmentationObject.expand">
-<a class="viewcode-back" href="../../../dynamicdl.parsing.html#dynamicdl.parsing.segmentationobject.SegmentationObject.expand">[docs]</a>
+<a class="viewcode-back" href="../../../parsing.html#dynamicdl.parsing.segmentationobject.SegmentationObject.expand">[docs]</a>
     <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>

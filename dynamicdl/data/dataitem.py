@@ -1,8 +1,13 @@
+'''
+.. module:: DataItem
+
+'''
+
 from copy import copy
 from typing import Any
 from typing_extensions import Self
 
-from .._utils import Warnings
+from .._warnings import Warnings
 from .tokens import RedundantToken
 from .datatype import DataType
 

@@ -1,7 +1,8 @@
 from typing import Union, Any, Optional
 from tqdm import tqdm
 
-from .._utils import load_config, Warnings
+from .._utils import load_config
+from .._warnings import Warnings
 from ..data.datatypes import DataTypes
 from ..data.dataitem import DataItem
 from ..data.dataentry import DataEntry

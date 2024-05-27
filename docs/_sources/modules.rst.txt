@@ -1,7 +1,0 @@
-DynamicDL
-=========
-
-.. toctree::
-   :maxdepth: 5
-
-   dynamicdl

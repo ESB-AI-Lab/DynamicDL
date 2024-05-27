@@ -1,7 +1,13 @@
+'''
+.. module:: DataEntry
+
+'''
+
 from typing import Union, Iterable
 from typing_extensions import Self
 
-from .._utils import union, Warnings
+from .._utils import union
+from .._warnings import Warnings
 from .tokens import UniqueToken, WildcardToken, RedundantToken
 from .dataitem import DataItem
 

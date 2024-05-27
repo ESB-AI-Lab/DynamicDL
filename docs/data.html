@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dynamicdl.data package &mdash; DynamicDL 0.1.1-alpha documentation</title>
+  <title>Data Items &mdash; DynamicDL 0.1.1-alpha documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -21,8 +21,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="dynamicdl.parsing package" href="dynamicdl.parsing.html" />
-    <link rel="prev" title="dynamicdl package" href="dynamicdl.html" /> 
+    <link rel="next" title="Parsing Structures" href="parsing.html" />
+    <link rel="prev" title="DynamicDL" href="dynamicdl.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -48,23 +48,115 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">DynamicData Tutorial</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">DynamicDL</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="dynamicdl.html">dynamicdl package</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="dynamicdl.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4 current"><a class="current reference internal" href="#">dynamicdl.data package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html">dynamicdl.parsing package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.processing.html">dynamicdl.processing package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamicdl.html">DynamicDL</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data Items</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-dynamicdl.data.dataentry">Data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.dataentry.DataEntry"><code class="docutils literal notranslate"><span class="pre">DataEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.dataentry.DataEntry.apply_tokens"><code class="docutils literal notranslate"><span class="pre">DataEntry.apply_tokens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.dataentry.DataEntry.merge"><code class="docutils literal notranslate"><span class="pre">DataEntry.merge()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.dataentry.DataEntry.merge_inplace"><code class="docutils literal notranslate"><span class="pre">DataEntry.merge_inplace()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.html#module-dynamicdl.dynamicdl">dynamicdl.dynamicdl module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.html#module-dynamicdl.engine">dynamicdl.engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.html#module-dynamicdl.transforms">dynamicdl.transforms module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.html#module-dynamicdl">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.dataitem.DataItem"><code class="docutils literal notranslate"><span class="pre">DataItem</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.dataitem.DataItem.add"><code class="docutils literal notranslate"><span class="pre">DataItem.add()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.dataitem.DataItem.copy"><code class="docutils literal notranslate"><span class="pre">DataItem.copy()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.datatype.DataType"><code class="docutils literal notranslate"><span class="pre">DataType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatype.DataType.verify_token"><code class="docutils literal notranslate"><span class="pre">DataType.verify_token()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes"><code class="docutils literal notranslate"><span class="pre">DataTypes</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.ABSOLUTE_FILE"><code class="docutils literal notranslate"><span class="pre">DataTypes.ABSOLUTE_FILE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.ABSOLUTE_FILE_SEG"><code class="docutils literal notranslate"><span class="pre">DataTypes.ABSOLUTE_FILE_SEG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.BBOX_CLASS_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.BBOX_CLASS_ID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.BBOX_CLASS_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.BBOX_CLASS_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.CLASS_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.CLASS_ID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.CLASS_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.CLASS_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.GENERIC"><code class="docutils literal notranslate"><span class="pre">DataTypes.GENERIC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.GENERIC_INT"><code class="docutils literal notranslate"><span class="pre">DataTypes.GENERIC_INT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.GENERIC_QUANTITY"><code class="docutils literal notranslate"><span class="pre">DataTypes.GENERIC_QUANTITY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.GENERIC_WORD"><code class="docutils literal notranslate"><span class="pre">DataTypes.GENERIC_WORD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.HEIGHT"><code class="docutils literal notranslate"><span class="pre">DataTypes.HEIGHT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.IMAGE_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_ID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.IMAGE_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.IMAGE_SET_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_SET_ID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.IMAGE_SET_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.IMAGE_SET_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.POLYGON"><code class="docutils literal notranslate"><span class="pre">DataTypes.POLYGON</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.SEG_CLASS_ID"><code class="docutils literal notranslate"><span class="pre">DataTypes.SEG_CLASS_ID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.SEG_CLASS_NAME"><code class="docutils literal notranslate"><span class="pre">DataTypes.SEG_CLASS_NAME</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.WIDTH"><code class="docutils literal notranslate"><span class="pre">DataTypes.WIDTH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.X"><code class="docutils literal notranslate"><span class="pre">DataTypes.X</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.X1"><code class="docutils literal notranslate"><span class="pre">DataTypes.X1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.X2"><code class="docutils literal notranslate"><span class="pre">DataTypes.X2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.XMAX"><code class="docutils literal notranslate"><span class="pre">DataTypes.XMAX</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.XMID"><code class="docutils literal notranslate"><span class="pre">DataTypes.XMID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.XMIN"><code class="docutils literal notranslate"><span class="pre">DataTypes.XMIN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.Y"><code class="docutils literal notranslate"><span class="pre">DataTypes.Y</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.Y1"><code class="docutils literal notranslate"><span class="pre">DataTypes.Y1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.Y2"><code class="docutils literal notranslate"><span class="pre">DataTypes.Y2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.YMAX"><code class="docutils literal notranslate"><span class="pre">DataTypes.YMAX</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.YMID"><code class="docutils literal notranslate"><span class="pre">DataTypes.YMID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.datatypes.DataTypes.YMIN"><code class="docutils literal notranslate"><span class="pre">DataTypes.YMIN</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#module-dynamicdl.data.tokens">Tokens</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.tokens.FilenameToken"><code class="docutils literal notranslate"><span class="pre">FilenameToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.tokens.FilenameToken.verify_token"><code class="docutils literal notranslate"><span class="pre">FilenameToken.verify_token()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.tokens.IDToken"><code class="docutils literal notranslate"><span class="pre">IDToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.tokens.IDToken.transform"><code class="docutils literal notranslate"><span class="pre">IDToken.transform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.tokens.IDToken.verify_token"><code class="docutils literal notranslate"><span class="pre">IDToken.verify_token()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.tokens.QuantityToken"><code class="docutils literal notranslate"><span class="pre">QuantityToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.tokens.QuantityToken.transform"><code class="docutils literal notranslate"><span class="pre">QuantityToken.transform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.tokens.QuantityToken.verify_token"><code class="docutils literal notranslate"><span class="pre">QuantityToken.verify_token()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.tokens.RedundantIDToken"><code class="docutils literal notranslate"><span class="pre">RedundantIDToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.tokens.RedundantIDToken.transform"><code class="docutils literal notranslate"><span class="pre">RedundantIDToken.transform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.tokens.RedundantIDToken.verify_token"><code class="docutils literal notranslate"><span class="pre">RedundantIDToken.verify_token()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.tokens.RedundantObjectToken"><code class="docutils literal notranslate"><span class="pre">RedundantObjectToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.tokens.RedundantObjectToken.transform"><code class="docutils literal notranslate"><span class="pre">RedundantObjectToken.transform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.tokens.RedundantObjectToken.verify_token"><code class="docutils literal notranslate"><span class="pre">RedundantObjectToken.verify_token()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.tokens.RedundantQuantityToken"><code class="docutils literal notranslate"><span class="pre">RedundantQuantityToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.tokens.RedundantQuantityToken.transform"><code class="docutils literal notranslate"><span class="pre">RedundantQuantityToken.transform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.tokens.RedundantQuantityToken.verify_token"><code class="docutils literal notranslate"><span class="pre">RedundantQuantityToken.verify_token()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.tokens.RedundantToken"><code class="docutils literal notranslate"><span class="pre">RedundantToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.tokens.RedundantToken.transform"><code class="docutils literal notranslate"><span class="pre">RedundantToken.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.tokens.Token"><code class="docutils literal notranslate"><span class="pre">Token</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.tokens.Token.transform"><code class="docutils literal notranslate"><span class="pre">Token.transform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.tokens.Token.verify_token"><code class="docutils literal notranslate"><span class="pre">Token.verify_token()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.tokens.UniqueIDToken"><code class="docutils literal notranslate"><span class="pre">UniqueIDToken</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.tokens.UniqueToken"><code class="docutils literal notranslate"><span class="pre">UniqueToken</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.tokens.WildcardIntToken"><code class="docutils literal notranslate"><span class="pre">WildcardIntToken</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.tokens.WildcardQuantityToken"><code class="docutils literal notranslate"><span class="pre">WildcardQuantityToken</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.tokens.WildcardToken"><code class="docutils literal notranslate"><span class="pre">WildcardToken</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.data.tokens.WildcardWordToken"><code class="docutils literal notranslate"><span class="pre">WildcardWordToken</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dynamicdl.data.tokens.WildcardWordToken.verify_token"><code class="docutils literal notranslate"><span class="pre">WildcardWordToken.verify_token()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-dynamicdl.data">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parsing.html">Parsing Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processing.html">File Processing</a></li>
 </ul>
 
         </div>
@@ -81,11 +173,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="modules.html">DynamicDL</a></li>
-          <li class="breadcrumb-item"><a href="dynamicdl.html">dynamicdl package</a></li>
-      <li class="breadcrumb-item active">dynamicdl.data package</li>
+      <li class="breadcrumb-item active">Data Items</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/dynamicdl.data.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/data.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -93,14 +183,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="dynamicdl-data-package">
-<h1>dynamicdl.data package<a class="headerlink" href="#dynamicdl-data-package" title="Link to this heading"></a></h1>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
-</section>
+  <section id="data-items">
+<h1>Data Items<a class="headerlink" href="#data-items" title="Link to this heading"></a></h1>
 <section id="module-dynamicdl.data.dataentry">
-<span id="dynamicdl-data-dataentry-module"></span><h2>dynamicdl.data.dataentry module<a class="headerlink" href="#module-dynamicdl.data.dataentry" title="Link to this heading"></a></h2>
-<dl class="py class">
+<span id="data"></span><h2>Data<a class="headerlink" href="#module-dynamicdl.data.dataentry" title="Link to this heading"></a></h2>
+<dl class="py class" id="module-DataEntry">
 <dt class="sig sig-object py" id="dynamicdl.data.dataentry.DataEntry">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.data.dataentry.</span></span><span class="sig-name descname"><span class="pre">DataEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.data.dataitem.DataItem" title="dynamicdl.data.dataitem.DataItem"><span class="pre">DataItem</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#dynamicdl.data.dataitem.DataItem" title="dynamicdl.data.dataitem.DataItem"><span class="pre">DataItem</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/data/dataentry.html#DataEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data.dataentry.DataEntry" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -150,11 +237,8 @@ use is handled by internal merging processes, and is not to be instantiated by u
 
 </dd></dl>
 
-</section>
-<section id="module-dynamicdl.data.dataitem">
-<span id="dynamicdl-data-dataitem-module"></span><h2>dynamicdl.data.dataitem module<a class="headerlink" href="#module-dynamicdl.data.dataitem" title="Link to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="dynamicdl.data.dataitem.DataItem">
+<dl class="py class" id="module-DataItem">
+<span id="module-dynamicdl.data.dataitem"></span><dt class="sig sig-object py" id="dynamicdl.data.dataitem.DataItem">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.data.dataitem.</span></span><span class="sig-name descname"><span class="pre">DataItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/data/dataitem.html#DataItem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data.dataitem.DataItem" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The <cite>DataItem</cite> class represents a value associated with a particular <cite>DataType</cite>. DataItem
@@ -205,10 +289,7 @@ its hierarchical children to inherit.</p>
 
 </dd></dl>
 
-</section>
-<section id="module-dynamicdl.data.datatype">
-<span id="dynamicdl-data-datatype-module"></span><h2>dynamicdl.data.datatype module<a class="headerlink" href="#module-dynamicdl.data.datatype" title="Link to this heading"></a></h2>
-<dl class="py class">
+<dl class="py class" id="module-dynamicdl.data.datatype">
 <dt class="sig sig-object py" id="dynamicdl.data.datatype.DataType">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.data.datatype.</span></span><span class="sig-name descname"><span class="pre">DataType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">desc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#dynamicdl.data.tokens.Token" title="dynamicdl.data.tokens.Token"><span class="pre">Token</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/data/datatype.html#DataType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data.datatype.DataType" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -236,10 +317,7 @@ functions for validation.</p>
 
 </dd></dl>
 
-</section>
-<section id="module-dynamicdl.data.datatypes">
-<span id="dynamicdl-data-datatypes-module"></span><h2>dynamicdl.data.datatypes module<a class="headerlink" href="#module-dynamicdl.data.datatypes" title="Link to this heading"></a></h2>
-<dl class="py class">
+<dl class="py class" id="module-dynamicdl.data.datatypes">
 <dt class="sig sig-object py" id="dynamicdl.data.datatypes.DataTypes">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.data.datatypes.</span></span><span class="sig-name descname"><span class="pre">DataTypes</span></span><a class="reference internal" href="_modules/dynamicdl/data/datatypes.html#DataTypes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data.datatypes.DataTypes" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -404,7 +482,7 @@ all presets currently available:</p>
 
 </section>
 <section id="module-dynamicdl.data.tokens">
-<span id="dynamicdl-data-tokens-module"></span><h2>dynamicdl.data.tokens module<a class="headerlink" href="#module-dynamicdl.data.tokens" title="Link to this heading"></a></h2>
+<span id="tokens"></span><h2>Tokens<a class="headerlink" href="#module-dynamicdl.data.tokens" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="dynamicdl.data.tokens.FilenameToken">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.data.tokens.</span></span><span class="sig-name descname"><span class="pre">FilenameToken</span></span><a class="reference internal" href="_modules/dynamicdl/data/tokens.html#FilenameToken"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.data.tokens.FilenameToken" title="Link to this definition"></a></dt>
@@ -692,8 +770,8 @@ parsing and processing.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="dynamicdl.html" class="btn btn-neutral float-left" title="dynamicdl package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="dynamicdl.parsing.html" class="btn btn-neutral float-right" title="dynamicdl.parsing package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="dynamicdl.html" class="btn btn-neutral float-left" title="DynamicDL" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="parsing.html" class="btn btn-neutral float-right" title="Parsing Structures" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

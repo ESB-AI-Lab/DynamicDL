@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dynamicdl.processing package &mdash; DynamicDL 0.1.1-alpha documentation</title>
+  <title>File Processing &mdash; DynamicDL 0.1.1-alpha documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -21,7 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="dynamicdl.parsing package" href="dynamicdl.parsing.html" /> 
+    <link rel="prev" title="Parsing Structures" href="parsing.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -47,21 +47,37 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">DynamicData Tutorial</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">DynamicDL</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="dynamicdl.html">dynamicdl package</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="dynamicdl.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.data.html">dynamicdl.data package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dynamicdl.parsing.html">dynamicdl.parsing package</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">dynamicdl.processing package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamicdl.html">DynamicDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data.html">Data Items</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parsing.html">Parsing Structures</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">File Processing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#dynamicdl.processing.csvfile.CSVFile"><code class="docutils literal notranslate"><span class="pre">CSVFile</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.processing.csvfile.CSVFile.parse"><code class="docutils literal notranslate"><span class="pre">CSVFile.parse()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.html#module-dynamicdl.dynamicdl">dynamicdl.dynamicdl module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.html#module-dynamicdl.engine">dynamicdl.engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.html#module-dynamicdl.transforms">dynamicdl.transforms module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="dynamicdl.html#module-dynamicdl">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dynamicdl.processing.datafile.DataFile"><code class="docutils literal notranslate"><span class="pre">DataFile</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.processing.datafile.DataFile.parse"><code class="docutils literal notranslate"><span class="pre">DataFile.parse()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#dynamicdl.processing.images.ImageEntry"><code class="docutils literal notranslate"><span class="pre">ImageEntry</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dynamicdl.processing.images.SegmentationImage"><code class="docutils literal notranslate"><span class="pre">SegmentationImage</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dynamicdl.processing.jsonfile.JSONFile"><code class="docutils literal notranslate"><span class="pre">JSONFile</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.processing.jsonfile.JSONFile.parse"><code class="docutils literal notranslate"><span class="pre">JSONFile.parse()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#dynamicdl.processing.txtfile.TXTFile"><code class="docutils literal notranslate"><span class="pre">TXTFile</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.processing.txtfile.TXTFile.parse"><code class="docutils literal notranslate"><span class="pre">TXTFile.parse()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#dynamicdl.processing.xmlfile.XMLFile"><code class="docutils literal notranslate"><span class="pre">XMLFile</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.processing.xmlfile.XMLFile.parse"><code class="docutils literal notranslate"><span class="pre">XMLFile.parse()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#dynamicdl.processing.yamlfile.YAMLFile"><code class="docutils literal notranslate"><span class="pre">YAMLFile</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dynamicdl.processing.yamlfile.YAMLFile.parse"><code class="docutils literal notranslate"><span class="pre">YAMLFile.parse()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-dynamicdl.processing">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -80,11 +96,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="modules.html">DynamicDL</a></li>
-          <li class="breadcrumb-item"><a href="dynamicdl.html">dynamicdl package</a></li>
-      <li class="breadcrumb-item active">dynamicdl.processing package</li>
+      <li class="breadcrumb-item active">File Processing</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/dynamicdl.processing.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/processing.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -92,16 +106,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="dynamicdl-processing-package">
-<h1>dynamicdl.processing package<a class="headerlink" href="#dynamicdl-processing-package" title="Link to this heading"></a></h1>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
-</section>
-<section id="module-dynamicdl.processing.csvfile">
-<span id="dynamicdl-processing-csvfile-module"></span><h2>dynamicdl.processing.csvfile module<a class="headerlink" href="#module-dynamicdl.processing.csvfile" title="Link to this heading"></a></h2>
+  <section id="module-dynamicdl.processing.csvfile">
+<span id="file-processing"></span><h1>File Processing<a class="headerlink" href="#module-dynamicdl.processing.csvfile" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="dynamicdl.processing.csvfile.CSVFile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.csvfile.</span></span><span class="sig-name descname"><span class="pre">CSVFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><span class="pre">Generic</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><span class="pre">Alias</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing/csvfile.html#CSVFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.csvfile.CSVFile" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.csvfile.</span></span><span class="sig-name descname"><span class="pre">CSVFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="parsing.html#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="parsing.html#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><span class="pre">Generic</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="parsing.html#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><span class="pre">Alias</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing/csvfile.html#CSVFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.csvfile.CSVFile" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#dynamicdl.processing.datafile.DataFile" title="dynamicdl.processing.datafile.DataFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFile</span></code></a></p>
 <p>Utility functions for parsing csv files.</p>
 <dl class="py method">
@@ -117,10 +126,7 @@
 
 </dd></dl>
 
-</section>
-<section id="module-dynamicdl.processing.datafile">
-<span id="dynamicdl-processing-datafile-module"></span><h2>dynamicdl.processing.datafile module<a class="headerlink" href="#module-dynamicdl.processing.datafile" title="Link to this heading"></a></h2>
-<dl class="py class">
+<dl class="py class" id="module-dynamicdl.processing.datafile">
 <dt class="sig sig-object py" id="dynamicdl.processing.datafile.DataFile">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.datafile.</span></span><span class="sig-name descname"><span class="pre">DataFile</span></span><a class="reference internal" href="_modules/dynamicdl/processing/datafile.html#DataFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.datafile.DataFile" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
@@ -138,10 +144,7 @@
 
 </dd></dl>
 
-</section>
-<section id="module-dynamicdl.processing.images">
-<span id="dynamicdl-processing-images-module"></span><h2>dynamicdl.processing.images module<a class="headerlink" href="#module-dynamicdl.processing.images" title="Link to this heading"></a></h2>
-<p>Image dummy classes.</p>
+<p id="module-dynamicdl.processing.images">Image dummy classes.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="dynamicdl.processing.images.ImageEntry">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.images.</span></span><span class="sig-name descname"><span class="pre">ImageEntry</span></span><a class="reference internal" href="_modules/dynamicdl/processing/images.html#ImageEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.images.ImageEntry" title="Link to this definition"></a></dt>
@@ -160,12 +163,9 @@ filestructure formats. It is a dummy object which provides absolute file and seg
 map data during processing, and is a marker object to recognize the presence of an image.</p>
 </dd></dl>
 
-</section>
-<section id="module-dynamicdl.processing.jsonfile">
-<span id="dynamicdl-processing-jsonfile-module"></span><h2>dynamicdl.processing.jsonfile module<a class="headerlink" href="#module-dynamicdl.processing.jsonfile" title="Link to this heading"></a></h2>
-<dl class="py class">
+<dl class="py class" id="module-dynamicdl.processing.jsonfile">
 <dt class="sig sig-object py" id="dynamicdl.processing.jsonfile.JSONFile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.jsonfile.</span></span><span class="sig-name descname"><span class="pre">JSONFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><span class="pre">Generic</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><span class="pre">Alias</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing/jsonfile.html#JSONFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.jsonfile.JSONFile" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.jsonfile.</span></span><span class="sig-name descname"><span class="pre">JSONFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="parsing.html#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="parsing.html#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><span class="pre">Generic</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="parsing.html#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><span class="pre">Alias</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing/jsonfile.html#JSONFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.jsonfile.JSONFile" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#dynamicdl.processing.datafile.DataFile" title="dynamicdl.processing.datafile.DataFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFile</span></code></a></p>
 <p>Annotation file notator. The <cite>JSONFile</cite> class has the simplest conversion from the form up to
 parsing. Data essentially follows the dict/list format in Python.</p>
@@ -214,7 +214,7 @@ parsing. Data essentially follows the dict/list format in Python.</p>
 which can represent data items respectively.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>form</strong> (<em>dict</em><em>[</em><em>str</em><em> | </em><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><em>DataType</em></a><em> | </em><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><em>Static</em></a><em> | </em><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><em>Generic</em></a><em> | </em><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><em>Alias</em></a><em>, </em><em>Any</em><em>]</em>) – The form which matches the data to be read from JSONFile.</p>
+<dd class="field-odd"><p><strong>form</strong> (<em>dict</em><em>[</em><em>str</em><em> | </em><a class="reference internal" href="data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><em>DataType</em></a><em> | </em><a class="reference internal" href="parsing.html#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><em>Static</em></a><em> | </em><a class="reference internal" href="parsing.html#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><em>Generic</em></a><em> | </em><a class="reference internal" href="parsing.html#dynamicdl.parsing.alias.Alias" title="dynamicdl.parsing.alias.Alias"><em>Alias</em></a><em>, </em><em>Any</em><em>]</em>) – The form which matches the data to be read from JSONFile.</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -230,12 +230,9 @@ which can represent data items respectively.</p>
 
 </dd></dl>
 
-</section>
-<section id="module-dynamicdl.processing.txtfile">
-<span id="dynamicdl-processing-txtfile-module"></span><h2>dynamicdl.processing.txtfile module<a class="headerlink" href="#module-dynamicdl.processing.txtfile" title="Link to this heading"></a></h2>
-<dl class="py class">
+<dl class="py class" id="module-dynamicdl.processing.txtfile">
 <dt class="sig sig-object py" id="dynamicdl.processing.txtfile.TXTFile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.txtfile.</span></span><span class="sig-name descname"><span class="pre">TXTFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><span class="pre">Generic</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><span class="pre">Generic</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing/txtfile.html#TXTFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.txtfile.TXTFile" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.txtfile.</span></span><span class="sig-name descname"><span class="pre">TXTFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="parsing.html#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><span class="pre">Generic</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="parsing.html#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><span class="pre">Generic</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing/txtfile.html#TXTFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.txtfile.TXTFile" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#dynamicdl.processing.datafile.DataFile" title="dynamicdl.processing.datafile.DataFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFile</span></code></a></p>
 <p>Utility functions for parsing txt files.</p>
 <dl class="py method">
@@ -251,12 +248,9 @@ which can represent data items respectively.</p>
 
 </dd></dl>
 
-</section>
-<section id="module-dynamicdl.processing.xmlfile">
-<span id="dynamicdl-processing-xmlfile-module"></span><h2>dynamicdl.processing.xmlfile module<a class="headerlink" href="#module-dynamicdl.processing.xmlfile" title="Link to this heading"></a></h2>
-<dl class="py class">
+<dl class="py class" id="module-dynamicdl.processing.xmlfile">
 <dt class="sig sig-object py" id="dynamicdl.processing.xmlfile.XMLFile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.xmlfile.</span></span><span class="sig-name descname"><span class="pre">XMLFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><span class="pre">Generic</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing/xmlfile.html#XMLFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.xmlfile.XMLFile" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.xmlfile.</span></span><span class="sig-name descname"><span class="pre">XMLFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="parsing.html#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="parsing.html#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><span class="pre">Generic</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing/xmlfile.html#XMLFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.xmlfile.XMLFile" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#dynamicdl.processing.datafile.DataFile" title="dynamicdl.processing.datafile.DataFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFile</span></code></a></p>
 <p>Utility functions for parsing xml files.</p>
 <dl class="py method">
@@ -272,12 +266,9 @@ which can represent data items respectively.</p>
 
 </dd></dl>
 
-</section>
-<section id="module-dynamicdl.processing.yamlfile">
-<span id="dynamicdl-processing-yamlfile-module"></span><h2>dynamicdl.processing.yamlfile module<a class="headerlink" href="#module-dynamicdl.processing.yamlfile" title="Link to this heading"></a></h2>
-<dl class="py class">
+<dl class="py class" id="module-dynamicdl.processing.yamlfile">
 <dt class="sig sig-object py" id="dynamicdl.processing.yamlfile.YAMLFile">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.yamlfile.</span></span><span class="sig-name descname"><span class="pre">YAMLFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="dynamicdl.parsing.html#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><span class="pre">Generic</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing/yamlfile.html#YAMLFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.yamlfile.YAMLFile" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.processing.yamlfile.</span></span><span class="sig-name descname"><span class="pre">YAMLFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="parsing.html#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="parsing.html#dynamicdl.parsing.generic.Generic" title="dynamicdl.parsing.generic.Generic"><span class="pre">Generic</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/processing/yamlfile.html#YAMLFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.processing.yamlfile.YAMLFile" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#dynamicdl.processing.datafile.DataFile" title="dynamicdl.processing.datafile.DataFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFile</span></code></a></p>
 <p>Utility functions for parsing yaml files.</p>
 <dl class="py method">
@@ -293,7 +284,6 @@ which can represent data items respectively.</p>
 
 </dd></dl>
 
-</section>
 <section id="module-dynamicdl.processing">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dynamicdl.processing" title="Link to this heading"></a></h2>
 <p>The <cite>dynamicdl.processing</cite> module handles file processing, including annotation files and
@@ -315,7 +305,7 @@ a File key indicator.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="dynamicdl.parsing.html" class="btn btn-neutral float-left" title="dynamicdl.parsing package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="parsing.html" class="btn btn-neutral float-left" title="Parsing Structures" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

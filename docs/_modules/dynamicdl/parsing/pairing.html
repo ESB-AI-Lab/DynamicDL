@@ -45,7 +45,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">DynamicData Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">DynamicDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamicdl.html">DynamicDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html">Data Items</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parsing.html">Parsing Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../processing.html">File Processing</a></li>
 </ul>
 
         </div>
@@ -76,7 +79,8 @@
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
-<span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">load_config</span><span class="p">,</span> <span class="n">Warnings</span>
+<span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">load_config</span>
+<span class="kn">from</span> <span class="nn">.._warnings</span> <span class="kn">import</span> <span class="n">Warnings</span>
 <span class="kn">from</span> <span class="nn">..data.tokens</span> <span class="kn">import</span> <span class="n">RedundantToken</span>
 <span class="kn">from</span> <span class="nn">..data.datatype</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">..data.datatypes</span> <span class="kn">import</span> <span class="n">DataTypes</span>
@@ -87,7 +91,7 @@
 <span class="n">config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Pairing">
-<a class="viewcode-back" href="../../../dynamicdl.parsing.html#dynamicdl.parsing.pairing.Pairing">[docs]</a>
+<a class="viewcode-back" href="../../../parsing.html#dynamicdl.parsing.pairing.Pairing">[docs]</a>
 <span class="k">class</span> <span class="nc">Pairing</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Pairing is a wrapper class used to specify when two or more nonunique datatypes should be</span>
@@ -113,7 +117,7 @@
                 <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;invalid_pairing&#39;</span><span class="p">,</span> <span class="n">paired</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">paired</span><span class="p">)))</span>
 
 <div class="viewcode-block" id="Pairing.update_pairing">
-<a class="viewcode-back" href="../../../dynamicdl.parsing.html#dynamicdl.parsing.pairing.Pairing.update_pairing">[docs]</a>
+<a class="viewcode-back" href="../../../parsing.html#dynamicdl.parsing.pairing.Pairing.update_pairing">[docs]</a>
     <span class="k">def</span> <span class="nf">update_pairing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="n">DataEntry</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Update a data entry with pairing values, and does nothing if the pairing does not aplpy.</span>
@@ -178,7 +182,7 @@
         <span class="k">return</span> <span class="n">pairs</span>
 
 <div class="viewcode-block" id="Pairing.find_pairings">
-<a class="viewcode-back" href="../../../dynamicdl.parsing.html#dynamicdl.parsing.pairing.Pairing.find_pairings">[docs]</a>
+<a class="viewcode-back" href="../../../parsing.html#dynamicdl.parsing.pairing.Pairing.find_pairings">[docs]</a>
     <span class="k">def</span> <span class="nf">find_pairings</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
@@ -197,7 +201,7 @@
 <span class="sd">         - `in_file` (`bool`): distinguisher to check usage of either `expand_generics`</span>
 <span class="sd">            or `expand_file_generics`.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="kn">from</span> <span class="nn">..engine</span> <span class="kn">import</span> <span class="n">expand_generics</span><span class="p">,</span> <span class="n">expand_file_generics</span>
+        <span class="kn">from</span> <span class="nn">.._main._engine</span> <span class="kn">import</span> <span class="n">expand_generics</span><span class="p">,</span> <span class="n">expand_file_generics</span>
         <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;MAX_PBAR_DEPTH&#39;</span><span class="p">]:</span>
             <span class="n">pbar</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">pbar</span><span class="p">:</span>

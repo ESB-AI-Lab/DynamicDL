@@ -12,7 +12,10 @@ Welcome to DynamicDL's documentation!
    
    installation
    tutorial
-   modules
+   dynamicdl
+   data
+   parsing
+   processing
 
 
 Indices and tables

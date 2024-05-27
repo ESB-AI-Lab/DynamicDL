@@ -1,59 +1,35 @@
-dynamicdl.processing package
-============================
-
-Submodules
-----------
-
-dynamicdl.processing.csvfile module
------------------------------------
+File Processing
+===============
 
 .. automodule:: dynamicdl.processing.csvfile
    :members:
    :undoc-members:
    :show-inheritance:
 
-dynamicdl.processing.datafile module
-------------------------------------
-
 .. automodule:: dynamicdl.processing.datafile
    :members:
    :undoc-members:
    :show-inheritance:
-
-dynamicdl.processing.images module
-----------------------------------
 
 .. automodule:: dynamicdl.processing.images
    :members:
    :undoc-members:
    :show-inheritance:
 
-dynamicdl.processing.jsonfile module
-------------------------------------
-
 .. automodule:: dynamicdl.processing.jsonfile
    :members:
    :undoc-members:
    :show-inheritance:
-
-dynamicdl.processing.txtfile module
------------------------------------
 
 .. automodule:: dynamicdl.processing.txtfile
    :members:
    :undoc-members:
    :show-inheritance:
 
-dynamicdl.processing.xmlfile module
------------------------------------
-
 .. automodule:: dynamicdl.processing.xmlfile
    :members:
    :undoc-members:
    :show-inheritance:
-
-dynamicdl.processing.yamlfile module
-------------------------------------
 
 .. automodule:: dynamicdl.processing.yamlfile
    :members:

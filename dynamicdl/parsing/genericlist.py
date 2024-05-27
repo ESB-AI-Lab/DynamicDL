@@ -1,7 +1,8 @@
 from typing import Union, Any, Optional
 from tqdm import tqdm
 
-from .._utils import union, load_config, Warnings
+from .._utils import union, load_config
+from .._warnings import Warnings
 from .static import Static
 
 config = load_config()
@@ -92,7 +93,7 @@ class GenericList:
         :param dataset: The dataset data, which should follow the syntax of `DynamicData` data.
         :type dataset: list[Any]
         '''
-        from ..engine import expand_generics
+        from .._main._engine import expand_generics
         if depth >= config['MAX_PBAR_DEPTH']:
             pbar = None
         if pbar:

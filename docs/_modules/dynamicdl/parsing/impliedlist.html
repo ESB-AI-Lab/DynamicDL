@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dynamicdl.parsing.ambiguouslist &mdash; DynamicDL 0.1.1-alpha documentation</title>
+  <title>dynamicdl.parsing.impliedlist &mdash; DynamicDL 0.1.1-alpha documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -66,7 +66,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">dynamicdl.parsing.ambiguouslist</li>
+      <li class="breadcrumb-item active">dynamicdl.parsing.impliedlist</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -75,86 +75,56 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for dynamicdl.parsing.ambiguouslist</h1><div class="highlight"><pre>
+  <h1>Source code for dynamicdl.parsing.impliedlist</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
-<span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">union</span>
+<span class="kn">from</span> <span class="nn">.._warnings</span> <span class="kn">import</span> <span class="n">Warnings</span>
+<span class="kn">from</span> <span class="nn">.._main._engine</span> <span class="kn">import</span> <span class="n">expand_generics</span>
+<span class="kn">from</span> <span class="nn">..data.datatype</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">.genericlist</span> <span class="kn">import</span> <span class="n">GenericList</span>
 <span class="kn">from</span> <span class="nn">.static</span> <span class="kn">import</span> <span class="n">Static</span>
 
-<div class="viewcode-block" id="AmbiguousList">
-<a class="viewcode-back" href="../../../parsing.html#dynamicdl.parsing.ambiguouslist.AmbiguousList">[docs]</a>
-<span class="k">class</span> <span class="nc">AmbiguousList</span><span class="p">:</span>
+<div class="viewcode-block" id="ImpliedList">
+<a class="viewcode-back" href="../../../parsing.html#dynamicdl.parsing.impliedlist.ImpliedList">[docs]</a>
+<span class="k">class</span> <span class="nc">ImpliedList</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Ambiguous List. Used to represent when an item could either be in a list, or a solo item.</span>
-<span class="sd">    This is primarily used for XML files.</span>
-<span class="sd">    </span>
-<span class="sd">    Example:</span>
-<span class="sd">    </span>
-<span class="sd">    .. code-block:: xml</span>
-
-<span class="sd">        &lt;annotation&gt;</span>
-<span class="sd">            &lt;box&gt;</span>
-<span class="sd">                &lt;x1&gt;1.0&lt;/x1&gt;</span>
-<span class="sd">                &lt;x2&gt;2.0&lt;/x2&gt;</span>
-<span class="sd">                &lt;y1&gt;3.0&lt;/x1&gt;</span>
-<span class="sd">                &lt;y2&gt;4.0&lt;/y2&gt;</span>
-<span class="sd">            &lt;/box&gt;</span>
-<span class="sd">        &lt;annotation&gt;</span>
-<span class="sd">        &lt;annotation&gt;</span>
-<span class="sd">            &lt;box&gt;</span>
-<span class="sd">                &lt;x1&gt;1.0&lt;/x1&gt;</span>
-<span class="sd">                &lt;x2&gt;2.0&lt;/x2&gt;</span>
-<span class="sd">                &lt;y1&gt;3.0&lt;/x1&gt;</span>
-<span class="sd">                &lt;y2&gt;4.0&lt;/y2&gt;</span>
-<span class="sd">            &lt;/box&gt;</span>
-<span class="sd">            &lt;box&gt;</span>
-<span class="sd">                &lt;x1&gt;5.0&lt;/x1&gt;</span>
-<span class="sd">                &lt;x2&gt;6.0&lt;/x2&gt;</span>
-<span class="sd">                &lt;y1&gt;7.0&lt;/x1&gt;</span>
-<span class="sd">                &lt;y2&gt;8.0&lt;/y2&gt;</span>
-<span class="sd">            &lt;/box&gt;</span>
-<span class="sd">        &lt;annotation&gt;</span>
-<span class="sd">        </span>
-<span class="sd">    Observe that the above XML file contains potentially multiple `box` tags. When the XML parser</span>
-<span class="sd">    encounters a tag, it is inferred to be a single tag such that for the first annotation, `box`</span>
-<span class="sd">    is a dict value with keys `x1`, `x2`, `y1`, `y2` but for the second annotation `box` is a list</span>
-<span class="sd">    of dicts following the form previously. In this case we wish to use `AmbiguousList` to</span>
-<span class="sd">    disambiguate the usage of the provided form with an XML file. `AmbiguousList` performs</span>
-<span class="sd">    identically to `GenericList` for multiple objects, and is primarily separate in order to detect</span>
-<span class="sd">    otherwise invisible errors with dataset parsing.</span>
-<span class="sd">    </span>
-<span class="sd">    :param form: Essentially a wrapper for `GenericList`. Either can provide the args to instantiate</span>
-<span class="sd">        a `GenericList`, or provide the `GenericList` object itself.</span>
-<span class="sd">    :type form: GenericList | list | Any</span>
+<span class="sd">    The `ImpliedList` class is meant to pair its objects with their associated index. </span>
+<span class="sd">    Implied list, meant especially for pairing object. Allows the index of each item to be</span>
+<span class="sd">    associated with that object. This is especially useful for datasets such as the YOLOv8 set,</span>
+<span class="sd">    where list of class names are provided with their index inferred to be the class id.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GenericList</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GenericList</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">indexer</span><span class="p">:</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="n">form</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">GenericList</span><span class="p">)</span> <span class="k">else</span> <span class="n">GenericList</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indexer</span> <span class="o">=</span> <span class="n">indexer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">start</span>
 
-<div class="viewcode-block" id="AmbiguousList.expand">
-<a class="viewcode-back" href="../../../parsing.html#dynamicdl.parsing.ambiguouslist.AmbiguousList.expand">[docs]</a>
+<div class="viewcode-block" id="ImpliedList.expand">
+<a class="viewcode-back" href="../../../parsing.html#dynamicdl.parsing.impliedlist.ImpliedList.expand">[docs]</a>
     <span class="k">def</span> <span class="nf">expand</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="n">dataset</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
         <span class="n">pbar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">tqdm</span><span class="p">],</span>
         <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Expand potential list into dict of statics.</span>
+<span class="sd">        Expand implied list into dict of statics.</span>
 <span class="sd">        </span>
-<span class="sd">        :param dataset: The dataset data, which is either a single value or a list of values</span>
-<span class="sd">            following some format.</span>
-<span class="sd">        :type dataset: Any</span>
+<span class="sd">        :param dataset: The dataset data, which must be a list of values following some format.</span>
+<span class="sd">        :type dataset: list</span>
 <span class="sd">        :return: The parsed expansion of `Static` values, always a list. Single values are converted</span>
 <span class="sd">            to lists of length 1. Note: for consistency lists are converted to dicts with int keys.</span>
 <span class="sd">        :rtype: dict[int, Any]</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="n">union</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;incorrect_type&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">got</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">form</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">))</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">expand_generics</span><span class="p">(</span>
             <span class="n">path</span><span class="p">,</span>
             <span class="n">dataset</span><span class="p">,</span>
+            <span class="n">form</span><span class="p">,</span>
             <span class="n">pbar</span><span class="p">,</span>
             <span class="n">depth</span><span class="o">=</span><span class="n">depth</span>
         <span class="p">)</span></div>

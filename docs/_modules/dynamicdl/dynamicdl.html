@@ -45,7 +45,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">DynamicData Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules.html">DynamicDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dynamicdl.html">DynamicDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data.html">Data Items</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parsing.html">Parsing Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../processing.html">File Processing</a></li>
 </ul>
 
         </div>
@@ -111,9 +114,8 @@
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">isna</span>
 <span class="kn">from</span> <span class="nn">pandas.core.series</span> <span class="kn">import</span> <span class="n">Series</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">LongTensor</span><span class="p">,</span> <span class="n">FloatTensor</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">FloatTensor</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torchvision.datasets.vision</span> <span class="kn">import</span> <span class="n">VisionDataset</span>
 <span class="kn">from</span> <span class="nn">torchvision.utils</span> <span class="kn">import</span> <span class="n">draw_bounding_boxes</span>
 <span class="kn">import</span> <span class="nn">torchvision.transforms.functional</span> <span class="k">as</span> <span class="nn">F</span>
 <span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">transforms</span> <span class="k">as</span> <span class="n">T</span>
@@ -121,93 +123,43 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
 
-<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">next_avail_id</span><span class="p">,</span> <span class="n">union</span><span class="p">,</span> <span class="n">Warnings</span>
-<span class="kn">from</span> <span class="nn">.engine</span> <span class="kn">import</span> <span class="n">populate_data</span>
-<span class="kn">from</span> <span class="nn">.transforms</span> <span class="kn">import</span> <span class="n">Transforms</span>
-
-<span class="k">def</span> <span class="nf">_collate_classification</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
-    <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">batch</span><span class="p">)</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">images</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">IntTensor</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">labels</span><span class="p">))</span>
-    <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s1">&#39;stack expects each tensor to be equal size, but got&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
-            <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;invalid_shape&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;classification&#39;</span><span class="p">)</span>
-        <span class="k">raise</span>
-
-<span class="k">def</span> <span class="nf">_collate_classification_dim</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
-    <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">batch</span><span class="p">)</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">IntTensor</span><span class="p">([</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]),</span>
-              <span class="s1">&#39;dim&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]}</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">images</span><span class="p">),</span> <span class="n">labels</span>
-    <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s1">&#39;stack expects each tensor to be equal size, but got&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
-            <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;invalid_shape&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;classification&#39;</span><span class="p">)</span>
-        <span class="k">raise</span>
-
-<span class="k">def</span> <span class="nf">_collate_detection</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">batch</span><span class="p">))</span>
-
-<span class="k">def</span> <span class="nf">_collate_detection_dim</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
-    <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">batch</span><span class="p">)</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">IntTensor</span><span class="p">([</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]),</span>
-              <span class="s1">&#39;dim&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]}</span>
-    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">images</span><span class="p">),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">_collate_segmentation</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
-    <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">batch</span><span class="p">)</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">images</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s1">&#39;stack expects each tensor to be equal size, but got&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
-            <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;invalid_shape&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;segmentation&#39;</span><span class="p">)</span>
-        <span class="k">raise</span>
-
-<span class="k">def</span> <span class="nf">_collate_segmentation_dim</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
-    <span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">batch</span><span class="p">)</span>
-    <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]),</span>
-              <span class="s1">&#39;dim&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;dim&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]}</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">images</span><span class="p">),</span> <span class="n">labels</span>
-    <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s1">&#39;stack expects each tensor to be equal size, but got&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
-            <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;invalid_shape&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;segmentation&#39;</span><span class="p">)</span>
-        <span class="k">raise</span>
-
-<span class="k">def</span> <span class="nf">_collate_default</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">batch</span><span class="p">))</span>
-
-<span class="k">def</span> <span class="nf">_collate</span><span class="p">(</span><span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">store_dim</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Getters for all preset collate functions.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;classification&#39;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_collate_classification_dim</span> <span class="k">if</span> <span class="n">store_dim</span> <span class="k">else</span> <span class="n">_collate_classification</span>
-    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;segmentation&#39;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_collate_segmentation_dim</span> <span class="k">if</span> <span class="n">store_dim</span> <span class="k">else</span> <span class="n">_collate_segmentation</span>
-    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;detection&#39;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_collate_detection_dim</span> <span class="k">if</span> <span class="n">store_dim</span> <span class="k">else</span> <span class="n">_collate_detection</span>
-    <span class="k">return</span> <span class="n">_collate_default</span>
+<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">next_avail_id</span><span class="p">,</span> <span class="n">union</span>
+<span class="kn">from</span> <span class="nn">._warnings</span> <span class="kn">import</span> <span class="n">Warnings</span>
+<span class="kn">from</span> <span class="nn">._main._engine</span> <span class="kn">import</span> <span class="n">populate_data</span>
+<span class="kn">from</span> <span class="nn">._main._transforms</span> <span class="kn">import</span> <span class="n">Transforms</span>
+<span class="kn">from</span> <span class="nn">._main._collate</span> <span class="kn">import</span> <span class="n">_collate</span>
+<span class="kn">from</span> <span class="nn">.dynamicds</span> <span class="kn">import</span> <span class="n">DynamicDS</span>
 
 <div class="viewcode-block" id="DynamicData">
 <a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.dynamicdl.DynamicData">[docs]</a>
 <span class="k">class</span> <span class="nc">DynamicData</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Main dataset class. Accepts root directory path and dictionary form of the structure.</span>
+<span class="sd">    DynamicDL expands a generic dataset form and interprets it through a series of recursive</span>
+<span class="sd">    hierarchical inheritances, to flatten the dataset into a list of entries fit for image</span>
+<span class="sd">    processing.</span>
 <span class="sd">    </span>
-<span class="sd">    Args:</span>
-<span class="sd">     - `root` (`str`): the root directory to access the dataset.</span>
-<span class="sd">     - `form` (`dict`): the form of the dataset. See documentation for further details on valid</span>
-<span class="sd">        forms.</span>
-<span class="sd">     - `bbox_scale_option` (`str`): choose from either &#39;auto&#39;, &#39;zeroone&#39;, or &#39;full&#39; scale options to</span>
-<span class="sd">        define, or leave empty for automatic. Default: &#39;auto&#39;</span>
-<span class="sd">     - `seg_scale_option` (`str`): choose from either &#39;auto&#39;, &#39;zeroone&#39;, or &#39;full&#39; scale options to</span>
-<span class="sd">        define, or leave empty for automatic. Default: &#39;auto&#39;</span>
-<span class="sd">     - `get_md5_hashes` (`bool`): when set to True, create a new column which finds md5 hashes for</span>
-<span class="sd">        each image available, and makes sure there are no duplicates. Default: False</span>
-<span class="sd">     - `purge_duplicates` (`Optional[bool]`): when set to True, remove all duplicate image entries.</span>
-<span class="sd">        Duplicate images are defined by having the same md5 hash, so this has no effect when</span>
-<span class="sd">        get_md5_hashes is False. When set to False, do not purge duplicates. Default: None</span>
+<span class="sd">    :param root: The root directory to access the dataset.</span>
+<span class="sd">    :type root: str</span>
+<span class="sd">    :param form: The form of the dataset. See documentation for further details on valid forms.</span>
+<span class="sd">    :type form: dict</span>
+<span class="sd">    :param bbox_scale_option: Choose from either `auto`, `zeroone`, or `full` scale options to</span>
+<span class="sd">        define, or leave empty for automatic. `zeroone` assumes detection coordinates to be</span>
+<span class="sd">        interpreted on a 0-1 scale as ratios dependent on image size. `full` leaves coordinates</span>
+<span class="sd">        as is. `auto` for auto-detection. Default: `auto`</span>
+<span class="sd">    :type bbox_scale_option: str</span>
+<span class="sd">    :param seg_scale_option: Choose from either `auto`, `zeroone`, or `full` scale options to</span>
+<span class="sd">        define, or leave empty for automatic. `zeroone` assumes segmentation coordinates to be</span>
+<span class="sd">        interpreted on a 0-1 scale as ratios dependent on image size. `full` leaves coordinates</span>
+<span class="sd">        as is. `auto` for auto-detection. Default: `auto`</span>
+<span class="sd">    :type seg_scale_option: str</span>
+<span class="sd">    :param get_md5_hashes: When set to True, create a new column which finds md5 hashes for each</span>
+<span class="sd">        image available, and makes sure there are no duplicates. Default: `False`</span>
+<span class="sd">    :type get_md5_hashes: bool</span>
+<span class="sd">    :param purge_duplicates: When set to True, remove all duplicate image entries. Duplicate images</span>
+<span class="sd">        are defined by having the same md5 hash, so this has no effect when `get_md5_hashes` is </span>
+<span class="sd">        `False`. When set to `False`, do not purge duplicates. Default: `None`</span>
+<span class="sd">    :type purge_duplicates: Optional[bool]</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="n">_inference_cols</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ABSOLUTE_FILE&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_DIM&#39;</span><span class="p">}</span>
@@ -1336,144 +1288,6 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span></div>
 </div>
-
-
-<div class="viewcode-block" id="DynamicDS">
-<a class="viewcode-back" href="../../dynamicdl.html#dynamicdl.dynamicdl.DynamicDS">[docs]</a>
-<span class="k">class</span> <span class="nc">DynamicDS</span><span class="p">(</span><span class="n">VisionDataset</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Dataset implementation for the DynamicData environment.</span>
-<span class="sd">    </span>
-<span class="sd">    Args:</span>
-<span class="sd">    - `df` (`DataFrame`): the dataframe from DynamicData.</span>
-<span class="sd">    - `root` (`str`): the root of the dataset folder.</span>
-<span class="sd">    - `mode` (`str`): the mode of the data to retrieve, i.e. classification, segmentation, etc.</span>
-<span class="sd">    - `id_mapping` (`dict[int, int]`): the id mapping from the dataframe to retrieve class names.</span>
-<span class="sd">    This is used primarily as a safety feature in order to make sure that used IDs are provided</span>
-<span class="sd">    in order starting from 0 without holes so that training works properly.</span>
-<span class="sd">    - `image_type` (`str`): the type of the image to export, to convert PIL images to.</span>
-<span class="sd">    Default: &#39;RGB&#39;. Also accepts &#39;L&#39; and &#39;CMYK&#39;.</span>
-<span class="sd">    - `normalization` (`str`): the type of normalization that the dataset currently is formatted in,</span>
-<span class="sd">    for box and polygon items. Accepts &#39;full&#39; or &#39;zeroone&#39;.</span>
-<span class="sd">    - `normalize_to` (`str`): the type of normalization that the dataset is to be resized to, for</span>
-<span class="sd">    box and polygon items. Accepts &#39;full&#39; or &#39;zeroone&#39;.</span>
-<span class="sd">    - `transform` (`Optional[Callable]`): the transform operation to apply to the images.</span>
-<span class="sd">    - `target_transform` (`Optional[Callable]`): the transform operation on the labels.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
-        <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">id_mapping</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
-        <span class="n">image_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;RGB&#39;</span><span class="p">,</span>
-        <span class="n">normalization</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;full&#39;</span><span class="p">,</span>
-        <span class="n">store_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">resize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">normalize_to</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">transform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">target_transform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">df</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">image_type</span> <span class="o">=</span> <span class="n">image_type</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">id_mapping</span> <span class="o">=</span> <span class="n">id_mapping</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">store_dim</span> <span class="o">=</span> <span class="n">store_dim</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">resize</span> <span class="o">=</span> <span class="n">resize</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">normalize_to</span> <span class="o">=</span> <span class="n">normalize_to</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">normalization</span> <span class="o">=</span> <span class="n">normalization</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;segmentation&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id_mapping</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">root</span><span class="p">,</span>
-            <span class="n">transforms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
-            <span class="n">target_transform</span><span class="o">=</span><span class="n">target_transform</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_get_class_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_mapping</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;CLASS_ID&#39;</span><span class="p">])]</span>
-
-    <span class="k">def</span> <span class="nf">_get_bbox_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
-        <span class="c1"># execute checks</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;BOX&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;BBOX_CLASS_ID&#39;</span><span class="p">]),</span> \
-            <span class="s1">&#39;BOX and BBOX_CLASS_ID len mismatch&#39;</span>
-        <span class="n">class_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_mapping</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;BBOX_CLASS_ID&#39;</span><span class="p">]))</span>
-        <span class="n">boxes</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;BOX&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">:</span>
-            <span class="n">factor_resize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resize</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">factor_resize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalization</span> <span class="o">==</span> <span class="s1">&#39;full&#39;</span><span class="p">:</span>
-            <span class="n">factor_norm</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;IMAGE_DIM&#39;</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">factor_norm</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">apply_resize</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor_resize</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">factor_norm</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                  <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor_resize</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">factor_norm</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                                  <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor_resize</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">factor_norm</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                  <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor_resize</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">factor_norm</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">bbox_tensors</span> <span class="o">=</span> <span class="p">[</span><span class="n">FloatTensor</span><span class="p">(</span><span class="n">apply_resize</span><span class="p">(</span><span class="n">box</span><span class="p">))</span> <span class="k">for</span> <span class="n">box</span> <span class="ow">in</span> <span class="n">boxes</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">bbox_tensors</span><span class="p">:</span>
-            <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;empty_bbox&#39;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;ABSOLUTE_FILE&#39;</span><span class="p">])</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_dim</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">{</span>
-                <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;boxes&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">bbox_tensors</span><span class="p">),</span> <span class="s1">&#39;labels&#39;</span><span class="p">:</span> <span class="n">LongTensor</span><span class="p">(</span><span class="n">class_ids</span><span class="p">)},</span>
-                <span class="s1">&#39;dim&#39;</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;IMAGE_DIM&#39;</span><span class="p">]</span>
-            <span class="p">}</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;boxes&#39;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">bbox_tensors</span><span class="p">),</span> <span class="s1">&#39;labels&#39;</span><span class="p">:</span> <span class="n">LongTensor</span><span class="p">(</span><span class="n">class_ids</span><span class="p">)}</span>
-
-    <span class="k">def</span> <span class="nf">_get_seg_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s1">&#39;ABSOLUTE_FILE_SEG&#39;</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">to_tensor</span><span class="p">(</span><span class="n">open_image</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;ABSOLUTE_FILE_SEG&#39;</span><span class="p">]))</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
-            <span class="k">return</span> <span class="n">mask</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;POLYGON&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;SEG_CLASS_ID&#39;</span><span class="p">]),</span> \
-            <span class="s1">&#39;SEG_CLASS_ID and POLYGON len mismatch&#39;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-            <span class="n">factor_resize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resize</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;IMAGE_DIM&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-            <span class="n">factor_resize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalization</span> <span class="o">==</span> <span class="s1">&#39;full&#39;</span><span class="p">:</span>
-            <span class="n">factor_norm</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;IMAGE_DIM&#39;</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span> <span class="n">factor_norm</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">apply_resize</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor_resize</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">factor_norm</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                  <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">factor_resize</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">factor_norm</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">class_id</span><span class="p">,</span> <span class="n">polygon</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;SEG_CLASS_ID&#39;</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;POLYGON&#39;</span><span class="p">]):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">polygon</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">apply_resize</span><span class="p">,</span> <span class="n">polygon</span><span class="p">))</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">fillPoly</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">pts</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)],</span>
-                            <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id_mapping</span><span class="p">[</span><span class="n">class_id</span><span class="p">])</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mask</span><span class="p">))</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">mask</span>
-
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
-        <span class="n">item</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-        <span class="n">image</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">to_tensor</span><span class="p">(</span><span class="n">open_image</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ABSOLUTE_FILE&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_type</span><span class="p">))</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">:</span>
-            <span class="n">image</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
-        <span class="n">label</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;inference&#39;</span><span class="p">,</span> <span class="s1">&#39;diffusion&#39;</span><span class="p">}:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">:</span>
-                <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;dim&#39;</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;IMAGE_DIM&#39;</span><span class="p">]}</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;classification&#39;</span><span class="p">:</span>
-            <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_class_labels</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;detection&#39;</span><span class="p">:</span>
-            <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_bbox_labels</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;segmentation&#39;</span><span class="p">:</span>
-            <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_seg_labels</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="p">:</span>
-            <span class="n">image</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_dim</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span> <span class="s1">&#39;dim&#39;</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;IMAGE_DIM&#39;</span><span class="p">]}</span>
-        <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="n">label</span></div>
 
 </pre></div>
 
