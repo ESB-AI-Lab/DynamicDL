@@ -25,4 +25,5 @@ setup(
         "jsonpickle>=3.0.0,<=3.1.0",
         "matplotlib>=3.6.0,<=3.8.4"
     ],
+    data_files='dynamicdl/config.json'
 )
