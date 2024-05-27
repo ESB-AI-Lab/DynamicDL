@@ -1,9 +1,10 @@
 '''
 Private utility functions for DynamicData.
 '''
-import os
 import json
 from typing import Union
+
+from .config import config
 
 def union(item: Union[list[object], object]) -> list[object]:
     '''
@@ -37,6 +38,4 @@ def check_map(it, num):
 
 def load_config():
     '''Load config object'''
-    with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r', encoding='utf-8') as f:
-        return json.load(f)
-
+    return config

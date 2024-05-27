@@ -4,6 +4,24 @@ Installation
 Currently DynamicDL is in alpha stage, meaning it is highly volatile. We recommend using some sort 
 of environment manager to maintain your versions.
 
+Installation of the latest release via pip:
+
+.. code-block:: shell
+
+   $ python -m venv .venv
+   $ source .venv/bin/activate
+   (venv) $ pip install dynamicdl
+
+Installation of the latest commit (dev version):
+
+.. code-block:: shell
+
+   $ python -m venv .venv && source .venv/bin/activate
+   (venv) $ git clone https://github.com/ESB-AI-Lab/DynamicDL.git dynamicdl && cd dynamicdl
+   (venv) $ pip install .
+   (venv) $ cd ..
+   (venv) $ rm -rf dynamicdl
+
 pip install:
 
 .. code-block:: shell
@@ -18,5 +36,8 @@ Building from source:
 
     $ python -m venv .venv
     $ source .venv/bin/activate
-    (venv) $ git clone https://github.com/ESB-AI-Lab/DynamicDL
+    (venv) $ git clone https://github.com/ESB-AI-Lab/DynamicDL.git dynamicdl2
+    (venv) $ cd dynamicdl
     (venv) $ pip install .
+    (venv) $ cd ..
+    (venv) $ rm -rf dynamicdl

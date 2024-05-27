@@ -1,9 +1,5 @@
 [build-system]
-requires = [
-    "setuptools>=60",
-    "setuptools-scm>=8.0",
-    "wheel"
-]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.poetry]
@@ -15,6 +11,7 @@ license = "Apache-2.0"
 readme = "README.md"
 homepage = "https://esb-ai-lab.github.io/DynamicDL"
 repository = "https://github.com/ESB-AI-Lab/DynamicDL"
+include = [{ path = "dynamicdl/config.json", format = ["sdist", "wheel"] }]
 
 [tool.poetry.dependencies]
 python = ">=3.9"

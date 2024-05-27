@@ -82,6 +82,20 @@
 <h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
 <p>Currently DynamicDL is in alpha stage, meaning it is highly volatile. We recommend using some sort
 of environment manager to maintain your versions.</p>
+<p>Installation of the latest release via pip:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+$<span class="w"> </span><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>dynamicdl
+</pre></div>
+</div>
+<p>Installation of the latest commit (dev version):</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ESB-AI-Lab/DynamicDL.git<span class="w"> </span>dynamicdl<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>dynamicdl
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>..
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>$<span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>dynamicdl
+</pre></div>
+</div>
 <p>pip install:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
 $<span class="w"> </span><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
@@ -91,8 +105,11 @@ $<span class="w"> </span><span class="nb">source</span><span class="w"> </span>.
 <p>Building from source:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
 $<span class="w"> </span><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
-<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ESB-AI-Lab/DynamicDL
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ESB-AI-Lab/DynamicDL.git<span class="w"> </span>dynamicdl2
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>dynamicdl
 <span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>..
+<span class="o">(</span>venv<span class="o">)</span><span class="w"> </span>$<span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>dynamicdl
 </pre></div>
 </div>
 </section>
