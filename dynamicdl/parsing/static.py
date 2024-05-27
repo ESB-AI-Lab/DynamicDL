@@ -53,4 +53,5 @@ class Static:
         return matched, data
 
     def __repr__(self) -> str:
-        return f'*-{self.name} ({", ".join([str(item) for item in self.data])})-*'
+        return f'{self.name} ({", ".join([str(item) for item in self.data])})'
+    

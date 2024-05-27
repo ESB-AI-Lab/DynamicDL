@@ -87,8 +87,44 @@
 <span class="sd">    Ambiguous List. Used to represent when an item could either be in a list, or a solo item.</span>
 <span class="sd">    This is primarily used for XML files.</span>
 <span class="sd">    </span>
-<span class="sd">     - `form` (`GenericList | list | Any`): effectively wrapper for GenericList. Either provide with</span>
-<span class="sd">        GenericList instantiation values or provide a GenericList.</span>
+<span class="sd">    Example:</span>
+<span class="sd">    </span>
+<span class="sd">    .. code-block:: xml</span>
+
+<span class="sd">        &lt;annotation&gt;</span>
+<span class="sd">            &lt;box&gt;</span>
+<span class="sd">                &lt;x1&gt;1.0&lt;/x1&gt;</span>
+<span class="sd">                &lt;x2&gt;2.0&lt;/x2&gt;</span>
+<span class="sd">                &lt;y1&gt;3.0&lt;/x1&gt;</span>
+<span class="sd">                &lt;y2&gt;4.0&lt;/y2&gt;</span>
+<span class="sd">            &lt;/box&gt;</span>
+<span class="sd">        &lt;annotation&gt;</span>
+<span class="sd">        &lt;annotation&gt;</span>
+<span class="sd">            &lt;box&gt;</span>
+<span class="sd">                &lt;x1&gt;1.0&lt;/x1&gt;</span>
+<span class="sd">                &lt;x2&gt;2.0&lt;/x2&gt;</span>
+<span class="sd">                &lt;y1&gt;3.0&lt;/x1&gt;</span>
+<span class="sd">                &lt;y2&gt;4.0&lt;/y2&gt;</span>
+<span class="sd">            &lt;/box&gt;</span>
+<span class="sd">            &lt;box&gt;</span>
+<span class="sd">                &lt;x1&gt;5.0&lt;/x1&gt;</span>
+<span class="sd">                &lt;x2&gt;6.0&lt;/x2&gt;</span>
+<span class="sd">                &lt;y1&gt;7.0&lt;/x1&gt;</span>
+<span class="sd">                &lt;y2&gt;8.0&lt;/y2&gt;</span>
+<span class="sd">            &lt;/box&gt;</span>
+<span class="sd">        &lt;annotation&gt;</span>
+<span class="sd">        </span>
+<span class="sd">    Observe that the above XML file contains potentially multiple `box` tags. When the XML parser</span>
+<span class="sd">    encounters a tag, it is inferred to be a single tag such that for the first annotation, `box`</span>
+<span class="sd">    is a dict value with keys `x1`, `x2`, `y1`, `y2` but for the second annotation `box` is a list</span>
+<span class="sd">    of dicts following the form previously. In this case we wish to use `AmbiguousList` to</span>
+<span class="sd">    disambiguate the usage of the provided form with an XML file. `AmbiguousList` performs</span>
+<span class="sd">    identically to `GenericList` for multiple objects, and is primarily separate in order to detect</span>
+<span class="sd">    otherwise invisible errors with dataset parsing.</span>
+<span class="sd">    </span>
+<span class="sd">    :param form: Essentially a wrapper for `GenericList`. Either can provide the args to instantiate</span>
+<span class="sd">        a `GenericList`, or provide the `GenericList` object itself.</span>
+<span class="sd">    :type form: GenericList | list | Any</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">GenericList</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="n">form</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="n">GenericList</span><span class="p">)</span> <span class="k">else</span> <span class="n">GenericList</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
@@ -105,8 +141,12 @@
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Expand potential list into dict of statics.</span>
 <span class="sd">        </span>
-<span class="sd">         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of </span>
-<span class="sd">            `DynamicData` data.</span>
+<span class="sd">        :param dataset: The dataset data, which is either a single value or a list of values</span>
+<span class="sd">            following some format.</span>
+<span class="sd">        :type dataset: Any</span>
+<span class="sd">        :return: The parsed expansion of `Static` values, always a list. Single values are converted</span>
+<span class="sd">            to lists of length 1. Note: for consistency lists are converted to dicts with int keys.</span>
+<span class="sd">        :rtype: dict[int, Any]</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">union</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span>

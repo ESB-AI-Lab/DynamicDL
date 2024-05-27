@@ -4,6 +4,14 @@ dynamicdl.processing package
 Submodules
 ----------
 
+dynamicdl.processing.csvfile module
+-----------------------------------
+
+.. automodule:: dynamicdl.processing.csvfile
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dynamicdl.processing.datafile module
 ------------------------------------
 

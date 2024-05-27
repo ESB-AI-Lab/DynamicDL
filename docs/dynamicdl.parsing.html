@@ -151,28 +151,61 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Ambiguous List. Used to represent when an item could either be in a list, or a solo item.
 This is primarily used for XML files.</p>
-<blockquote>
-<div><ul class="simple">
-<li><dl class="simple">
-<dt><cite>form</cite> (<cite>GenericList | list | Any</cite>): effectively wrapper for GenericList. Either provide with</dt><dd><p>GenericList instantiation values or provide a GenericList.</p>
+<p>Example:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;annotation&gt;</span>
+<span class="w">    </span><span class="nt">&lt;box&gt;</span>
+<span class="w">        </span><span class="nt">&lt;x1&gt;</span>1.0<span class="nt">&lt;/x1&gt;</span>
+<span class="w">        </span><span class="nt">&lt;x2&gt;</span>2.0<span class="nt">&lt;/x2&gt;</span>
+<span class="w">        </span><span class="nt">&lt;y1&gt;</span>3.0<span class="nt">&lt;/x1&gt;</span>
+<span class="w">        </span><span class="nt">&lt;y2&gt;</span>4.0<span class="nt">&lt;/y2&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/box&gt;</span>
+<span class="nt">&lt;annotation&gt;</span>
+<span class="nt">&lt;annotation&gt;</span>
+<span class="w">    </span><span class="nt">&lt;box&gt;</span>
+<span class="w">        </span><span class="nt">&lt;x1&gt;</span>1.0<span class="nt">&lt;/x1&gt;</span>
+<span class="w">        </span><span class="nt">&lt;x2&gt;</span>2.0<span class="nt">&lt;/x2&gt;</span>
+<span class="w">        </span><span class="nt">&lt;y1&gt;</span>3.0<span class="nt">&lt;/x1&gt;</span>
+<span class="w">        </span><span class="nt">&lt;y2&gt;</span>4.0<span class="nt">&lt;/y2&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/box&gt;</span>
+<span class="w">    </span><span class="nt">&lt;box&gt;</span>
+<span class="w">        </span><span class="nt">&lt;x1&gt;</span>5.0<span class="nt">&lt;/x1&gt;</span>
+<span class="w">        </span><span class="nt">&lt;x2&gt;</span>6.0<span class="nt">&lt;/x2&gt;</span>
+<span class="w">        </span><span class="nt">&lt;y1&gt;</span>7.0<span class="nt">&lt;/x1&gt;</span>
+<span class="w">        </span><span class="nt">&lt;y2&gt;</span>8.0<span class="nt">&lt;/y2&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/box&gt;</span>
+<span class="nt">&lt;annotation&gt;</span>
+</pre></div>
+</div>
+<p>Observe that the above XML file contains potentially multiple <cite>box</cite> tags. When the XML parser
+encounters a tag, it is inferred to be a single tag such that for the first annotation, <cite>box</cite>
+is a dict value with keys <cite>x1</cite>, <cite>x2</cite>, <cite>y1</cite>, <cite>y2</cite> but for the second annotation <cite>box</cite> is a list
+of dicts following the form previously. In this case we wish to use <cite>AmbiguousList</cite> to
+disambiguate the usage of the provided form with an XML file. <cite>AmbiguousList</cite> performs
+identically to <cite>GenericList</cite> for multiple objects, and is primarily separate in order to detect
+otherwise invisible errors with dataset parsing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>form</strong> (<a class="reference internal" href="#dynamicdl.parsing.genericlist.GenericList" title="dynamicdl.parsing.genericlist.GenericList"><em>GenericList</em></a><em> | </em><em>list</em><em> | </em><em>Any</em>) – Essentially a wrapper for <cite>GenericList</cite>. Either can provide the args to instantiate
+a <cite>GenericList</cite>, or provide the <cite>GenericList</cite> object itself.</p>
 </dd>
 </dl>
-</li>
-</ul>
-</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="dynamicdl.parsing.ambiguouslist.AmbiguousList.expand">
 <span class="sig-name descname"><span class="pre">expand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/parsing/ambiguouslist.html#AmbiguousList.expand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.ambiguouslist.AmbiguousList.expand" title="Link to this definition"></a></dt>
 <dd><p>Expand potential list into dict of statics.</p>
-<blockquote>
-<div><ul class="simple">
-<li><dl class="simple">
-<dt><cite>dataset</cite> (<cite>list[Any]</cite>): the dataset data, which should follow the syntax of </dt><dd><p><cite>DynamicData</cite> data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dataset</strong> (<em>Any</em>) – The dataset data, which is either a single value or a list of values
+following some format.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The parsed expansion of <cite>Static</cite> values, always a list. Single values are converted
+to lists of length 1. Note: for consistency lists are converted to dicts with int keys.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[int, Any]</p>
 </dd>
 </dl>
-</li>
-</ul>
-</div></blockquote>
 </dd></dl>
 
 </dd></dl>
@@ -363,28 +396,71 @@ This may be useful when the filenames do indeed include <cite>.</cite> without i
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.parsing.genericlist.</span></span><span class="sig-name descname"><span class="pre">GenericList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/parsing/genericlist.html#GenericList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.genericlist.GenericList" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Generic list item. Items inside the list are expected to repeat mod <cite>len(form)</cite>.</p>
-<blockquote>
-<div><ul class="simple">
-<li><dl class="simple">
-<dt><cite>form</cite> (<cite>list[Any] | Any</cite>): the form to stick to. Each entry in <cite>form</cite> must be some valid</dt><dd><p>form following the syntax of <cite>DynamicData</cite> forms.</p>
+<p>Example:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;bounding_box&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="mf">1.0</span><span class="p">,</span>
+<span class="w">        </span><span class="mf">2.0</span><span class="p">,</span>
+<span class="w">        </span><span class="mf">3.0</span><span class="p">,</span>
+<span class="w">        </span><span class="mf">4.0</span><span class="p">,</span>
+<span class="w">        </span><span class="mf">5.0</span><span class="p">,</span>
+<span class="w">        </span><span class="mf">6.0</span><span class="p">,</span>
+<span class="w">        </span><span class="mf">7.0</span><span class="p">,</span>
+<span class="w">        </span><span class="mf">8.0</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Suppose that we wish to parse the bounding boxes for this particular json file. Let each value
+represent X1, Y1, X2, Y2 as needed. Then we can parse the form as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">form</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;bounding_box&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="n">DataTypes</span><span class="o">.</span><span class="n">X1</span><span class="p">,</span>
+        <span class="n">DataTypes</span><span class="o">.</span><span class="n">Y1</span><span class="p">,</span>
+        <span class="n">DataTypes</span><span class="o">.</span><span class="n">X2</span><span class="p">,</span>
+        <span class="n">DataTypes</span><span class="o">.</span><span class="n">Y2</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Suppose the format was changed to x, y pairs:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;bounding_box&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">],</span>
+<span class="w">        </span><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">],</span>
+<span class="w">        </span><span class="p">[</span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="mf">6.0</span><span class="p">],</span>
+<span class="w">        </span><span class="p">[</span><span class="mf">7.0</span><span class="p">,</span><span class="w"> </span><span class="mf">8.0</span><span class="p">]</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Its corresponding form:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">form</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;bounding_box&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">[</span><span class="n">DataTypes</span><span class="o">.</span><span class="n">X1</span><span class="p">,</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">Y1</span><span class="p">],</span>
+        <span class="p">[</span><span class="n">DataTypes</span><span class="o">.</span><span class="n">X2</span><span class="p">,</span> <span class="n">DataTypes</span><span class="o">.</span><span class="n">Y2</span><span class="p">]</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>During parsing, the standard python list is always inferred to be a <cite>GenericList</cite>. When the list
+items are 1:1, <cite>GenericList</cite> parses properly regardless.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>form</strong> (<em>list</em><em>[</em><em>Any</em><em>] </em><em>| </em><em>Any</em>) – The form to stick to. Each entry in <cite>form</cite> must be some valid generic-like form,
+and all items inside the <cite>form</cite> list will be combined into one object upon parsing.
+Further lines in the list are expected to conform to the same scheme as the first entry.</p>
 </dd>
 </dl>
-</li>
-</ul>
-</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="dynamicdl.parsing.genericlist.GenericList.expand">
 <span class="sig-name descname"><span class="pre">expand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/parsing/genericlist.html#GenericList.expand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.genericlist.GenericList.expand" title="Link to this definition"></a></dt>
-<dd><p>Expand list into dict of statics.</p>
-<blockquote>
-<div><ul class="simple">
-<li><dl class="simple">
-<dt><cite>dataset</cite> (<cite>list[Any]</cite>): the dataset data, which should follow the syntax of </dt><dd><p><cite>DynamicData</cite> data.</p>
+<dd><p>Expand list into dict of statics, for internal processing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dataset</strong> (<em>list</em><em>[</em><em>Any</em><em>]</em>) – The dataset data, which should follow the syntax of <cite>DynamicData</cite> data.</p>
 </dd>
 </dl>
-</li>
-</ul>
-</div></blockquote>
 </dd></dl>
 
 </dd></dl>
@@ -431,8 +507,8 @@ pattern.</p>
 <dt class="sig sig-object py" id="dynamicdl.parsing.pairing.Pairing">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.parsing.pairing.</span></span><span class="sig-name descname"><span class="pre">Pairing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">paired</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dynamicdl.data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><span class="pre">DataType</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/parsing/pairing.html#Pairing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.pairing.Pairing" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Used to specify when two nonunique datatypes should be associated together. Most commonly used
-to pair ID and name together.</p>
+<p>Pairing is a wrapper class used to specify when two or more nonunique datatypes should be
+associated together. Most commonly used to pair ID and name together.</p>
 <ul class="simple">
 <li><dl class="simple">
 <dt><cite>form</cite> (<cite>Any</cite>): Whatever follows the DynamicData specified form as required. Pairing is a</dt><dd><p>wrapper class so let it behave as it should</p>
@@ -484,26 +560,24 @@ the data internally.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Object to represent a collection of polygonal coordinates for segmentation. Functionally serves
 the purpose of being a wrapper class for <cite>GenericList</cite> and should be instantiated when the only
-contents inside are <cite>DataTypes.X</cite> and <cite>DataTypes.Y</cite> items as well as non-data items.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>form</cite> (<cite>GenericList | list</cite>): either a GenericList object or a list which will create a GL.</p></li>
-</ul>
-</div></blockquote>
+contents inside are <cite>DataTypes.X</cite> and <cite>DataTypes.Y</cite> items as well as non-data items. This
+class therefore provides a way to bundle together POLYGON data types with variable length points
+for handling thereafter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>form</strong> (<a class="reference internal" href="#dynamicdl.parsing.genericlist.GenericList" title="dynamicdl.parsing.genericlist.GenericList"><em>GenericList</em></a><em> | </em><em>list</em>) – Either a GenericList object or a list which will create a GL.</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="dynamicdl.parsing.segmentationobject.SegmentationObject.expand">
 <span class="sig-name descname"><span class="pre">expand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dynamicdl.parsing.static.Static" title="dynamicdl.parsing.static.Static"><span class="pre">Static</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/parsing/segmentationobject.html#SegmentationObject.expand"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.segmentationobject.SegmentationObject.expand" title="Link to this definition"></a></dt>
 <dd><p>Evaluate object by expanding and merging, and extracting the corresponding X, Y values
 which define the SegmentationObject.</p>
-<blockquote>
-<div><ul class="simple">
-<li><dl class="simple">
-<dt><cite>dataset</cite> (<cite>list[Any]</cite>): the dataset data, which should follow the syntax of </dt><dd><p><cite>DynamicData</cite> data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dataset</strong> (<em>list</em><em>[</em><em>Any</em><em>]</em>) – The dataset data, which should follow the syntax of <cite>DynamicData</cite> data.</p>
 </dd>
 </dl>
-</li>
-</ul>
-</div></blockquote>
 </dd></dl>
 
 </dd></dl>

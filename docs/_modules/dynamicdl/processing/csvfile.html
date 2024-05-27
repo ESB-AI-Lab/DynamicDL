@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dynamicdl.processing.jsonfile &mdash; DynamicDL 0.1.1-alpha documentation</title>
+  <title>dynamicdl.processing.csvfile &mdash; DynamicDL 0.1.1-alpha documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -63,7 +63,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">dynamicdl.processing.jsonfile</li>
+      <li class="breadcrumb-item active">dynamicdl.processing.csvfile</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -72,13 +72,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for dynamicdl.processing.jsonfile</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+  <h1>Source code for dynamicdl.processing.csvfile</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">import</span> <span class="nn">csv</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
-<span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">load_config</span>
+<span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">load_config</span><span class="p">,</span> <span class="n">Warnings</span>
 <span class="kn">from</span> <span class="nn">..data.datatype</span> <span class="kn">import</span> <span class="n">DataType</span>
+<span class="kn">from</span> <span class="nn">..data.dataentry</span> <span class="kn">import</span> <span class="n">DataEntry</span>
 <span class="kn">from</span> <span class="nn">..parsing.static</span> <span class="kn">import</span> <span class="n">Static</span>
 <span class="kn">from</span> <span class="nn">..parsing.generic</span> <span class="kn">import</span> <span class="n">Generic</span>
 <span class="kn">from</span> <span class="nn">..parsing.alias</span> <span class="kn">import</span> <span class="n">Alias</span>
@@ -86,71 +87,27 @@
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
 
-<div class="viewcode-block" id="JSONFile">
-<a class="viewcode-back" href="../../../dynamicdl.processing.html#dynamicdl.processing.jsonfile.JSONFile">[docs]</a>
-<span class="k">class</span> <span class="nc">JSONFile</span><span class="p">(</span><span class="n">DataFile</span><span class="p">):</span>
+<div class="viewcode-block" id="CSVFile">
+<a class="viewcode-back" href="../../../dynamicdl.processing.html#dynamicdl.processing.csvfile.CSVFile">[docs]</a>
+<span class="k">class</span> <span class="nc">CSVFile</span><span class="p">(</span><span class="n">DataFile</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Annotation file notator. The `JSONFile` class has the simplest conversion from the form up to</span>
-<span class="sd">    parsing. Data essentially follows the dict/list format in Python.</span>
-<span class="sd">    </span>
-<span class="sd">    Example:</span>
-<span class="sd">    </span>
-<span class="sd">    .. code-block:: json</span>
-
-<span class="sd">        {</span>
-<span class="sd">            &quot;images&quot;: [</span>
-<span class="sd">                {</span>
-<span class="sd">                    &quot;id&quot;: 0,</span>
-<span class="sd">                    &quot;file_name&quot;: &quot;sample.jpg&quot;</span>
-<span class="sd">                }</span>
-<span class="sd">            ],</span>
-<span class="sd">            &quot;categories&quot;: [</span>
-<span class="sd">                {</span>
-<span class="sd">                    &quot;id&quot;: 0,</span>
-<span class="sd">                    &quot;name&quot;: &quot;my_class&quot;</span>
-<span class="sd">                }</span>
-<span class="sd">            ],</span>
-<span class="sd">            &quot;annotations&quot;: [</span>
-<span class="sd">                {</span>
-<span class="sd">                    &quot;image_id&quot;: 0,</span>
-<span class="sd">                    &quot;category_id&quot;: 0,</span>
-<span class="sd">                    &quot;bbox&quot;: [1.0, 2.0, 3.0, 4.0]</span>
-<span class="sd">                }</span>
-<span class="sd">            ]</span>
-<span class="sd">        }</span>
-<span class="sd">    </span>
-<span class="sd">    .. code-block:: python</span>
-<span class="sd">    </span>
-<span class="sd">        JSONFile({</span>
-<span class="sd">            &#39;images&#39;: [{</span>
-<span class="sd">                &#39;id&#39;: DT.IMAGE_ID,</span>
-<span class="sd">                &#39;file_name&#39;: Generic(&#39;{}.jpg&#39;, DT.IMAGE_NAME)</span>
-<span class="sd">            }],</span>
-<span class="sd">            &#39;categories&#39;: Pairing([{</span>
-<span class="sd">                &#39;id&#39;: DT.BBOX_CLASS_ID,</span>
-<span class="sd">                &#39;name&#39;: DT.BBOX_CLASS_NAME</span>
-<span class="sd">            }], DT.BBOX_CLASS_ID, DT.BBOX_CLASS_NAME),</span>
-<span class="sd">            &#39;annotations&#39;: [{</span>
-<span class="sd">                &#39;image_id&#39;: DT.IMAGE_ID,</span>
-<span class="sd">                &#39;category_id&#39;: DT.BBOX_CLASS_ID,</span>
-<span class="sd">                &#39;bbox&#39;: [DT.XMIN, DT.YMIN, DT.WIDTH, DT.HEIGHT]</span>
-<span class="sd">            }]</span>
-<span class="sd">        })</span>
-<span class="sd">    </span>
-<span class="sd">    Notice how the JSONFile constructor matches exactly the style of the json data, denoting areas</span>
-<span class="sd">    which can represent data items respectively.</span>
-<span class="sd">    </span>
-<span class="sd">    :param form: The form which matches the data to be read from JSONFile.</span>
-<span class="sd">    :type form: dict[str | DataType | Static | Generic | Alias, Any]</span>
+<span class="sd">    Utility functions for parsing csv files.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">form</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">Static</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Alias</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span>
+        <span class="n">form</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">DataType</span><span class="p">,</span> <span class="n">Static</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Alias</span><span class="p">]],</span>
+        <span class="n">header</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="n">form</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">generic</span> <span class="ow">in</span> <span class="n">form</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">generic</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Generic</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">generic</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">generic</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="n">header</span>
 
-<div class="viewcode-block" id="JSONFile.parse">
-<a class="viewcode-back" href="../../../dynamicdl.processing.html#dynamicdl.processing.jsonfile.JSONFile.parse">[docs]</a>
+<div class="viewcode-block" id="CSVFile.parse">
+<a class="viewcode-back" href="../../../dynamicdl.processing.html#dynamicdl.processing.csvfile.CSVFile.parse">[docs]</a>
     <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -158,20 +115,27 @@
         <span class="n">pbar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">tqdm</span><span class="p">],</span>
         <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">..engine</span> <span class="kn">import</span> <span class="n">expand_generics</span>
         <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;MAX_PBAR_DEPTH&#39;</span><span class="p">]:</span>
             <span class="n">pbar</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">pbar</span><span class="p">:</span>
             <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expanding generics: </span><span class="si">{</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">curr_path</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">expand_generics</span><span class="p">(</span>
-            <span class="n">curr_path</span><span class="p">,</span>
-            <span class="n">data</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">,</span>
-            <span class="n">pbar</span><span class="p">,</span>
-            <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
-        <span class="p">)</span></div>
+            <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">ncol</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">reader</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">ncol</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">):</span>
+                <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;invalid_csv_cols&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">ncol</span><span class="p">,</span> <span class="n">exp</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+                <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">item</span><span class="p">,</span> <span class="n">form</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">):</span>
+                    <span class="n">res</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">:</span>
+                        <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;invalid_csv_value&#39;</span><span class="p">,</span> <span class="n">item</span><span class="o">=</span><span class="n">item</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">)</span>
+                    <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DataEntry</span><span class="p">(</span><span class="n">items</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">data</span></div>
 </div>
 
 </pre></div>

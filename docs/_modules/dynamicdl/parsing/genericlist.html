@@ -73,8 +73,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for dynamicdl.parsing.genericlist</h1><div class="highlight"><pre>
-<span></span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
 <span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">union</span><span class="p">,</span> <span class="n">load_config</span><span class="p">,</span> <span class="n">Warnings</span>
@@ -88,8 +87,68 @@
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Generic list item. Items inside the list are expected to repeat mod `len(form)`.</span>
 <span class="sd">    </span>
-<span class="sd">     - `form` (`list[Any] | Any`): the form to stick to. Each entry in `form` must be some valid</span>
-<span class="sd">        form following the syntax of `DynamicData` forms.</span>
+<span class="sd">    Example:</span>
+<span class="sd">    </span>
+<span class="sd">    .. code-block:: json</span>
+
+<span class="sd">        {</span>
+<span class="sd">            &quot;bounding_box&quot;: [</span>
+<span class="sd">                1.0,</span>
+<span class="sd">                2.0,</span>
+<span class="sd">                3.0,</span>
+<span class="sd">                4.0,</span>
+<span class="sd">                5.0,</span>
+<span class="sd">                6.0,</span>
+<span class="sd">                7.0,</span>
+<span class="sd">                8.0</span>
+<span class="sd">            ]</span>
+<span class="sd">        }</span>
+<span class="sd">        </span>
+<span class="sd">    Suppose that we wish to parse the bounding boxes for this particular json file. Let each value</span>
+<span class="sd">    represent X1, Y1, X2, Y2 as needed. Then we can parse the form as follows:</span>
+<span class="sd">    </span>
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        form = {</span>
+<span class="sd">            &quot;bounding_box&quot;: [</span>
+<span class="sd">                DataTypes.X1,</span>
+<span class="sd">                DataTypes.Y1,</span>
+<span class="sd">                DataTypes.X2,</span>
+<span class="sd">                DataTypes.Y2</span>
+<span class="sd">            ]</span>
+<span class="sd">        }</span>
+<span class="sd">        </span>
+<span class="sd">    Suppose the format was changed to x, y pairs:</span>
+<span class="sd">    </span>
+<span class="sd">    .. code-block:: json</span>
+
+<span class="sd">        {</span>
+<span class="sd">            &quot;bounding_box&quot;: [</span>
+<span class="sd">                [1.0, 2.0],</span>
+<span class="sd">                [3.0, 4.0],</span>
+<span class="sd">                [5.0, 6.0],</span>
+<span class="sd">                [7.0, 8.0]</span>
+<span class="sd">            ]</span>
+<span class="sd">        }</span>
+<span class="sd">    </span>
+<span class="sd">    Its corresponding form:</span>
+<span class="sd">    </span>
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        form = {</span>
+<span class="sd">            &quot;bounding_box&quot;: [</span>
+<span class="sd">                [DataTypes.X1, DataTypes.Y1],</span>
+<span class="sd">                [DataTypes.X2, DataTypes.Y2]</span>
+<span class="sd">            ]</span>
+<span class="sd">        }</span>
+<span class="sd">        </span>
+<span class="sd">    During parsing, the standard python list is always inferred to be a `GenericList`. When the list</span>
+<span class="sd">    items are 1:1, `GenericList` parses properly regardless.</span>
+<span class="sd">    </span>
+<span class="sd">    :param form: The form to stick to. Each entry in `form` must be some valid generic-like form,</span>
+<span class="sd">        and all items inside the `form` list will be combined into one object upon parsing.</span>
+<span class="sd">        Further lines in the list are expected to conform to the same scheme as the first entry.</span>
+<span class="sd">    :type form: list[Any] | Any</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -107,10 +166,10 @@
         <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">list</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Expand list into dict of statics.</span>
+<span class="sd">        Expand list into dict of statics, for internal processing.</span>
 <span class="sd">        </span>
-<span class="sd">         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of </span>
-<span class="sd">            `DynamicData` data.</span>
+<span class="sd">        :param dataset: The dataset data, which should follow the syntax of `DynamicData` data.</span>
+<span class="sd">        :type dataset: list[Any]</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="kn">from</span> <span class="nn">..engine</span> <span class="kn">import</span> <span class="n">expand_generics</span>
         <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;MAX_PBAR_DEPTH&#39;</span><span class="p">]:</span>

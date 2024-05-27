@@ -30,7 +30,7 @@ class DataItem:
         self.value = value
 
     def __repr__(self) -> str:
-        return f'{self.delimiter}: {self.value}'
+        return f'{self.delimiter.desc}: {self.value}'
 
     def __eq__(self, other: Self) -> bool:
         if self.__class__ != other.__class__:

@@ -91,9 +91,12 @@
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Object to represent a collection of polygonal coordinates for segmentation. Functionally serves</span>
 <span class="sd">    the purpose of being a wrapper class for `GenericList` and should be instantiated when the only</span>
-<span class="sd">    contents inside are `DataTypes.X` and `DataTypes.Y` items as well as non-data items.</span>
+<span class="sd">    contents inside are `DataTypes.X` and `DataTypes.Y` items as well as non-data items. This</span>
+<span class="sd">    class therefore provides a way to bundle together POLYGON data types with variable length points</span>
+<span class="sd">    for handling thereafter.</span>
 <span class="sd">    </span>
-<span class="sd">     - `form` (`GenericList | list`): either a GenericList object or a list which will create a GL.</span>
+<span class="sd">    :param form: Either a GenericList object or a list which will create a GL.</span>
+<span class="sd">    :type form: GenericList | list</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -107,12 +110,6 @@
     <span class="k">def</span> <span class="nf">_merge</span><span class="p">(</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Static</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataEntry</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Recursive process for merging data in segmentation object. Differs from main merge algorithm</span>
-<span class="sd">        because it can only process within unique values.</span>
-<span class="sd">        </span>
-<span class="sd">         - `data` (`dict[Static | int, Any] | Static`): the data to merge, from the expand call.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
         <span class="c1"># base cases</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Static</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">DataEntry</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
@@ -149,8 +146,8 @@
 <span class="sd">        Evaluate object by expanding and merging, and extracting the corresponding X, Y values</span>
 <span class="sd">        which define the SegmentationObject.</span>
 <span class="sd">        </span>
-<span class="sd">         - `dataset` (`list[Any]`): the dataset data, which should follow the syntax of </span>
-<span class="sd">            `DynamicData` data.</span>
+<span class="sd">        :param dataset: The dataset data, which should follow the syntax of `DynamicData` data.</span>
+<span class="sd">        :type dataset: list[Any]</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;MAX_PBAR_DEPTH&#39;</span><span class="p">]:</span>
             <span class="n">pbar</span> <span class="o">=</span> <span class="kc">None</span>

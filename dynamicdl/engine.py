@@ -3,7 +3,7 @@ import heapq
 from typing import Any, Optional, Union
 from tqdm import tqdm
 
-from ._utils import Warnings, check_map, load_config
+from ._utils import Warnings, load_config, MergeError
 from .data.tokens import UniqueToken
 from .data.datatype import DataType
 from .data.datatypes import DataTypes
@@ -338,9 +338,7 @@ def _merge(
             if isinstance(key, Static):
                 result.apply_tokens(key.data)
                 # result = DataEntry.merge(DataEntry(key.data), result)
-            if result.unique:
-                recursive.append([result])
-            else: recursive.append(result)
+            recursive.append(result)
             continue
         # list entry result
         if isinstance(key, Static):
@@ -361,15 +359,17 @@ def _merge(
         if tokens:
             for item in result:
                 for token in tokens:
-                    item.apply_tokens(token.data.values())
+                    item.apply_tokens(list(token.data.values()))
         return result
 
     # if inside unique loop, either can merge all together or result has multiple entries
-    if not check_map((item.unique for item in tokens), 2):
+    try:
         result = DataEntry([])
         for item in tokens:
-            result = DataEntry.merge(item, result)
+            result.merge_inplace(item)
         return result
+    except MergeError:
+        pass
 
     # if there are non unique entries then the data will naturally fall through as pairings are
     # meant to catch the nonunique data
@@ -382,7 +382,7 @@ def _merge(
             others.append(item)
     for other in others:
         for entry in uniques:
-            entry.apply_tokens(other.data.values())
+            entry.apply_tokens(list(other.data.values()))
     return uniques
 
 def populate_data(root_dir: str, form: dict, verbose: bool = False) -> list[DataEntry]:
