@@ -1,5 +1,4 @@
-from typing import Union, Any, Optional
-from tqdm import tqdm
+from typing import Union, Any
 
 from .._utils import union, load_config
 from .._warnings import Warnings

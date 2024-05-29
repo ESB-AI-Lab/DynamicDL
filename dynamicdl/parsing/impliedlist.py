@@ -1,5 +1,4 @@
-from typing import Union, Any, Optional
-from tqdm import tqdm
+from typing import Union, Any
 
 from .._warnings import Warnings
 from .._main._engine import expand_generics

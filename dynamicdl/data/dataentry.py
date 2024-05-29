@@ -6,9 +6,10 @@
 from typing import Union, Iterable
 from typing_extensions import Self
 
-from .._utils import union
+from .._utils import union, config
 from .._warnings import Warnings
 from .tokens import UniqueToken, WildcardToken, RedundantToken
+from .partialtype import PartialType
 from .dataitem import DataItem
 
 class DataEntry:
@@ -20,13 +21,7 @@ class DataEntry:
     :type items: list[DataItem] | DataItem
     '''
 
-    _valid_sets = [
-        {'IMAGE_SET_ID', 'IMAGE_SET_NAME'},
-        {'XMIN', 'XMAX', 'YMIN', 'YMAX', 'XMID', 'YMID', 'X1', 'X2', 'Y1', 'Y2', 'WIDTH', 'HEIGHT',
-         'BBOX_CLASS_ID', 'BBOX_CLASS_NAME'},
-        {'POLYGON', 'SEG_CLASS_ID', 'SEG_CLASS_NAME'},
-        {'X', 'Y'}
-    ]
+    _valid_sets = config['VALID_ENTRY_SETS']
 
     def __init__(self, items: Union[list[DataItem], DataItem]) -> None:
         items: list[DataItem] = union(items)
@@ -44,12 +39,14 @@ class DataEntry:
         :param other: The other data entry to merge into this instance.
         :type other: DataEntry
         '''
-        redundant_overlap = set()
+        redundant_overlap: set[Union[str, PartialType]] = set()
         for desc, item in other.data.items():
             if isinstance(item.delimiter.token_type, WildcardToken):
                 continue
             if isinstance(item.delimiter.token_type, RedundantToken):
                 if desc in self.data and self.data[desc] != other.data[desc]:
+                    if isinstance(item.delimiter, PartialType):
+                        desc = item.delimiter
                     redundant_overlap.add(desc)
                 continue
             if desc in self.data and self.data[desc] != other.data[desc]:
@@ -62,6 +59,12 @@ class DataEntry:
                     redundant_overlap = group
                     allocated = True
                     break
+            # catch partial types; they belong to same group if parents are all same
+            if not allocated and all(isinstance(dt, PartialType) for dt in redundant_overlap):
+                first = redundant_overlap.pop()
+                redundant_overlap.add(first)
+                if all(first.parent == dt.parent for dt in redundant_overlap):
+                    allocated = True
             if not allocated:
                 Warnings.error(
                     'merge_redundant_conflict',
@@ -75,8 +78,22 @@ class DataEntry:
         for desc, item in other.data.items():
             if desc not in self.data:
                 self.data[desc] = item
+                if isinstance(item.delimiter, PartialType):
+                    self._handle_partial_types(item.delimiter)
                 continue
         self._update_unique()
+
+    def _handle_partial_types(self, datatype: PartialType) -> None:
+        parent = datatype.parent
+        if set(map(lambda x: x, parent.datatypes)).issubset(self.data.keys()):
+            values = [self.data[dt].value for dt in parent.datatypes]
+            item = DataItem(parent.to, parent.construct(values))
+            # require recursive apply tokens to prevent merge conflicts
+            self.apply_tokens([item])
+            if parent.preserve_all:
+                return
+            for dt in parent.datatypes:
+                self.data.pop(dt)
 
     def apply_tokens(self, items: Iterable[DataItem]) -> None:
         '''
@@ -103,6 +120,8 @@ class DataEntry:
             if item.delimiter.desc not in self.data:
                 if not isinstance(item.delimiter.token_type, RedundantToken):
                     self.data[item.delimiter.desc] = item
+                    if isinstance(item.delimiter, PartialType):
+                        self._handle_partial_types(item.delimiter)
                     continue
                 for group in DataEntry._valid_sets:
                     if item.delimiter.desc in group:

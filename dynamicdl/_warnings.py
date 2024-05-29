@@ -88,6 +88,12 @@ class Warnings:
     incorrect_type = ('Expected list at path {path}, got {got} instead', RuntimeError)
     merged_all = ('The merging process returned one DataEntry, expected many', RuntimeError)
 
+    # data items
+    partial_overwrite = ('Partial datatype field {desc} was overwritten, which is not allowed',
+                         MergeError)
+    type_exists = ('Attempted to initialize a DataType object which already exists: {desc}',
+                   RuntimeError)
+
     @staticmethod
     def warn(name: str, **kwargs: str) -> None:
         '''

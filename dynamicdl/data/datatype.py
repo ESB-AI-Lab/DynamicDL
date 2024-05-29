@@ -1,6 +1,7 @@
 from typing import Optional
 from typing_extensions import Self
 
+from .._warnings import Warnings
 from .tokens import Token
 
 class DataType:
@@ -15,11 +16,15 @@ class DataType:
     :param token_type: The token type of the DataType.
     :type token_type: Token
     '''
+    types: dict[str, Self] = {}
 
     def __init__(self, desc: str, token_type: Token, doc: Optional[str] = None) -> None:
         self.desc: str = desc
         self.token_type: Token = token_type
         self.doc: str = doc if doc is not None else desc
+        if desc in DataType.types:
+            Warnings.error('type_exists', desc=desc)
+        DataType.types[desc] = self
 
     def __repr__(self) -> str:
         return f'{self.doc}'

@@ -31,9 +31,9 @@ class Alias:
         if len(generics) == 0:
             Warnings.error('generics_missing')
         self.generics = [generic if isinstance(generic, Generic)
-                         else Generic('{}', DataType) for generic in generics]
-        self.patterns: list[str] = [generic.pattern for generic in generics]
-        self.aliases: list[tuple[DataType, ...]] = [generic.data for generic in generics]
+                         else Generic('{}', generic) for generic in generics]
+        self.patterns: list[str] = [generic.pattern for generic in self.generics]
+        self.aliases: list[tuple[DataType, ...]] = [generic.data for generic in self.generics]
         self.desc = ''.join([token.desc for alias in self.aliases for token in alias])
 
     def match(self, entry: str) -> tuple[bool, list[DataItem]]:
