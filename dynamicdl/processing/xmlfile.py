@@ -19,21 +19,13 @@ class XMLFile(DataFile):
     def parse(
         self,
         path: str,
-        curr_path: list[str],
-        pbar: Optional[tqdm],
-        depth: int = 0
+        curr_path: list[str]
     ) -> dict:
         from .._main._engine import expand_generics
-        if depth >= config['MAX_PBAR_DEPTH']:
-            pbar = None
-        if pbar:
-            pbar.set_description(f'Expanding generics: {"/".join(curr_path)}')
         with open(path, 'r', encoding='utf-8') as f:
             data = xmltodict.parse(f.read())
         return expand_generics(
             curr_path,
             data,
-            self.form,
-            pbar,
-            depth = depth
+            self.form
         )

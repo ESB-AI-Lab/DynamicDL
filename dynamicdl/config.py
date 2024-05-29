@@ -1,3 +1,3 @@
 config = {
-    "MAX_PBAR_DEPTH": 2
+    "MAX_PBAR_DEPTH": 4
 }

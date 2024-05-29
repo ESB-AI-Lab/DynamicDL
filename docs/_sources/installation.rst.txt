@@ -10,14 +10,14 @@ Installation of the latest release via pip:
 
    $ python -m venv .venv
    $ source .venv/bin/activate
-   (venv) $ pip install dynamicdl
+   (.venv) $ pip install dynamicdl
 
 Installation of the latest commit (dev version):
 
 .. code-block:: shell
 
    $ python -m venv .venv && source .venv/bin/activate
-   (venv) $ git clone https://github.com/ESB-AI-Lab/DynamicDL.git dynamicdl && cd dynamicdl
-   (venv) $ pip install .
-   (venv) $ cd ..
-   (venv) $ rm -rf dynamicdl
+   (.venv) $ git clone https://github.com/ESB-AI-Lab/DynamicDL.git dynamicdl && cd dynamicdl
+   (.venv) $ pip install .
+   (.venv) $ cd ..
+   (.venv) $ rm -rf dynamicdl

@@ -83,9 +83,7 @@ class GenericList:
     def expand(
         self,
         path: list[str],
-        dataset: list[Any],
-        pbar: Optional[tqdm],
-        depth: int = 0
+        dataset: list[Any]
     ) -> tuple[dict[Static, Any], list]:
         '''
         Expand list into dict of statics, for internal processing.
@@ -94,10 +92,6 @@ class GenericList:
         :type dataset: list[Any]
         '''
         from .._main._engine import expand_generics
-        if depth >= config['MAX_PBAR_DEPTH']:
-            pbar = None
-        if pbar:
-            pbar.set_description(f'Expanding generics: {"/".join(path)}')
         if len(dataset) % len(self.form) != 0:
             Warnings.error('generic_list_length', length1=len(dataset), length2=len(self.form))
         item_list: list[Any] = []
@@ -107,9 +101,7 @@ class GenericList:
             result, pairing = expand_generics(
                 path + [str(index)],
                 entry,
-                self.form[index % len(self.form)],
-                pbar,
-                depth = depth + 1
+                self.form[index % len(self.form)]
             )
             pairings += pairing
             item.append(result)

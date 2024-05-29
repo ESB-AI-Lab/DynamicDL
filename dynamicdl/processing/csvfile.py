@@ -33,14 +33,8 @@ class CSVFile(DataFile):
     def parse(
         self,
         path: str,
-        curr_path: list[str],
-        pbar: Optional[tqdm],
-        depth: int = 0
+        curr_path: list[str]
     ) -> dict:
-        if depth >= config['MAX_PBAR_DEPTH']:
-            pbar = None
-        if pbar:
-            pbar.set_description(f'Expanding generics: {"/".join(curr_path)}')
         data = []
         with open(path, 'r', encoding='utf-8') as f:
             reader = csv.reader(f)

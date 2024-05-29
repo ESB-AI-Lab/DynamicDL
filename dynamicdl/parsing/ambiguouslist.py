@@ -55,9 +55,7 @@ class AmbiguousList:
     def expand(
         self,
         path: list[str],
-        dataset: Any,
-        pbar: Optional[tqdm],
-        depth: int = 0
+        dataset: Any
     ) -> dict[Static, Any]:
         '''
         Expand potential list into dict of statics.
@@ -70,9 +68,4 @@ class AmbiguousList:
         :rtype: dict[int, Any]
         '''
         dataset = union(dataset)
-        return self.form.expand(
-            path,
-            dataset,
-            pbar,
-            depth=depth
-        )
+        return self.form.expand(path, dataset)

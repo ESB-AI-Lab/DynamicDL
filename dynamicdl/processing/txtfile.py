@@ -32,9 +32,7 @@ class TXTFile(DataFile):
     def parse(
         self,
         path: str,
-        curr_path: list[str],
-        pbar: Optional[tqdm],
-        depth: int = 0
+        curr_path: list[str]
     ) -> dict:
         from .._main._engine import expand_generics
         def filter_ignores(line: str):
@@ -42,10 +40,6 @@ class TXTFile(DataFile):
                 if ignore_type.match(line)[0]:
                     return True
             return False
-        if depth >= config['MAX_PBAR_DEPTH']:
-            pbar = None
-        if pbar:
-            pbar.set_description(f'Expanding generics: {"/".join(curr_path)}')
         data = []
         with open(path, 'r', encoding='utf-8') as f:
             lines = f.readlines()
@@ -58,9 +52,7 @@ class TXTFile(DataFile):
         return expand_generics(
             curr_path,
             data,
-            self.form,
-            pbar,
-            depth = depth
+            self.form
         )
 
     @staticmethod

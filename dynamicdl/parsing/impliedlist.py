@@ -22,9 +22,7 @@ class ImpliedList:
     def expand(
         self,
         path: list[str],
-        dataset: list,
-        pbar: Optional[tqdm],
-        depth: int = 0
+        dataset: list
     ) -> dict[Static, Any]:
         '''
         Expand implied list into dict of statics.
@@ -42,7 +40,5 @@ class ImpliedList:
         return expand_generics(
             path,
             dataset,
-            form,
-            pbar,
-            depth=depth
+            form
         )

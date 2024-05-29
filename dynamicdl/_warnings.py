@@ -86,6 +86,7 @@ class Warnings:
     invalid_csv_value = ('Invalid data {item} encountered, failed to fit into generic {form}',
                          ValueError)
     incorrect_type = ('Expected list at path {path}, got {got} instead', RuntimeError)
+    merged_all = ('The merging process returned one DataEntry, expected many', RuntimeError)
 
     @staticmethod
     def warn(name: str, **kwargs: str) -> None:

@@ -19,15 +19,16 @@ from ..parsing.pairing import Pairing
 from ..parsing.ambiguouslist import AmbiguousList
 from ..processing.images import ImageEntry, SegmentationImage
 from ..processing.datafile import DataFile
+from ._utils import unique, key_has_data
 
 config = load_config()
+unique_identifiers: list[DataType] = [var for var in vars(DataTypes).values() if
+    isinstance(var, DataType) and isinstance(var.token_type, UniqueToken)]
 
 def expand_generics(
     path: list[str],
     dataset: Any,
-    root: Any,
-    pbar: Optional[tqdm] = None,
-    depth: int = 0
+    root: Any
 ) -> Union[dict, Static]:
     '''
     Expand all generics and replace with statics, inplace.
@@ -39,9 +40,7 @@ def expand_generics(
     if isinstance(root, (GenericList, SegmentationObject)):
         return root.expand(
             path,
-            dataset,
-            pbar,
-            depth = depth
+            dataset
         )
     if isinstance(root, DataType):
         root = Generic('{}', root)
@@ -54,10 +53,6 @@ def expand_generics(
     generics: list[Generic] = []
     names: set[Static] = set()
     pairings: list[Pairing] = []
-    if depth >= config['MAX_PBAR_DEPTH']:
-        pbar = None
-    if pbar:
-        pbar.set_description(f'Expanding generics: {"/".join(path)}')
     for i, key in enumerate(root):
         # priority queue push to prioritize generics with the most wildcards for disambiguation
         if isinstance(key, DataType):
@@ -111,18 +106,14 @@ def expand_generics(
             uniques, pairing = expand_generics(
                 path + [key.name if isinstance(key, Static) else str(key)],
                 dataset[key.name],
-                value,
-                pbar,
-                depth = depth + 1
+                value
             )
             expanded_root[key] = uniques
             pairings += pairing
         elif isinstance(value, (GenericList, AmbiguousList, SegmentationObject)):
             uniques, pairing = value.expand(
                 path + [key.name if isinstance(key, Static) else str(key)],
-                dataset[key.name],
-                pbar,
-                depth = depth + 1
+                dataset[key.name]
             )
             expanded_root[key] = uniques
             pairings += pairing
@@ -132,9 +123,7 @@ def expand_generics(
             value.find_pairings(
                 path + [key.name if isinstance(key, Static) else str(key)],
                 dataset[key.name],
-                pbar,
-                in_file = True,
-                depth = depth + 1
+                in_file = True
             )
             pairings.append(value)
             to_pop.append(key)
@@ -245,9 +234,7 @@ def expand_file_generics(
         elif isinstance(value, DataFile):
             uniques, pairing = value.parse(
                 os.path.join(path, key.name),
-                curr_path + [key.name],
-                pbar,
-                depth = depth + 1,
+                curr_path + [key.name]
             )
             expanded_root[key] = uniques
             pairings += pairing
@@ -266,7 +253,7 @@ def expand_file_generics(
             value.find_pairings(
                 os.path.join(path, key.name),
                 dataset[key.name],
-                pbar,
+                pbar = pbar,
                 in_file = False,
                 curr_path = curr_path + [key.name],
                 depth = depth + 1)
@@ -276,115 +263,85 @@ def expand_file_generics(
         expanded_root.pop(item)
     return expanded_root, pairings
 
-def _add_to_hashmap(hashmaps: dict[str, dict[str, DataEntry]], entry: DataEntry,
-                    unique_identifiers: list[DataType]) -> None:
-    for id_try in unique_identifiers:
-        value = entry.data.get(id_try.desc)
-        if not value:
-            continue
-        if value.value in hashmaps[id_try.desc]:
-            hashmaps[id_try.desc][value.value].merge_inplace(entry)
-            for id_update in unique_identifiers:
-                value_update = entry.data.get(id_update.desc)
-                if id_update == id_try or not value_update:
-                    continue
-                hashmaps[id_update.desc][value_update.value] = hashmaps[id_try.desc][value.value]
-            break
-        hashmaps[id_try.desc][value.value] = entry
-
-def _merge_lists(lists: list[list[DataEntry]]) -> list[DataEntry]:
-    if len(lists) == 0:
-        return []
-
-    # get all unique identifiers
-    unique_identifiers: list[DataType] = [var for var in vars(DataTypes).values() if
-        isinstance(var, DataType) and isinstance(var.token_type, UniqueToken)]
-
-    # append to hashmaps for efficient merge
-    hashmaps: dict[str, dict[str, DataEntry]] = {id.desc:{} for id in unique_identifiers}
-    for next_list in lists:
-        for entry in next_list:
-            _add_to_hashmap(hashmaps, entry, unique_identifiers)
-
-    # extract data from all hashmaps, same entries have same pointer so set works for unique items
-    data = set()
-    for identifier in unique_identifiers:
-        data.update(hashmaps[identifier.desc].values())
-    return list(data)
+def _add_to_hashmap(
+    hmap: dict[str, dict[str, DataEntry]],
+    entry: DataEntry
+) -> tuple[DataEntry, tuple[str, str]]:
+    for item in unique(entry):
+        name = entry.data[item].value
+        old_entry = hmap[item].get(name, None)
+        if old_entry is not None:
+            old_entry.merge_inplace(entry)
+            for desc in unique(old_entry):
+                name = old_entry.data[desc].value
+                hmap[desc][name] = old_entry
+            return old_entry, (desc, name)
+        hmap[item][name] = entry
+    return entry, (item, name)
 
 def _merge(
-    data: Union[dict[Union[Static, int], Any], Static],
+    dataset: Union[dict[Union[Static, int], Any], Static],
     path: list[str],
+    data: list[DataItem],
+    hmap: dict[str, dict[str, DataEntry]],
+    pbar: tqdm = None,
     depth: int = 0
-) -> Union[DataEntry, list[DataEntry]]:
-    # base cases
-    if isinstance(data, Static):
-        return DataEntry(data.data)
-    if len(data) == 0:
-        return []
-    recursive = []
+) -> Union[DataEntry | dict[DataEntry, tuple[str, str]]]:
+    if isinstance(dataset, Static):
+        entry = DataEntry(dataset.data)
+        return entry
+    if len(dataset) == 0:
+        return DataEntry([])
 
-    pbar = data.items()
-    if len(data) > 100:
-        pbar = tqdm(data.items(), desc="/".join(path), position=depth, leave=False)
-    # get result
-    for key, val in pbar:
-        result = _merge(
+    if depth >= config['MAX_PBAR_DEPTH'] or any('.' in token for token in path):
+        pbar = None
+    if pbar:
+        pbar.set_description(f'Merging | {"/".join(path)}')
+    
+    uniques: list[DataEntry] = []
+    lists: dict[DataEntry, tuple[str, str]] = {}
+    others: DataEntry = DataEntry([])
+    for key, val in dataset.items():
+        res = _merge(
             val,
             path + [key.name if isinstance(key, Static) else str(key)],
+            data + key.data if isinstance(key, Static) else [],
+            hmap,
+            pbar,
             depth = depth + 1
         )
-        # unique entry result
-        if isinstance(result, DataEntry):
-            if isinstance(key, Static):
-                result.apply_tokens(key.data)
-                # result = DataEntry.merge(DataEntry(key.data), result)
-            recursive.append(result)
+        if isinstance(res, dict):
+            lists.update({hmap[hloc][name]: (hloc, name) for hloc, name in res.values()})
             continue
-        # list entry result
-        if isinstance(key, Static):
-            for item in result:
-                item.apply_tokens(key.data)
-        recursive.append(result)
-    lists: list[list[DataEntry]] = []
-    tokens: list[DataEntry] = []
-    for item in recursive:
-        if isinstance(item, list):
-            lists.append(item)
+        if key_has_data(key):
+            res.apply_tokens(key.data)
+        if unique(res):
+            uniques.append(res)
         else:
-            tokens.append(item)
-
-    # if outside unique loop, merge lists and apply tokens as needed
+            others.apply_tokens(res.data.values())
     if lists:
-        result = _merge_lists(lists)
-        if tokens:
-            for item in result:
-                for token in tokens:
-                    item.apply_tokens(list(token.data.values()))
-        return result
-
-    # if inside unique loop, either can merge all together or result has multiple entries
+        # need to clean up assert
+        assert len(uniques) == 0, 'Cannot have unique values when unmergeables already exist'
+        for item in lists:
+            item.apply_tokens(others.data.values())
+        return lists
+    
+    if not uniques:
+        return others
+    
+    entry = DataEntry([])
     try:
-        result = DataEntry([])
-        for item in tokens:
-            result.merge_inplace(item)
-        return result
+        for item in uniques:
+            entry.apply_tokens(item.data.values())
+        entry.apply_tokens(others.data.values())
+        return entry
     except MergeError:
-        pass
-
-    # if there are non unique entries then the data will naturally fall through as pairings are
-    # meant to catch the nonunique data
-    uniques: list[DataEntry] = []
-    others: list[DataEntry] = []
-    for item in tokens:
-        if item.unique:
-            uniques.append(item)
-        else:
-            others.append(item)
-    for other in others:
-        for entry in uniques:
-            entry.apply_tokens(list(other.data.values()))
-    return uniques
+        for item in uniques:
+            item.apply_tokens(others.data.values())
+            item.apply_tokens(data)
+            entry, key = _add_to_hashmap(hmap, item)
+            lists[entry] = key
+        return lists
 
 def populate_data(root_dir: str, form: dict, verbose: bool = False) -> list[DataEntry]:
     '''
@@ -409,9 +366,18 @@ def populate_data(root_dir: str, form: dict, verbose: bool = False) -> list[Data
             form,
             pbar if verbose else None
         )
+        # from .._utils import get_str
+        # print(get_str(data))
         pbar.update(1)
         pbar.set_description('Merging data')
-        data = _merge(data, [], depth=1)
+        hmap = {id.desc:{} for id in unique_identifiers}
+        data = _merge(data, [], [], hmap, pbar, depth=1)
+        # from .._utils import get_str
+        # print(get_str(data))
+        if isinstance(data, DataEntry):
+            Warnings.error('merged_all')
+        data = [hmap[hloc][name] for hloc, name in data.values()]
+        
         pbar.update(1)
         pbar.set_description('Applying pairing entries')
         for pairing in pairings:
@@ -419,4 +385,4 @@ def populate_data(root_dir: str, form: dict, verbose: bool = False) -> list[Data
                 pairing.update_pairing(entry)
         pbar.update(1)
         pbar.set_description('Done!')
-    return _merge_lists([data])
+    return data

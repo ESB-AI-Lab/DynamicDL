@@ -37,51 +37,6 @@ class DataEntry:
         self.unique = any(isinstance(item.delimiter.token_type, UniqueToken)
             for item in self.data.values())
 
-    @classmethod
-    def merge(cls, first: Self, second: Self) -> Self:
-        '''
-        Merge two data entries together, storing it in a new instance. For inplace operations see
-        `merge_inplace`.
-        
-        :param first: The first data entry to merge.
-        :type first: DataEntry
-        :param second: The second data entry to merge.
-        :type second: DataEntry
-        '''
-        merged = cls(list(first.data.values()))
-        redundant_overlap = set()
-        for desc, item in second.data.items():
-            if isinstance(item.delimiter.token_type, WildcardToken):
-                continue
-            if isinstance(item.delimiter.token_type, RedundantToken):
-                if desc in merged.data and merged.data[desc] != second.data[desc]:
-                    redundant_overlap.add(desc)
-                continue
-            if desc in merged.data and merged.data[desc] != second.data[desc]:
-                Warnings.error('merge_conflict', first=first, second=second)
-        allocated = False
-        for group in DataEntry._valid_sets:
-            if redundant_overlap.issubset(group):
-                redundant_overlap = group
-                allocated = True
-                break
-        if not allocated:
-            Warnings.error(
-                'merge_redundant_conflict',
-                overlap=redundant_overlap,
-                first=first,
-                second=second
-            )
-        for desc in redundant_overlap:
-            if desc in merged.data and desc in second.data:
-                merged.data[desc].add(second.data[desc])
-        for desc, item in second.data.items():
-            if desc not in merged.data:
-                merged.data[desc] = item
-                continue
-        merged._update_unique()
-        return merged
-
     def merge_inplace(self, other: Self) -> None:
         '''
         Merge two data entries together, storing it in this instance.
@@ -99,29 +54,31 @@ class DataEntry:
                 continue
             if desc in self.data and self.data[desc] != other.data[desc]:
                 Warnings.error('merge_conflict', first=self, second=other)
-        allocated = False
-        for group in DataEntry._valid_sets:
-            if redundant_overlap.issubset(group):
-                redundant_overlap = group
-                allocated = True
-                break
-        if not allocated:
-            Warnings.error(
-                'merge_redundant_conflict',
-                overlap=redundant_overlap,
-                first=self,
-                second=other
-            )
-        for desc in redundant_overlap:
-            if desc in self.data and desc in other.data:
-                self.data[desc].add(other.data[desc])
+
+        if redundant_overlap:
+            allocated = False
+            for group in DataEntry._valid_sets:
+                if redundant_overlap.issubset(group):
+                    redundant_overlap = group
+                    allocated = True
+                    break
+            if not allocated:
+                Warnings.error(
+                    'merge_redundant_conflict',
+                    overlap=redundant_overlap,
+                    first=self,
+                    second=other
+                )
+            for desc in redundant_overlap:
+                if desc in self.data and desc in other.data:
+                    self.data[desc].add(other.data[desc])
         for desc, item in other.data.items():
             if desc not in self.data:
                 self.data[desc] = item
                 continue
         self._update_unique()
 
-    def apply_tokens(self, items: Union[list[DataItem], DataItem]) -> None:
+    def apply_tokens(self, items: Iterable[DataItem]) -> None:
         '''
         Apply new tokens to the item.
         
@@ -135,13 +92,12 @@ class DataEntry:
         for item in items:
             if isinstance(item.delimiter.token_type, RedundantToken):
                 continue
-            if isinstance(item.delimiter.token_type, UniqueToken):
-                if item.delimiter.desc in self.data and self.data[item.delimiter.desc] != item:
-                    Warnings.error(
-                        'merge_unique_conflict',
-                        parent=self.data[item.delimiter.desc],
-                        data=item
-                    )
+            if item.delimiter.desc in self.data and self.data[item.delimiter.desc] != item:
+                Warnings.error(
+                    'merge_unique_conflict',
+                    parent=self.data[item.delimiter.desc],
+                    token=item
+                )
         # merge
         for item in items:
             if item.delimiter.desc not in self.data:

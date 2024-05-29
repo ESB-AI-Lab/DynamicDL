@@ -102,7 +102,7 @@ class Pairing:
         self,
         path: Union[str, list[str]],
         dataset: Any,
-        pbar: Optional[tqdm],
+        pbar: Optional[tqdm] = None,
         curr_path: Optional[list[str]] = None,
         in_file: bool = True,
         depth: int = 0
@@ -117,19 +117,11 @@ class Pairing:
             or `expand_file_generics`.
         '''
         from .._main._engine import expand_generics, expand_file_generics
-        if depth >= config['MAX_PBAR_DEPTH']:
-            pbar = None
-        if pbar:
-            if curr_path is None:
-                curr_path = path
-            pbar.set_description(f'Expanding generics: {"/".join(curr_path)}')
         if in_file:
             expanded, _ = expand_generics(
                 path,
                 dataset,
-                self.form,
-                pbar,
-                depth = depth
+                self.form
             )
         else:
             expanded, _ = expand_file_generics(

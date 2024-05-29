@@ -45,24 +45,21 @@ class SegmentationObject:
             # unique entry result
             if isinstance(result, DataEntry):
                 if isinstance(key, Static):
-                    result = DataEntry.merge(DataEntry(key.data), result)
+                    result.apply_tokens(key.data)
                 if result.unique:
                     recursive.append([result])
                 else:
                     recursive.append(result)
 
-        # if inside unique loop, either can merge all together or result has multiple entries
         result = DataEntry([])
         for item in recursive:
-            result = DataEntry.merge(item, result)
+            result.merge_inplace(item)
         return result
 
     def expand(
         self,
         path: list[str],
-        dataset: list[Any],
-        pbar: Optional[tqdm],
-        depth: int = 0
+        dataset: list[Any]
     ) -> tuple[dict[Static, Any], list]:
         '''
         Evaluate object by expanding and merging, and extracting the corresponding X, Y values
@@ -71,15 +68,9 @@ class SegmentationObject:
         :param dataset: The dataset data, which should follow the syntax of `DynamicData` data.
         :type dataset: list[Any]
         '''
-        if depth >= config['MAX_PBAR_DEPTH']:
-            pbar = None
-        if pbar:
-            pbar.set_description(f'Expanding generics: {"/".join(path)}')
         item_dict, _ = self.form.expand(
             path,
-            dataset,
-            pbar,
-            depth=depth
+            dataset
         )
         entry = self._merge(item_dict)
         entry.data.pop('GENERIC', '')
