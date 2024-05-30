@@ -1,5 +1,4 @@
-from typing import Optional, Union, Any
-from tqdm import tqdm
+from typing import Union, Any
 import xmltodict
 
 from .._utils import load_config

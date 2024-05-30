@@ -6,10 +6,9 @@ from .tokens import Token
 
 class DataType:
     '''
-    `DataType` is a container class for storing relevant dataset items. As of 0.1.1-alpha, it is not
-    yet supported for users to create their own `DataType` objects. Instead, currently usage is
-    through the `DataTypes` module. This will change in future versions. Static objects and further
-    documentation are provided in the `DataTypes` class.
+    `DataType` is a container class for storing relevant dataset items. Token type options can be
+    found in the `tokens` module. Warning: DataType instantiates are persistent through program
+    execution, and can be accessed at the static dict `DataType.types`.
 
     :param desc: The purpose of the DataType. This should be unique for every new object.
     :type desc: str

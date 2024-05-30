@@ -95,22 +95,30 @@
 <span class="k">class</span> <span class="nc">DynamicDS</span><span class="p">(</span><span class="n">VisionDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Dataset implementation for the DynamicData environment.</span>
-<span class="sd">    </span>
-<span class="sd">    Args:</span>
-<span class="sd">    - `df` (`DataFrame`): the dataframe from DynamicData.</span>
-<span class="sd">    - `root` (`str`): the root of the dataset folder.</span>
-<span class="sd">    - `mode` (`str`): the mode of the data to retrieve, i.e. classification, segmentation, etc.</span>
-<span class="sd">    - `id_mapping` (`dict[int, int]`): the id mapping from the dataframe to retrieve class names.</span>
-<span class="sd">    This is used primarily as a safety feature in order to make sure that used IDs are provided</span>
-<span class="sd">    in order starting from 0 without holes so that training works properly.</span>
-<span class="sd">    - `image_type` (`str`): the type of the image to export, to convert PIL images to.</span>
-<span class="sd">    Default: &#39;RGB&#39;. Also accepts &#39;L&#39; and &#39;CMYK&#39;.</span>
-<span class="sd">    - `normalization` (`str`): the type of normalization that the dataset currently is formatted in,</span>
-<span class="sd">    for box and polygon items. Accepts &#39;full&#39; or &#39;zeroone&#39;.</span>
-<span class="sd">    - `normalize_to` (`str`): the type of normalization that the dataset is to be resized to, for</span>
-<span class="sd">    box and polygon items. Accepts &#39;full&#39; or &#39;zeroone&#39;.</span>
-<span class="sd">    - `transform` (`Optional[Callable]`): the transform operation to apply to the images.</span>
-<span class="sd">    - `target_transform` (`Optional[Callable]`): the transform operation on the labels.</span>
+
+<span class="sd">    :param df: The dataframe from DynamicData.</span>
+<span class="sd">    :type df: DataFrame</span>
+<span class="sd">    :param root: The root of the dataset folder.</span>
+<span class="sd">    :type root: str</span>
+<span class="sd">    :param mode: The mode of the data to retrieve, i.e. classification, segmentation, etc.</span>
+<span class="sd">    :type mode: str</span>
+<span class="sd">    :param id_mapping: The id mapping from the dataframe to retrieve class names. This is used</span>
+<span class="sd">        primarily as a safety feature in order to make sure that used IDs are provided in order</span>
+<span class="sd">        starting from 0 without holes so that training works properly.</span>
+<span class="sd">    :type id_mapping: dict[int, int]</span>
+<span class="sd">    :param image_type: The type of the image to export, to convert PIL images to.</span>
+<span class="sd">            Default: &#39;RGB&#39;. Also accepts &#39;L&#39; and &#39;CMYK&#39;.</span>
+<span class="sd">    :type image_type: str</span>
+<span class="sd">    :param normalization: The type of normalization that the dataset currently is formatted in,</span>
+<span class="sd">        for box and polygon items. Accepts &#39;full&#39; or &#39;zeroone&#39;.</span>
+<span class="sd">    :type normalization: str</span>
+<span class="sd">    :param normalize_to: The type of normalization that the dataset is to be resized to, for</span>
+<span class="sd">        box and polygon items. Accepts &#39;full&#39; or &#39;zeroone&#39;.</span>
+<span class="sd">    :type normalize_to: str</span>
+<span class="sd">    :param transform: The transform operation to apply to the images.</span>
+<span class="sd">    :type transform: Optional[Callable]</span>
+<span class="sd">    :param target_transform: The transform operation on the labels.</span>
+<span class="sd">    :type target_transform: Optional[Callable]</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>

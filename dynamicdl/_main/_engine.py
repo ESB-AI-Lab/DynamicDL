@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 from .._utils import load_config
 from .._warnings import Warnings, MergeError
-from ..data.tokens import UniqueToken
+from ..data.tokens import UniqueToken, WildcardToken
 from ..data.datatype import DataType
 from ..data.datatypes import DataTypes
 from ..data.dataitem import DataItem
@@ -325,10 +325,10 @@ def _merge(
         for item in lists:
             item.apply_tokens(others.data.values())
         return lists
-    
+
     if not uniques:
         return others
-    
+
     entry = DataEntry([])
     try:
         for item in uniques:
@@ -370,19 +370,22 @@ def populate_data(root_dir: str, form: dict, verbose: bool = False) -> list[Data
         # print(get_str(data))
         pbar.update(1)
         pbar.set_description('Merging data')
-        hmap = {id.desc:{} for id in unique_identifiers}
+        hmap: dict[str, dict[str, DataEntry]] = {id.desc:{} for id in unique_identifiers}
         data = _merge(data, [], [], hmap, pbar, depth=1)
         # from .._utils import get_str
         # print(get_str(data))
         if isinstance(data, DataEntry):
             Warnings.error('merged_all')
         data = [hmap[hloc][name] for hloc, name in data.values()]
-        
         pbar.update(1)
         pbar.set_description('Applying pairing entries')
         for pairing in pairings:
             for entry in data:
                 pairing.update_pairing(entry)
+        pbar.set_description('Removing all generic values')
+        for entry in data:
+            entry.data = {k: v for k, v in entry.data.items()
+                if not isinstance(v.delimiter.token_type, WildcardToken)}
         pbar.update(1)
         pbar.set_description('Done!')
     return data

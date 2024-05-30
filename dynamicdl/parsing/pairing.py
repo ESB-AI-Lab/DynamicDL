@@ -17,10 +17,11 @@ class Pairing:
     Pairing is a wrapper class used to specify when two or more nonunique datatypes should be
     associated together. Most commonly used to pair ID and name together. 
 
-    - `form` (`Any`): Whatever follows the DynamicData specified form as required. Pairing is a
-        wrapper class so let it behave as it should
-    - `paired` (`DataType`): Items which should be associated together.
-
+    :param form: Whatever follows the DynamicData specified form as required. Pairing is a
+        wrapper class so let it behave as it should.
+    :type form: Any
+    :param paired: Items which should be associated together.
+    :type paired: DataType
     '''
     def __init__(self, form: Any, *paired: DataType) -> None:
         if len(paired) <= 1:
@@ -40,7 +41,8 @@ class Pairing:
         '''
         Update a data entry with pairing values, and does nothing if the pairing does not aplpy.
         
-         - `entry` (`DataEntry`): the entry to apply this pairing
+        :param entry: The entry to apply this pairing
+        :type entry: DataEntry
         '''
         entry_vals = set(entry.data.keys())
         overlap = entry_vals.intersection(self.paired_desc)
@@ -111,10 +113,11 @@ class Pairing:
         Similar to other processes' `expand` function. Finds the pairing values and stores
         the data internally.
         
-         - `dataset` (`Any`): the dataset data, which should follow the syntax of `DynamicData`
-            data.
-         - `in_file` (`bool`): distinguisher to check usage of either `expand_generics`
+        :param dataset: The dataset data, which should follow the syntax of `DynamicData` data.
+        :type dataset: Any
+        :param in_file: Distinguisher to check usage of either `expand_generics`
             or `expand_file_generics`.
+        :type in_file: bool
         '''
         from .._main._engine import expand_generics, expand_file_generics
         if in_file:

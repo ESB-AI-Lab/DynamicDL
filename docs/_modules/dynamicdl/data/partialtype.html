@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dynamicdl.data.partialtype &mdash; DynamicDL 0.1.1-alpha documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e30984f2"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            DynamicDL
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">DynamicData Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamicdl.html">DynamicDL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data.html">Data Items</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parsing.html">Parsing Structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../processing.html">File Processing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DynamicDL</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">dynamicdl.data.partialtype</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for dynamicdl.data.partialtype</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
+
+<span class="c1"># from .._warnings import Warnings</span>
+<span class="kn">from</span> <span class="nn">.tokens</span> <span class="kn">import</span> <span class="n">RedundantToken</span>
+<span class="kn">from</span> <span class="nn">.datatype</span> <span class="kn">import</span> <span class="n">DataType</span>
+
+<div class="viewcode-block" id="PartialType">
+<a class="viewcode-back" href="../../../data.html#dynamicdl.data.partialtype.PartialType">[docs]</a>
+<span class="k">class</span> <span class="nc">PartialType</span><span class="p">(</span><span class="n">DataType</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The `PartialType` class is used to create datatypes which comprise of another type. This is</span>
+<span class="sd">    especially useful, for example, when one wishes to use an `IMAGE_ID`-like parameter but it is</span>
+<span class="sd">    not distinct throughout the dataset. Instead, suppose that the combination of `CLASS_NAME` and</span>
+<span class="sd">    `IMAGE_ID` forms some unique `IMAGE_NAME`. `PartialType` and its wrapper `ComboType` achieves</span>
+<span class="sd">    this functionality.</span>
+<span class="sd">    </span>
+<span class="sd">    Example:</span>
+<span class="sd">    </span>
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        my_id_type = DataType(&#39;my_id&#39;, IDToken())</span>
+<span class="sd">        my_image_name = ComboType(</span>
+<span class="sd">            DataTypes.IMAGE_NAME,</span>
+<span class="sd">            &#39;{}_{}&#39;,</span>
+<span class="sd">            DataTypes.CLASS_NAME,</span>
+<span class="sd">            my_id_type,</span>
+<span class="sd">            preserve_all = True</span>
+<span class="sd">        )</span>
+<span class="sd">        # ... other code</span>
+<span class="sd">        # we can now place `my_id_type` and `DataTypes.CLASS_NAME` in our form when parsing the</span>
+<span class="sd">        # dataset, and when they are found together they will automatically parse into</span>
+<span class="sd">        # DataTypes.IMAGE_NAME!</span>
+<span class="sd">    </span>
+<span class="sd">    Now, every IMAGE_NAME datatype will be constructed from the template `{CLASS_NAME}_{ID}` as we</span>
+<span class="sd">    have specified. This no longer creates merge conflicts! Note that we created a new ID type that</span>
+<span class="sd">    is not exactly IMAGE_ID, as IMAGE_ID is a unique token which should not be merged.</span>
+<span class="sd">    </span>
+<span class="sd">    :param desc: The purpose of the DataType. This should be unique for every new object.</span>
+<span class="sd">    :type desc: str</span>
+<span class="sd">    :param token_type: The token type of the DataType.</span>
+<span class="sd">    :type token_type: Token</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="s1">&#39;ComboType&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span> <span class="n">ComboType</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="ComboType">
+<a class="viewcode-back" href="../../../data.html#dynamicdl.data.partialtype.ComboType">[docs]</a>
+<span class="k">class</span> <span class="nc">ComboType</span><span class="p">(</span><span class="n">DataType</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    The `ComboType` class is used to create datatypes which comprise of another type. This is</span>
+<span class="sd">    especially useful, for example, when one wishes to use an `IMAGE_ID`-like parameter but it is</span>
+<span class="sd">    not distinct throughout the dataset. Instead, suppose that the combination of `CLASS_NAME` and</span>
+<span class="sd">    `IMAGE_ID` forms some unique `IMAGE_NAME`. `PartialType` and its wrapper `ComboType` achieves</span>
+<span class="sd">    this functionality. See the `PartialType` class for details.</span>
+<span class="sd">    </span>
+<span class="sd">    :param to: The `DataType` to convert the fully initialized `PartialType` collection to.</span>
+<span class="sd">    :type to: DataType</span>
+<span class="sd">    :param constructor: The structure to apply when converting to the `DataType`. Each `PartialType`</span>
+<span class="sd">        section should be replaced with a wildcard `{}` with the order presented in `datatypes`.</span>
+<span class="sd">    :type constructor: str</span>
+<span class="sd">    :param datatypes: The PartialTypes for which to make up the ComboType.</span>
+<span class="sd">    :type datatypes: PartialType</span>
+<span class="sd">    :param preserve_all: Preserves the data for each `PartialType` in the dataframe; otherwise,</span>
+<span class="sd">        constructing the `ComboType` will result in popping all `PartialType` data.</span>
+<span class="sd">    :type preserve_all: bool</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">to</span><span class="p">:</span> <span class="n">DataType</span><span class="p">,</span>
+        <span class="n">constructor</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">datatypes</span><span class="p">:</span> <span class="n">PartialType</span><span class="p">,</span>
+        <span class="n">preserve_all</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datatypes</span> <span class="o">=</span> <span class="p">{</span><span class="n">dt</span><span class="o">.</span><span class="n">desc</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">datatypes</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constructor</span> <span class="o">=</span> <span class="n">constructor</span>
+        <span class="c1"># assert lengths equal</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">to</span> <span class="o">=</span> <span class="n">to</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preserve_all</span> <span class="o">=</span> <span class="n">preserve_all</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">desc</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span>
+            <span class="n">token_type</span> <span class="o">=</span> <span class="n">to</span><span class="o">.</span><span class="n">token_type</span><span class="p">,</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Combo data type for </span><span class="si">{</span><span class="n">to</span><span class="o">.</span><span class="n">desc</span><span class="si">}</span><span class="s1">, comprised of elements &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datatypes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s1">. &#39;</span> <span class="o">+</span> <span class="n">to</span><span class="o">.</span><span class="n">doc</span><span class="p">)</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="ComboType.construct">
+<a class="viewcode-back" href="../../../data.html#dynamicdl.data.partialtype.ComboType.construct">[docs]</a>
+    <span class="k">def</span> <span class="nf">construct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Construct the full datatype value</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">token_type</span><span class="p">,</span> <span class="n">RedundantToken</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to</span><span class="o">.</span><span class="n">token_type</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">constructor</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">entry</span><span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">)]</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to</span><span class="o">.</span><span class="n">token_type</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">constructor</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">)</span>
+        <span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Anthony Tong.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

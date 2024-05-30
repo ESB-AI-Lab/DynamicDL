@@ -24,6 +24,11 @@ Data
    :undoc-members:
    :show-inheritance:
 
+.. automodule:: dynamicdl.data.partialtype
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Tokens
 ------
 

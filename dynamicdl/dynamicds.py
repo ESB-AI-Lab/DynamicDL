@@ -15,22 +15,30 @@ from ._warnings import Warnings
 class DynamicDS(VisionDataset):
     '''
     Dataset implementation for the DynamicData environment.
-    
-    Args:
-    - `df` (`DataFrame`): the dataframe from DynamicData.
-    - `root` (`str`): the root of the dataset folder.
-    - `mode` (`str`): the mode of the data to retrieve, i.e. classification, segmentation, etc.
-    - `id_mapping` (`dict[int, int]`): the id mapping from the dataframe to retrieve class names.
-    This is used primarily as a safety feature in order to make sure that used IDs are provided
-    in order starting from 0 without holes so that training works properly.
-    - `image_type` (`str`): the type of the image to export, to convert PIL images to.
-    Default: 'RGB'. Also accepts 'L' and 'CMYK'.
-    - `normalization` (`str`): the type of normalization that the dataset currently is formatted in,
-    for box and polygon items. Accepts 'full' or 'zeroone'.
-    - `normalize_to` (`str`): the type of normalization that the dataset is to be resized to, for
-    box and polygon items. Accepts 'full' or 'zeroone'.
-    - `transform` (`Optional[Callable]`): the transform operation to apply to the images.
-    - `target_transform` (`Optional[Callable]`): the transform operation on the labels.
+
+    :param df: The dataframe from DynamicData.
+    :type df: DataFrame
+    :param root: The root of the dataset folder.
+    :type root: str
+    :param mode: The mode of the data to retrieve, i.e. classification, segmentation, etc.
+    :type mode: str
+    :param id_mapping: The id mapping from the dataframe to retrieve class names. This is used
+        primarily as a safety feature in order to make sure that used IDs are provided in order
+        starting from 0 without holes so that training works properly.
+    :type id_mapping: dict[int, int]
+    :param image_type: The type of the image to export, to convert PIL images to.
+            Default: 'RGB'. Also accepts 'L' and 'CMYK'.
+    :type image_type: str
+    :param normalization: The type of normalization that the dataset currently is formatted in,
+        for box and polygon items. Accepts 'full' or 'zeroone'.
+    :type normalization: str
+    :param normalize_to: The type of normalization that the dataset is to be resized to, for
+        box and polygon items. Accepts 'full' or 'zeroone'.
+    :type normalize_to: str
+    :param transform: The transform operation to apply to the images.
+    :type transform: Optional[Callable]
+    :param target_transform: The transform operation on the labels.
+    :type target_transform: Optional[Callable]
     '''
     def __init__(
         self,

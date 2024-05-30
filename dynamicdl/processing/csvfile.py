@@ -1,6 +1,5 @@
-from typing import Union, Optional, Iterable
+from typing import Union, Iterable
 import csv
-from tqdm import tqdm
 
 from .._utils import load_config
 from .._warnings import Warnings

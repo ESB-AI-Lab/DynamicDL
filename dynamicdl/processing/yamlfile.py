@@ -1,6 +1,5 @@
-from typing import Optional, Union, Any
+from typing import Union, Any
 import yaml
-from tqdm import tqdm
 
 
 from .._utils import load_config

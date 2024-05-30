@@ -1,6 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Optional
-from tqdm import tqdm
 
 class DataFile(ABC):
     '''
@@ -10,9 +8,7 @@ class DataFile(ABC):
     def parse(
         self,
         path: str,
-        curr_path: list[str],
-        pbar: Optional[tqdm],
-        depth: int = 0
+        curr_path: list[str]
     ) -> dict:
         '''
         Parses a file.

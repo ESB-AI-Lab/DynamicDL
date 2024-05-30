@@ -548,44 +548,40 @@ pattern.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Pairing is a wrapper class used to specify when two or more nonunique datatypes should be
 associated together. Most commonly used to pair ID and name together.</p>
-<ul class="simple">
-<li><dl class="simple">
-<dt><cite>form</cite> (<cite>Any</cite>): Whatever follows the DynamicData specified form as required. Pairing is a</dt><dd><p>wrapper class so let it behave as it should</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>form</strong> (<em>Any</em>) – Whatever follows the DynamicData specified form as required. Pairing is a
+wrapper class so let it behave as it should.</p></li>
+<li><p><strong>paired</strong> (<a class="reference internal" href="data.html#dynamicdl.data.datatype.DataType" title="dynamicdl.data.datatype.DataType"><em>DataType</em></a>) – Items which should be associated together.</p></li>
+</ul>
 </dd>
 </dl>
-</li>
-<li><p><cite>paired</cite> (<cite>DataType</cite>): Items which should be associated together.</p></li>
-</ul>
 <dl class="py method">
 <dt class="sig sig-object py" id="dynamicdl.parsing.pairing.Pairing.find_pairings">
 <span class="sig-name descname"><span class="pre">find_pairings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pbar</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tqdm</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curr_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/dynamicdl/parsing/pairing.html#Pairing.find_pairings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.pairing.Pairing.find_pairings" title="Link to this definition"></a></dt>
 <dd><p>Similar to other processes’ <cite>expand</cite> function. Finds the pairing values and stores
 the data internally.</p>
-<blockquote>
-<div><ul class="simple">
-<li><dl class="simple">
-<dt><cite>dataset</cite> (<cite>Any</cite>): the dataset data, which should follow the syntax of <cite>DynamicData</cite></dt><dd><p>data.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>in_file</cite> (<cite>bool</cite>): distinguisher to check usage of either <cite>expand_generics</cite></dt><dd><p>or <cite>expand_file_generics</cite>.</p>
-</dd>
-</dl>
-</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> (<em>Any</em>) – The dataset data, which should follow the syntax of <cite>DynamicData</cite> data.</p></li>
+<li><p><strong>in_file</strong> (<em>bool</em>) – Distinguisher to check usage of either <cite>expand_generics</cite>
+or <cite>expand_file_generics</cite>.</p></li>
 </ul>
-</div></blockquote>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dynamicdl.parsing.pairing.Pairing.update_pairing">
 <span class="sig-name descname"><span class="pre">update_pairing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="data.html#dynamicdl.data.dataentry.DataEntry" title="dynamicdl.data.dataentry.DataEntry"><span class="pre">DataEntry</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/dynamicdl/parsing/pairing.html#Pairing.update_pairing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.parsing.pairing.Pairing.update_pairing" title="Link to this definition"></a></dt>
 <dd><p>Update a data entry with pairing values, and does nothing if the pairing does not aplpy.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><cite>entry</cite> (<cite>DataEntry</cite>): the entry to apply this pairing</p></li>
-</ul>
-</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entry</strong> (<a class="reference internal" href="data.html#dynamicdl.data.dataentry.DataEntry" title="dynamicdl.data.dataentry.DataEntry"><em>DataEntry</em></a>) – The entry to apply this pairing</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

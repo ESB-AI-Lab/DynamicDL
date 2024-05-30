@@ -97,10 +97,11 @@
 <span class="sd">    Pairing is a wrapper class used to specify when two or more nonunique datatypes should be</span>
 <span class="sd">    associated together. Most commonly used to pair ID and name together. </span>
 
-<span class="sd">    - `form` (`Any`): Whatever follows the DynamicData specified form as required. Pairing is a</span>
-<span class="sd">        wrapper class so let it behave as it should</span>
-<span class="sd">    - `paired` (`DataType`): Items which should be associated together.</span>
-
+<span class="sd">    :param form: Whatever follows the DynamicData specified form as required. Pairing is a</span>
+<span class="sd">        wrapper class so let it behave as it should.</span>
+<span class="sd">    :type form: Any</span>
+<span class="sd">    :param paired: Items which should be associated together.</span>
+<span class="sd">    :type paired: DataType</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">paired</span><span class="p">:</span> <span class="n">DataType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">paired</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
@@ -122,7 +123,8 @@
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Update a data entry with pairing values, and does nothing if the pairing does not aplpy.</span>
 <span class="sd">        </span>
-<span class="sd">         - `entry` (`DataEntry`): the entry to apply this pairing</span>
+<span class="sd">        :param entry: The entry to apply this pairing</span>
+<span class="sd">        :type entry: DataEntry</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">entry_vals</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">overlap</span> <span class="o">=</span> <span class="n">entry_vals</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paired_desc</span><span class="p">)</span>
@@ -196,10 +198,11 @@
 <span class="sd">        Similar to other processes&#39; `expand` function. Finds the pairing values and stores</span>
 <span class="sd">        the data internally.</span>
 <span class="sd">        </span>
-<span class="sd">         - `dataset` (`Any`): the dataset data, which should follow the syntax of `DynamicData`</span>
-<span class="sd">            data.</span>
-<span class="sd">         - `in_file` (`bool`): distinguisher to check usage of either `expand_generics`</span>
+<span class="sd">        :param dataset: The dataset data, which should follow the syntax of `DynamicData` data.</span>
+<span class="sd">        :type dataset: Any</span>
+<span class="sd">        :param in_file: Distinguisher to check usage of either `expand_generics`</span>
 <span class="sd">            or `expand_file_generics`.</span>
+<span class="sd">        :type in_file: bool</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="kn">from</span> <span class="nn">.._main._engine</span> <span class="kn">import</span> <span class="n">expand_generics</span><span class="p">,</span> <span class="n">expand_file_generics</span>
         <span class="k">if</span> <span class="n">in_file</span><span class="p">:</span>

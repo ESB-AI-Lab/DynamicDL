@@ -76,29 +76,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for dynamicdl.dynamicdl</h1><div class="highlight"><pre>
-<span></span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">Main module for processing datasets. Collects all parsed objects into the DynamicData object, and</span>
-<span class="sd">maintains the DynamicDL class for PyTorch Dataset and DataLoader functionalities.</span>
-
-<span class="sd">Collate functions (pseudo-private)</span>
-
-<span class="sd">DynamicData main class public functions:</span>
-<span class="sd"> - parse()</span>
-<span class="sd"> - get_transforms()</span>
-<span class="sd"> - get_dataset()</span>
-<span class="sd"> - get_dataloader()</span>
-<span class="sd"> - get_image_set()</span>
-<span class="sd"> - split_image_set()</span>
-<span class="sd"> - clear_image_sets()</span>
-<span class="sd"> - delete_image_set()</span>
-<span class="sd"> - save()</span>
-<span class="sd"> - load()</span>
-<span class="sd"> - sample_image()</span>
-<span class="sd"> - inference()</span>
-
-<span class="sd">DynamicDS class (VisionDataset extension)</span>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">md5</span>
@@ -123,7 +101,7 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Self</span>
 
-<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">next_avail_id</span><span class="p">,</span> <span class="n">union</span>
+<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">next_avail_id</span><span class="p">,</span> <span class="n">union</span><span class="p">,</span> <span class="n">config</span>
 <span class="kn">from</span> <span class="nn">._warnings</span> <span class="kn">import</span> <span class="n">Warnings</span>
 <span class="kn">from</span> <span class="nn">._main._engine</span> <span class="kn">import</span> <span class="n">populate_data</span>
 <span class="kn">from</span> <span class="nn">._main._transforms</span> <span class="kn">import</span> <span class="n">Transforms</span>
@@ -162,49 +140,10 @@
 <span class="sd">    :type purge_duplicates: Optional[bool]</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="n">_inference_cols</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ABSOLUTE_FILE&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_DIM&#39;</span><span class="p">}</span>
-    <span class="n">_diffusion_cols</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ABSOLUTE_FILE&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_DIM&#39;</span><span class="p">}</span>
-    <span class="n">_classification_cols</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ABSOLUTE_FILE&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;CLASS_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_DIM&#39;</span><span class="p">}</span>
-    <span class="n">_detection_cols</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ABSOLUTE_FILE&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;BBOX_CLASS_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;BOX&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_DIM&#39;</span><span class="p">}</span>
-    <span class="n">_segmentation_img_cols</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ABSOLUTE_FILE&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;ABSOLUTE_FILE_SEG&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_DIM&#39;</span><span class="p">}</span>
-    <span class="n">_segmentation_poly_cols</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ABSOLUTE_FILE&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;POLYGON&#39;</span><span class="p">,</span> <span class="s1">&#39;SEG_CLASS_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;IMAGE_DIM&#39;</span><span class="p">}</span>
+    <span class="n">_modes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;MODES&#39;</span><span class="p">]</span>
 
-    <span class="n">_generics</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GENERIC, GENERIC_INT, GENERIC_WORD, GENERIC_FLOAT&#39;</span><span class="p">]</span>
-
-    <span class="n">_BBOX_MODES</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span>
-            <span class="p">{</span><span class="s1">&#39;X1&#39;</span><span class="p">,</span> <span class="s1">&#39;X2&#39;</span><span class="p">,</span> <span class="s1">&#39;Y1&#39;</span><span class="p">,</span> <span class="s1">&#39;Y2&#39;</span><span class="p">},</span>
-            <span class="p">(</span><span class="s1">&#39;X1&#39;</span><span class="p">,</span> <span class="s1">&#39;Y1&#39;</span><span class="p">,</span> <span class="s1">&#39;X2&#39;</span><span class="p">,</span> <span class="s1">&#39;Y2&#39;</span><span class="p">),</span>
-            <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="mi">6</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="mi">6</span><span class="p">),</span>
-             <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="mi">6</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="mi">6</span><span class="p">))</span>
-        <span class="p">),</span>
-        <span class="p">(</span>
-            <span class="p">{</span><span class="s1">&#39;XMIN&#39;</span><span class="p">,</span> <span class="s1">&#39;YMIN&#39;</span><span class="p">,</span> <span class="s1">&#39;XMAX&#39;</span><span class="p">,</span> <span class="s1">&#39;YMAX&#39;</span><span class="p">},</span>
-            <span class="p">(</span><span class="s1">&#39;XMIN&#39;</span><span class="p">,</span> <span class="s1">&#39;YMIN&#39;</span><span class="p">,</span> <span class="s1">&#39;XMAX&#39;</span><span class="p">,</span> <span class="s1">&#39;YMAX&#39;</span><span class="p">),</span>
-            <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">6</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">6</span><span class="p">),</span>
-             <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">6</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">6</span><span class="p">))</span>
-        <span class="p">),</span>
-        <span class="p">(</span>
-            <span class="p">{</span><span class="s1">&#39;XMIN&#39;</span><span class="p">,</span> <span class="s1">&#39;YMIN&#39;</span><span class="p">,</span> <span class="s1">&#39;WIDTH&#39;</span><span class="p">,</span> <span class="s1">&#39;HEIGHT&#39;</span><span class="p">},</span>
-            <span class="p">(</span><span class="s1">&#39;XMIN&#39;</span><span class="p">,</span> <span class="s1">&#39;YMIN&#39;</span><span class="p">,</span> <span class="s1">&#39;WIDTH&#39;</span><span class="p">,</span> <span class="s1">&#39;HEIGHT&#39;</span><span class="p">),</span>
-            <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">6</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">6</span><span class="p">),</span>
-             <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">6</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">6</span><span class="p">))</span>
-        <span class="p">),</span>
-        <span class="p">(</span>
-            <span class="p">{</span><span class="s1">&#39;XMID&#39;</span><span class="p">,</span> <span class="s1">&#39;YMID&#39;</span><span class="p">,</span> <span class="s1">&#39;WIDTH&#39;</span><span class="p">,</span> <span class="s1">&#39;HEIGHT&#39;</span><span class="p">},</span>
-            <span class="p">(</span><span class="s1">&#39;XMID&#39;</span><span class="p">,</span> <span class="s1">&#39;YMID&#39;</span><span class="p">,</span> <span class="s1">&#39;WIDTH&#39;</span><span class="p">,</span> <span class="s1">&#39;HEIGHT&#39;</span><span class="p">),</span>
-            <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
-             <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-        <span class="p">),</span>
-        <span class="p">(</span>
-            <span class="p">{</span><span class="s1">&#39;XMAX&#39;</span><span class="p">,</span> <span class="s1">&#39;YMAX&#39;</span><span class="p">,</span> <span class="s1">&#39;WIDTH&#39;</span><span class="p">,</span> <span class="s1">&#39;HEIGHT&#39;</span><span class="p">},</span>
-            <span class="p">(</span><span class="s1">&#39;XMAX&#39;</span><span class="p">,</span> <span class="s1">&#39;YMAX&#39;</span><span class="p">,</span> <span class="s1">&#39;WIDTH&#39;</span><span class="p">,</span> <span class="s1">&#39;HEIGHT&#39;</span><span class="p">),</span>
-            <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">6</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">6</span><span class="p">),</span>
-             <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">6</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">6</span><span class="p">))</span>
-        <span class="p">)</span>
-    <span class="p">]</span>
-    <span class="n">_BBOX_COLS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;X1&#39;</span><span class="p">,</span> <span class="s1">&#39;X2&#39;</span><span class="p">,</span> <span class="s1">&#39;Y1&#39;</span><span class="p">,</span> <span class="s1">&#39;Y2&#39;</span><span class="p">,</span> <span class="s1">&#39;XMIN&#39;</span><span class="p">,</span> <span class="s1">&#39;XMAX&#39;</span><span class="p">,</span> <span class="s1">&#39;YMIN&#39;</span><span class="p">,</span> <span class="s1">&#39;YMAX&#39;</span><span class="p">,</span> <span class="s1">&#39;XMID&#39;</span><span class="p">,</span> <span class="s1">&#39;YMID&#39;</span><span class="p">,</span> <span class="s1">&#39;WIDTH&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;HEIGHT&#39;</span><span class="p">,</span> <span class="s1">&#39;BBOX_CLASS_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;BBOX_CLASS_NAME&#39;</span><span class="p">}</span>
+    <span class="n">_BBOX_MODES</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;BBOX_MODES&#39;</span><span class="p">]</span>
+    <span class="n">_BBOX_COLS</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;BBOX_COLS&#39;</span><span class="p">]</span>
 
     <span class="n">_scale_options</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;zeroone&#39;</span><span class="p">,</span> <span class="s1">&#39;full&#39;</span><span class="p">)</span>
 
@@ -241,9 +180,12 @@
 <span class="sd">        Must be called to instantiate the data in the dataset instance. Performs the recursive</span>
 <span class="sd">        populate_data algorithm and creates the dataframe, and then cleans up the data.</span>
 <span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">         - `override` (`bool`): whether to overwrite existing data if it has already been parsed and</span>
-<span class="sd">            cleaned. Default: False</span>
+<span class="sd">        :param override: Whether to overwrite existing data if it has already been parsed and</span>
+<span class="sd">            cleaned. Default: `False`</span>
+<span class="sd">        :type override: bool</span>
+<span class="sd">        :param verbose: Whether to show more details about the merging process. May have an impact</span>
+<span class="sd">            on runtime. Default: `False`</span>
+<span class="sd">        :type verbose: bool</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[DynamicData] Parsing data...&#39;</span><span class="p">)</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -284,9 +226,6 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_md5_hashes</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_get_md5_hashes</span><span class="p">()</span>
 
-        <span class="c1"># drop generic as it is useless data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">DynamicData</span><span class="o">.</span><span class="n">_generics</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
-
         <span class="c1"># convert bounding boxes into proper format and store under &#39;BOX&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_convert_bbox</span><span class="p">()</span>
 
@@ -313,18 +252,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_get_modes</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="n">modes</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">DynamicData</span><span class="o">.</span><span class="n">_inference_cols</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
-            <span class="n">modes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;inference&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">DynamicData</span><span class="o">.</span><span class="n">_diffusion_cols</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
-            <span class="n">modes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;diffusion&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">DynamicData</span><span class="o">.</span><span class="n">_classification_cols</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
-            <span class="n">modes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;classification&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">DynamicData</span><span class="o">.</span><span class="n">_detection_cols</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
-            <span class="n">modes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;detection&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">DynamicData</span><span class="o">.</span><span class="n">_segmentation_img_cols</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="ow">or</span> \
-            <span class="n">DynamicData</span><span class="o">.</span><span class="n">_segmentation_poly_cols</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
-            <span class="n">modes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;segmentation&#39;</span><span class="p">)</span>
+        <span class="n">modes</span> <span class="o">=</span> <span class="p">[</span><span class="n">mode</span> <span class="k">for</span> <span class="n">mode</span><span class="p">,</span> <span class="n">subset</span> <span class="ow">in</span> <span class="n">DynamicData</span><span class="o">.</span><span class="n">_modes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">subset</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)]</span>
         <span class="k">return</span> <span class="n">modes</span>
 
     <span class="k">def</span> <span class="nf">_get_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -332,22 +260,15 @@
         <span class="n">data</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;       | Available modes: </span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_modes</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="n">data</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;       | Images: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_modes</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s1">&#39;segmentation&#39;</span><span class="p">:</span>
-                <span class="n">opt</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-            <span class="k">elif</span> <span class="s1">&#39;POLYGON&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-                <span class="n">opt</span> <span class="o">=</span> <span class="s1">&#39;poly_&#39;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">opt</span> <span class="o">=</span> <span class="s1">&#39;img_&#39;</span>
-            <span class="n">colset</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">opt</span><span class="si">}</span><span class="s2">cols&quot;</span>
-
             <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">[</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colset</span><span class="p">))]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">DynamicData</span><span class="o">.</span><span class="n">_modes</span><span class="p">[</span><span class="n">mode</span><span class="p">])]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
             <span class="p">])</span>
             <span class="n">data</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;       | Complete entries for </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
 
         <span class="k">if</span> <span class="s1">&#39;detection&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_modes</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;       | Bounding box scaling option: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bbox_scale_option</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="k">if</span> <span class="s1">&#39;segmentation&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_modes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;segmentation_poly&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_modes</span> <span class="ow">or</span> 
+            <span class="s1">&#39;segmentation_mask&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_modes</span><span class="p">):</span>
             <span class="n">data</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;       | Segmentation object scaling option: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">seg_scale_option</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
@@ -641,31 +562,38 @@
         <span class="n">std</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">),</span>
         <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">remove_invalid</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">resize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">resize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">],</span> <span class="o">...</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Retrieve the default standard image/label transforms for specified mode.</span>
 <span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">         - `mode` (`str`): choose a mode out of available modes for the transforms. Each mode has</span>
+<span class="sd">        :param mode: Choose a mode out of available modes for the transforms. Each mode has</span>
 <span class="sd">            slightly altered standard transforms.</span>
-<span class="sd">         - `calculate_stats` (`bool`): when set to True, calculate the statistics for the entire</span>
+<span class="sd">        :type mode: str</span>
+<span class="sd">        :param calculate_stats: When set to True, calculate the statistics for the entire</span>
 <span class="sd">            dataset, overriding default mean/std kwarg (defaults from ImageNet). Use this feature</span>
 <span class="sd">            when dataset mean/std is unknown and differs significantly from ImageNet. Default: True.</span>
-<span class="sd">         - `mean` (`Tuple[float, ...]`): default mean statistics for the dataset. Has no effect when</span>
+<span class="sd">        :type calculate_stats: bool</span>
+<span class="sd">        :param mean: Default mean statistics for the dataset. Has no effect when</span>
 <span class="sd">            `calculate_stats = True`. Default: ImageNet values.</span>
-<span class="sd">         - `std` (`Tuple[float, ...]`): default mean statistics for the dataset. Has no effect when</span>
+<span class="sd">        :type mean: Tuple[float, ...]</span>
+<span class="sd">        :param std: Default mean statistics for the dataset. Has no effect when</span>
 <span class="sd">            `calculate_stats = True`. Default: ImageNet values.</span>
-<span class="sd">         - `normalize` (`bool`): when set to True, normalize the dataset according to some</span>
+<span class="sd">        :type std: Tuple[float, ...]</span>
+<span class="sd">        :param normalize: When set to True, normalize the dataset according to some</span>
 <span class="sd">            mean/std values, either from calculated stats or ImageNet default. This statement is</span>
 <span class="sd">            overriden when `calculate_stats` is set to True. Default: True.</span>
-<span class="sd">         - `remove_invalid` (`bool`): remove invalid entries when calculating the statistics,</span>
-<span class="sd">            assuming `calculate_stats` is set to True. If `calculate_stats` is False, this value</span>
-<span class="sd">            has no effect. Default: True.</span>
-<span class="sd">         - `resize` (`Optional[tuple[int, int]]`): resize to specific tuple dimensions before</span>
-<span class="sd">            calculating statistics, only when `calculate_stats` is set to True, just like</span>
-<span class="sd">            `remove_invalid`. Default: None.</span>
-<span class="sd">        </span>
+<span class="sd">        :type normalize: bool</span>
+<span class="sd">        :param remove_invalid: Remove invalid entries when calculating the statistics, assuming</span>
+<span class="sd">            `calculate_stats` is set to `True`. If `calculate_stats` is `False`, this value has no</span>
+<span class="sd">            effect. Default: `True`.</span>
+<span class="sd">        :type remove_invalid: bool</span>
+<span class="sd">        :param resize: Resize to specific tuple dimensions before calculating statistics, only when</span>
+<span class="sd">            `calculate_stats` is set to True, just like `remove_invalid`. Default: `None`.</span>
+<span class="sd">        :type resize: Optional[Tuple[int, ...]]</span>
+<span class="sd">        :return: A tuple of two callable transforms, the first being the standard image transform</span>
+<span class="sd">            and the latter being the standard target transform.</span>
+<span class="sd">        :rtype: Tuple[Optional[Callable], ...]</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">calculate_stats</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">Transforms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">resize</span><span class="o">=</span><span class="n">resize</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="n">normalize</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="n">std</span><span class="p">)</span>
@@ -724,40 +652,50 @@
         <span class="n">normalize_to</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;DynamicDS&#39;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Retrieve the PyTorch dataset (torch.utils.data.Dataset) of a specific mode and image set.</span>
+<span class="sd">        Retrieve the PyTorch dataset (`torch.utils.data.Dataset`) of a specific mode and image set.</span>
 <span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">         - `mode` (`str`): the mode of training to select. See available modes with</span>
-<span class="sd">            `available_modes`.</span>
-<span class="sd">         - `remove_invalid` (`bool`): if set to True, deletes any NaN/corrupt items in the image set</span>
+<span class="sd">        :param mode: The mode of training to select. See available modes with `available_modes`.</span>
+<span class="sd">        :type mode: str</span>
+<span class="sd">        :param remove_invalid: If set to True, deletes any NaN/corrupt items in the image set</span>
 <span class="sd">            pertaining to the relevant mode. In the False case, either NaN values are substituted</span>
 <span class="sd">            with empty values or an error is thrown, depending on the mode selected.</span>
-<span class="sd">         - `store_dim` (`bool`): if set to True, the labels in the dataset will return a dict with</span>
-<span class="sd">            two keys. &#39;label&#39; contains the standard PyTorch labels and &#39;dim&#39; contains the image&#39;s</span>
+<span class="sd">        :type remove_invalid: bool</span>
+<span class="sd">        :param store_dim: If set to True, the labels in the dataset will return a dict with two</span>
+<span class="sd">            keys. `label` contains the standard PyTorch labels and `dim` contains the image&#39;s</span>
 <span class="sd">            former dimensions.</span>
-<span class="sd">         - `preset_transform` (`bool`): whether to use default preset transforms. Consists of</span>
-<span class="sd">            normalization with either calculated mean of the dataset about to be used or standard</span>
-<span class="sd">            ImageNet statistics depending on `calculate_stats`. Default: True</span>
-<span class="sd">         - `calculate_stats` (`bool`): whether to calculate mean and std for this dataset to be used</span>
-<span class="sd">            in normalization transforms. If False, uses ImageNet default weights. Only has effect</span>
-<span class="sd">            when `preset_transform` is set to True. Default: True</span>
-<span class="sd">         - `mean` (`Tuple[float, ...]`): default mean statistics for the dataset. Has no effect when</span>
+<span class="sd">        :type store_dim: bool</span>
+<span class="sd">        :param preset_transform: Whether to use default preset transforms. Consists of normalization</span>
+<span class="sd">            with either calculated mean of the dataset about to be used or standard ImageNet</span>
+<span class="sd">            statistics depending on `calculate_stats`. Default: `True`</span>
+<span class="sd">        :type preset_transform: bool</span>
+<span class="sd">        :param calculate_stats: Whether to calculate mean and std for this dataset to be used in</span>
+<span class="sd">            normalization transforms. If False, uses ImageNet default weights. Only has effect</span>
+<span class="sd">            when `preset_transform` is set to `True`. Default: `True`</span>
+<span class="sd">        :type calculate_stats: bool</span>
+<span class="sd">        :param mean: Default mean statistics for the dataset. Has no effect when</span>
 <span class="sd">            `calculate_stats = True`. Default: ImageNet values.</span>
-<span class="sd">         - `std` (`Tuple[float, ...]`): default mean statistics for the dataset. Has no effect when</span>
+<span class="sd">        :type mean: Tuple[float, ...]</span>
+<span class="sd">        :param std: Default mean statistics for the dataset. Has no effect when</span>
 <span class="sd">            `calculate_stats = True`. Default: ImageNet values.</span>
-<span class="sd">         - `normalize` (`bool`): when set to True, normalize the dataset according to some</span>
-<span class="sd">            mean/std values, either from calculated stats or ImageNet default. This statement is</span>
-<span class="sd">            overriden when `calculate_stats` is set to True. Default: True.</span>
-<span class="sd">         - `image_set` (`Optional[str]`): the image set to pull from. Default: all images.</span>
-<span class="sd">         - `transform` (`Optional[Callable]`): the transform operation to apply to the images.</span>
-<span class="sd">         - `target_transform` (`Optional[Callable]`): the transform operation on the labels.</span>
-<span class="sd">         - `transforms` (`Optional[tuple[Optional[Callable], ...]]`): tuple in the format</span>
-<span class="sd">            `(transform, target_transform)`. Default PyTorch transforms are available in the</span>
-<span class="sd">            CVTransforms class.</span>
-<span class="sd">         - `resize` (`Optional[tuple[int, int]]`): if provided, resize all images to exact</span>
-<span class="sd">            configuration.</span>
-<span class="sd">         - `normalize_to` (`Optional[str]`): if provided, normalize bounding box/segmentation</span>
-<span class="sd">            coordinates to a specific configuration. Options: &#39;zeroone&#39;, &#39;full&#39;</span>
+<span class="sd">        :type std: Tuple[float, ...]</span>
+<span class="sd">        :param normalize: When set to `True`, normalize the dataset according to some mean/std</span>
+<span class="sd">            values, either from calculated stats or ImageNet default. This statement is overriden</span>
+<span class="sd">            when `calculate_stats` is set to `True`. Default: `True`.</span>
+<span class="sd">        :type normalize: bool</span>
+<span class="sd">        :param image_set: The image set to pull from. Default: all images.</span>
+<span class="sd">        :type image_set: Optional[str]</span>
+<span class="sd">        :param transform: The transform operation to apply to the images.</span>
+<span class="sd">        :type transform: Optional[Callable]</span>
+<span class="sd">        :param target_transform: The transform operation to apply to the labels.</span>
+<span class="sd">        :type target_transform: Optional[Callable]</span>
+<span class="sd">        :param transforms: Tuple in the format `(transform, target_transform)`. Obtain default</span>
+<span class="sd">            transforms from `DynamicData.get_transforms()`, or supply your own.</span>
+<span class="sd">        :type transforms: Optional[Tuple[Optional[Callable], ...]]</span>
+<span class="sd">        :param resize: If provided, resize all images to exact `(width, height)` configuration.</span>
+<span class="sd">        :type resize: Optional[Tuple[int, ...]]</span>
+<span class="sd">        :param normalize_to: If provided, normalize bounding box/segmentation coordinates to a</span>
+<span class="sd">            specific configuration. Options: &#39;zeroone&#39;, &#39;full&#39;</span>
+<span class="sd">        :type normalize_to: Optional[str]</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
@@ -785,23 +723,16 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;image_set_missing&#39;</span><span class="p">,</span> <span class="n">imgset_name</span><span class="o">=</span><span class="n">imgset_mode</span><span class="p">,</span> <span class="n">image_set</span><span class="o">=</span><span class="n">image_set</span><span class="p">)</span>
         <span class="n">normalization</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">DynamicData</span><span class="o">.</span><span class="n">_modes</span><span class="p">[</span><span class="n">mode</span><span class="p">])]</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;classification&#39;</span><span class="p">:</span>
-            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">DynamicData</span><span class="o">.</span><span class="n">_classification_cols</span><span class="p">)]</span>
             <span class="n">id_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_to_class</span><span class="p">)}</span>
         <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;detection&#39;</span><span class="p">:</span>
-            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">DynamicData</span><span class="o">.</span><span class="n">_detection_cols</span><span class="p">)]</span>
             <span class="n">normalization</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bbox_scale_option</span>
             <span class="n">id_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_to_bbox_class</span><span class="p">)}</span>
-        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;segmentation&#39;</span><span class="p">:</span>
-            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">DynamicData</span><span class="o">.</span><span class="n">_segmentation_poly_cols</span> <span class="k">if</span> <span class="s1">&#39;POLYGON&#39;</span> <span class="ow">in</span>
-                                       <span class="n">dataframe</span> <span class="k">else</span> <span class="n">DynamicData</span><span class="o">.</span><span class="n">_segmentation_img_cols</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;segmentation_mask&#39;</span> <span class="ow">or</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;segmentation_poly&#39;</span><span class="p">:</span>
             <span class="n">normalization</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seg_scale_option</span>
             <span class="n">id_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_to_seg_class</span><span class="p">)}</span>
-        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;inference&#39;</span><span class="p">:</span>
-            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">DynamicData</span><span class="o">.</span><span class="n">_inference_cols</span><span class="p">)]</span>
-            <span class="n">id_mapping</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;diffusion&#39;</span><span class="p">:</span>
-            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">DynamicData</span><span class="o">.</span><span class="n">_diffusion_cols</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;inference&#39;</span> <span class="ow">or</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;diffusion&#39;</span><span class="p">:</span>
             <span class="n">id_mapping</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">remove_invalid</span><span class="p">:</span>
             <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
@@ -812,10 +743,11 @@
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;[DynamicData] Removed </span><span class="si">{</span><span class="n">start</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">end</span><span class="si">}</span><span class="s1"> empty entries from data.&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">replace_nan</span> <span class="o">=</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">([]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="n">isna</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span><span class="p">))</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;detection&#39;</span><span class="p">:</span>
                 <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;BBOX_CLASS_ID&#39;</span><span class="p">]</span> <span class="c1"># BOX already accounted for in bbox creation</span>
-            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;segmentation&#39;</span><span class="p">:</span>
-                <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;POLYGON&#39;</span><span class="p">,</span> <span class="s1">&#39;SEG_CLASS_ID&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;POLYGON&#39;</span> <span class="ow">in</span> <span class="n">dataframe</span> <span class="k">else</span> <span class="p">[]</span>
+            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;segmentation_poly&#39;</span><span class="p">:</span>
+                <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;POLYGON&#39;</span><span class="p">,</span> <span class="s1">&#39;SEG_CLASS_ID&#39;</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
                 <span class="n">dataframe</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">replace_nan</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
@@ -826,9 +758,18 @@
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;image_set_empty&#39;</span><span class="p">,</span> <span class="n">image_set</span><span class="o">=</span><span class="n">image_set</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">DynamicDS</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">id_mapping</span><span class="o">=</span><span class="n">id_mapping</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
-                        <span class="n">target_transform</span><span class="o">=</span><span class="n">target_transform</span><span class="p">,</span> <span class="n">resize</span><span class="o">=</span><span class="n">resize</span><span class="p">,</span> <span class="n">store_dim</span><span class="o">=</span><span class="n">store_dim</span><span class="p">,</span>
-                        <span class="n">normalize_to</span><span class="o">=</span><span class="n">normalize_to</span><span class="p">,</span> <span class="n">normalization</span><span class="o">=</span><span class="n">normalization</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">DynamicDS</span><span class="p">(</span>
+            <span class="n">dataframe</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
+            <span class="n">mode</span><span class="p">,</span>
+            <span class="n">id_mapping</span><span class="o">=</span><span class="n">id_mapping</span><span class="p">,</span>
+            <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
+            <span class="n">target_transform</span><span class="o">=</span><span class="n">target_transform</span><span class="p">,</span>
+            <span class="n">resize</span><span class="o">=</span><span class="n">resize</span><span class="p">,</span>
+            <span class="n">store_dim</span><span class="o">=</span><span class="n">store_dim</span><span class="p">,</span>
+            <span class="n">normalize_to</span><span class="o">=</span><span class="n">normalize_to</span><span class="p">,</span>
+            <span class="n">normalization</span><span class="o">=</span><span class="n">normalization</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="DynamicData.get_dataloader">
@@ -836,9 +777,9 @@
     <span class="k">def</span> <span class="nf">get_dataloader</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
         <span class="n">shuffle</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">remove_invalid</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">store_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">preset_transform</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -855,42 +796,55 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Retrieve the PyTorch dataloader (torch.utils.data.DataLoader) for this dataset.</span>
-<span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">         - `mode` (`str`): the mode of training to select. See available modes with</span>
-<span class="sd">            `available_modes`.</span>
-<span class="sd">         - `batch_size` (`int`): the batch size of the image. Default: 4.</span>
-<span class="sd">         - `shuffle` (`bool`): whether to shuffle the data before loading. Default: True.</span>
-<span class="sd">         - `num_workers` (`int`): number of workers for the dataloader. Default: 1.</span>
-<span class="sd">         - `remove_invalid` (`bool`): if set to True, deletes any NaN/corrupt items in the image set</span>
+<span class="sd">            </span>
+<span class="sd">        :param mode: The mode of training to select. See available modes with `available_modes`.</span>
+<span class="sd">        :type mode: str</span>
+<span class="sd">        :param batch_size: The batch size of the image. Default: 16.</span>
+<span class="sd">        :type batch_size: int</span>
+<span class="sd">        :param shuffle: Whether to shuffle the data before loading. Default: `True`.</span>
+<span class="sd">        :type shuffle: bool</span>
+<span class="sd">        :param num_workers: Number of workers for the dataloader. Default: 0.</span>
+<span class="sd">        :type num_workers: int</span>
+<span class="sd">        :param remove_invalid: If set to True, deletes any NaN/corrupt items in the image set</span>
 <span class="sd">            pertaining to the relevant mode. In the False case, either NaN values are substituted</span>
 <span class="sd">            with empty values or an error is thrown, depending on the mode selected.</span>
-<span class="sd">         - `store_dim` (`bool`): if set to True, the labels in the dataset will return a dict with</span>
-<span class="sd">            two keys. &#39;label&#39; contains the standard PyTorch labels and &#39;dim&#39; contains the image&#39;s</span>
+<span class="sd">        :type remove_invalid: bool</span>
+<span class="sd">        :param store_dim: If set to True, the labels in the dataset will return a dict with two</span>
+<span class="sd">            keys. `label` contains the standard PyTorch labels and `dim` contains the image&#39;s</span>
 <span class="sd">            former dimensions.</span>
-<span class="sd">         - `preset_transform` (`bool`): whether to use default preset transforms. Consists of</span>
-<span class="sd">            normalization with either calculated mean of the dataset about to be used or standard</span>
-<span class="sd">            ImageNet statistics depending on `calculate_stats`. Default: True</span>
-<span class="sd">         - `calculate_stats` (`bool`): whether to calculate mean and std for this dataset to be used</span>
-<span class="sd">            in normalization transforms. If False, uses ImageNet default weights. Only has effect</span>
-<span class="sd">            when `preset_transform` is set to True. Default: True</span>
-<span class="sd">         - `mean` (`Tuple[float, ...]`): default mean statistics for the dataset. Has no effect when</span>
+<span class="sd">        :type store_dim: bool</span>
+<span class="sd">        :param preset_transform: Whether to use default preset transforms. Consists of normalization</span>
+<span class="sd">            with either calculated mean of the dataset about to be used or standard ImageNet</span>
+<span class="sd">            statistics depending on `calculate_stats`. Default: `True`</span>
+<span class="sd">        :type preset_transform: bool</span>
+<span class="sd">        :param calculate_stats: Whether to calculate mean and std for this dataset to be used in</span>
+<span class="sd">            normalization transforms. If False, uses ImageNet default weights. Only has effect</span>
+<span class="sd">            when `preset_transform` is set to `True`. Default: `True`</span>
+<span class="sd">        :type calculate_stats: bool</span>
+<span class="sd">        :param mean: Default mean statistics for the dataset. Has no effect when</span>
 <span class="sd">            `calculate_stats = True`. Default: ImageNet values.</span>
-<span class="sd">         - `std` (`Tuple[float, ...]`): default mean statistics for the dataset. Has no effect when</span>
+<span class="sd">        :type mean: Tuple[float, ...]</span>
+<span class="sd">        :param std: Default mean statistics for the dataset. Has no effect when</span>
 <span class="sd">            `calculate_stats = True`. Default: ImageNet values.</span>
-<span class="sd">         - `normalize` (`bool`): when set to True, normalize the dataset according to some</span>
-<span class="sd">            mean/std values, either from calculated stats or ImageNet default. This statement is</span>
-<span class="sd">            overriden when `calculate_stats` is set to True. Default: True.</span>
-<span class="sd">         - `image_set` (`Optional[str]`): the image set to pull from. Default: all images.</span>
-<span class="sd">         - `transform` (`Optional[Callable]`): the transform operation to apply to the images.</span>
-<span class="sd">         - `target_transform` (`Optional[Callable]`): the transform operation on the labels.</span>
-<span class="sd">         - `transforms` (`Optional[tuple[Optional[Callable], ...]]`): tuple in the format</span>
-<span class="sd">            `(transform, target_transform)`. Default PyTorch transforms are available in the</span>
-<span class="sd">            CVTransforms class.</span>
-<span class="sd">         - `resize` (`Optional[tuple[int, int]]`): if provided, resize all images to exact</span>
-<span class="sd">            configuration.</span>
-<span class="sd">         - `normalize_to` (`Optional[str]`): if provided, normalize bounding box/segmentation</span>
-<span class="sd">            coordinates to a specific configuration. Options: &#39;zeroone&#39;, &#39;full&#39;</span>
+<span class="sd">        :type std: Tuple[float, ...]</span>
+<span class="sd">        :param normalize: When set to True, normalize the dataset according to some mean/std values,</span>
+<span class="sd">            either from calculated stats or ImageNet default. This statement is overriden when</span>
+<span class="sd">            `calculate_stats` is set to T`rue. Default: `True`.</span>
+<span class="sd">        :type normalize: bool</span>
+<span class="sd">        :param image_set: The image set to pull from. Default: all images.</span>
+<span class="sd">        :type image_set: Optional[str]</span>
+<span class="sd">        :param transform: The transform operation to apply to the images.</span>
+<span class="sd">        :type transform: Optional[Callable]</span>
+<span class="sd">        :param target_transform: The transform operation to apply to the labels.</span>
+<span class="sd">        :type target_transform: Optional[Callable]</span>
+<span class="sd">        :param transforms: Tuple in the format `(transform, target_transform)`. Obtain default</span>
+<span class="sd">            transforms from `DynamicData.get_transforms()`, or supply your own.</span>
+<span class="sd">        :type transforms: Optional[Tuple[Optional[Callable], ...]]</span>
+<span class="sd">        :param resize: If provided, resize all images to exact `(width, height)` configuration.</span>
+<span class="sd">        :type resize: Optional[Tuple[int, ...]]</span>
+<span class="sd">        :param normalize_to: If provided, normalize bounding box/segmentation coordinates to a</span>
+<span class="sd">            specific configuration. Options: &#39;zeroone&#39;, &#39;full&#39;</span>
+<span class="sd">        :type normalize_to: Optional[str]</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span>
@@ -929,16 +883,19 @@
 <span class="sd">        set will receive the percentage that is missing from the rest of the sets, or deleted if</span>
 <span class="sd">        the other sets add up to 1.</span>
 <span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">         - `image_set` (`str | int`): the old image set name to split. Accepts both name and ID.</span>
-<span class="sd">         - `new_sets` (`tuple[str, float]`): each entry of new_sets has a name for the set</span>
-<span class="sd">            accompanied with a float to represent the percentage to split data into.</span>
-<span class="sd">         - `inplace` (`bool`): whether to perform the operation inplace on the existing image set.</span>
-<span class="sd">            If False, then the new sets are required to add up to exactly 100% of the compositions.</span>
-<span class="sd">            If True, any remaining percentages less than 100% will be filled back into the old image</span>
-<span class="sd">            set. Default: False.</span>
-<span class="sd">         - `seed` (`Optional[int]`): the seed to use for the operation, in case consistent dataset</span>
-<span class="sd">            manipulation in memory is required. Default: None</span>
+<span class="sd">        :param image_set: The old image set name to split. Accepts both name and ID.</span>
+<span class="sd">        :type image_set: str | int</span>
+<span class="sd">        :param new_sets: Each entry of `new_sets` has a name for the set accompanied with a float to</span>
+<span class="sd">            represent the percentage to split data into.</span>
+<span class="sd">        :type new_sets: Tuple[str, float]</span>
+<span class="sd">        :param inplace: Whether to perform the operation inplace on the existing image set. If</span>
+<span class="sd">            `False`, then the new sets are required to add up to exactly 100% of the compositions.</span>
+<span class="sd">            If `True`, any remaining percentages less than 100% will be filled back into the old</span>
+<span class="sd">            image set. Default: `False`.</span>
+<span class="sd">        :type inplace: bool</span>
+<span class="sd">        :param seed: The seed to use for the operation, in case consistent dataset manipulation</span>
+<span class="sd">            in memory is required. Default: `None`</span>
+<span class="sd">        :type seed: Optional[int]</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="c1"># checks before splitting</span>
         <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;name&#39;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image_set</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;id&#39;</span>
@@ -1004,9 +961,9 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Retrieve the sub-DataFrame which contains all images in a specific image set.</span>
-<span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">         - image_set (str, int): the image set. Accepts both string and int.</span>
+
+<span class="sd">        :param image_set: The image set. Accepts both string and int.</span>
+<span class="sd">        :type image_set: str | int</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image_set</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">[</span><span class="s1">&#39;IMAGE_SET_NAME&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">image_set</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)]</span>
@@ -1021,10 +978,9 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Clear image sets from the dict if they contain no elements.</span>
-<span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">         - sets (list[str | int], Optional): If defined, only scan the provided list, otherwise</span>
-<span class="sd">            scan all sets. Default: None.</span>
+
+<span class="sd">        :param sets: If defined, only scan the provided list, otherwise scan all sets. Default: None.</span>
+<span class="sd">        :type sets: list[str | int], Optional</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">to_pop</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">sets</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1051,9 +1007,9 @@
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Delete image set from all entries. If an entry has only that image set, replace with the</span>
 <span class="sd">        default dataset.</span>
-<span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">         - image_set (str, int): the image set to delete. Accepts both name and ID.</span>
+
+<span class="sd">        :param image_set: The image set to delete. Accepts both name and ID.</span>
+<span class="sd">        :type image_set: str | int</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">using_id</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image_set</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">using_id</span><span class="p">:</span>
@@ -1095,12 +1051,14 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Save the dataset into DynamicData json format.</span>
-<span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">         - filename (str): the filename to save the dataset.</span>
-<span class="sd">         - overwrite (bool): whether to overwrite the file if it already exists. Default: False.</span>
-<span class="sd">         - safe (bool): if True, do not encode `form` with jsonpickle. Then dataset cannot be</span>
+
+<span class="sd">        :param filename: The filename to save the dataset.</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :param overwrite: Whether to overwrite the file if it already exists. Default: `False`.</span>
+<span class="sd">        :type overwrite: bool</span>
+<span class="sd">        :param safe: If `True`, do not encode `form` with jsonpickle. Then dataset cannot be</span>
 <span class="sd">            re-parsed, but is no longer subject to arbitrary code injection upon load.</span>
+<span class="sd">        :type safe: bool</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">safe</span><span class="p">:</span>
             <span class="n">Warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;unsafe_save&#39;</span><span class="p">)</span>
@@ -1137,9 +1095,9 @@
 <span class="sd">        Load a DynamicData object from file. Warning: do not load any json files that you did not</span>
 <span class="sd">        create. This method uses jsonpickle, an insecure loading system with potential for arbitrary</span>
 <span class="sd">        Python code execution.</span>
-<span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">         - filename (str): the filename to load the data from.</span>
+
+<span class="sd">        :param filename: The filename to load the data from.</span>
+<span class="sd">        :type filename: str</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[DynamicData] Loading dataset...&#39;</span><span class="p">)</span>
@@ -1187,12 +1145,13 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sample an image from the dataset.</span>
-<span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">         - `dpi` (`float`): the image display size, if not in segmentation mode.</span>
-<span class="sd">         - `mode` (`Optional[str | list[str]]`): pick from any of the available modes, or supply a</span>
-<span class="sd">            list of modes. Default: all modes.</span>
-<span class="sd">         - `idx` (`Optional[int]`): use a specific idx from the dataset. Default: a random image.</span>
+
+<span class="sd">        :param dpi: The image display size, if not in segmentation mode.</span>
+<span class="sd">        :type dpi: float</span>
+<span class="sd">        :param mode: Pick from any of the available modes, or supply a list of modes. Default: all modes.</span>
+<span class="sd">        :type mode: Optional[str | list[str]]</span>
+<span class="sd">        :param idx: Use a specific idx from the dataset. Default: a random image.</span>
+<span class="sd">        :type idx: Optional[int]</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
@@ -1221,23 +1180,24 @@
                     <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;red&#39;</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[DynamicData] Warning: Image has no bounding boxes.&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s1">&#39;segmentation&#39;</span> <span class="ow">in</span> <span class="n">mode</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;segmentation_mask&#39;</span> <span class="ow">in</span> <span class="n">mode</span><span class="p">:</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">axarr</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="n">axarr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-            <span class="k">if</span> <span class="s1">&#39;ABSOLUTE_FILE_SEG&#39;</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
-                <span class="n">mask</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">to_tensor</span><span class="p">(</span><span class="n">open_image</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;ABSOLUTE_FILE_SEG&#39;</span><span class="p">]))</span>
-                <span class="n">axarr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;POLYGON&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;SEG_CLASS_ID&#39;</span><span class="p">]),</span> \
-                    <span class="s1">&#39;SEG_CLASS_ID and POLYGON len mismatch&#39;</span>
-                <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;ABSOLUTE_FILE&#39;</span><span class="p">],</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">))</span>
-                <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-                <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">next_avail_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_to_seg_class</span><span class="p">))</span>
-                <span class="k">for</span> <span class="n">class_id</span><span class="p">,</span> <span class="n">polygon</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;SEG_CLASS_ID&#39;</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;POLYGON&#39;</span><span class="p">]):</span>
-                    <span class="n">mask</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">fillPoly</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">pts</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)],</span>
-                                    <span class="n">color</span><span class="o">=</span><span class="n">class_id</span><span class="p">)</span>
-                <span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mask</span><span class="p">))</span>
-                <span class="n">axarr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">to_tensor</span><span class="p">(</span><span class="n">open_image</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;ABSOLUTE_FILE_SEG&#39;</span><span class="p">]))</span>
+            <span class="n">axarr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">if</span> <span class="s1">&#39;segmentation_poly&#39;</span> <span class="ow">in</span> <span class="n">mode</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">axarr</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">axarr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;POLYGON&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;SEG_CLASS_ID&#39;</span><span class="p">]),</span> \
+                <span class="s1">&#39;SEG_CLASS_ID and POLYGON len mismatch&#39;</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;ABSOLUTE_FILE&#39;</span><span class="p">],</span> <span class="n">cv2</span><span class="o">.</span><span class="n">IMREAD_GRAYSCALE</span><span class="p">))</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">next_avail_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_to_seg_class</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">class_id</span><span class="p">,</span> <span class="n">polygon</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;SEG_CLASS_ID&#39;</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;POLYGON&#39;</span><span class="p">]):</span>
+                <span class="n">mask</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">fillPoly</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">pts</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)],</span>
+                                <span class="n">color</span><span class="o">=</span><span class="n">class_id</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mask</span><span class="p">))</span>
+            <span class="n">axarr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span></div>
 
@@ -1277,7 +1237,7 @@
                     <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_to_bbox_class</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[DynamicData] Warning: Image has no bounding boxes.&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;segmentation&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;segmentation_poly&#39;</span> <span class="ow">or</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;segmentation_mask&#39;</span><span class="p">:</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">axarr</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="n">axarr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;out&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39;out&#39;</span> <span class="ow">in</span> <span class="n">result</span> <span class="k">else</span> <span class="n">result</span>

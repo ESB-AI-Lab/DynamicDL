@@ -98,27 +98,6 @@
              
   <section id="module-dynamicdl.dynamicdl">
 <span id="dynamicdl"></span><h1>DynamicDL<a class="headerlink" href="#module-dynamicdl.dynamicdl" title="Link to this heading"></a></h1>
-<p>Main module for processing datasets. Collects all parsed objects into the DynamicData object, and
-maintains the DynamicDL class for PyTorch Dataset and DataLoader functionalities.</p>
-<p>Collate functions (pseudo-private)</p>
-<dl class="simple">
-<dt>DynamicData main class public functions:</dt><dd><ul class="simple">
-<li><p>parse()</p></li>
-<li><p>get_transforms()</p></li>
-<li><p>get_dataset()</p></li>
-<li><p>get_dataloader()</p></li>
-<li><p>get_image_set()</p></li>
-<li><p>split_image_set()</p></li>
-<li><p>clear_image_sets()</p></li>
-<li><p>delete_image_set()</p></li>
-<li><p>save()</p></li>
-<li><p>load()</p></li>
-<li><p>sample_image()</p></li>
-<li><p>inference()</p></li>
-</ul>
-</dd>
-</dl>
-<p>DynamicDS class (VisionDataset extension)</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="dynamicdl.dynamicdl.DynamicData">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.dynamicdl.</span></span><span class="sig-name descname"><span class="pre">DynamicData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbox_scale_option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seg_scale_option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_md5_hashes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">purge_duplicates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/dynamicdl.html#DynamicData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicdl.DynamicData" title="Link to this definition"></a></dt>
@@ -152,14 +131,9 @@ are defined by having the same md5 hash, so this has no effect when <cite>get_md
 <dt class="sig sig-object py" id="dynamicdl.dynamicdl.DynamicData.clear_image_sets">
 <span class="sig-name descname"><span class="pre">clear_image_sets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/dynamicdl/dynamicdl.html#DynamicData.clear_image_sets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicdl.DynamicData.clear_image_sets" title="Link to this definition"></a></dt>
 <dd><p>Clear image sets from the dict if they contain no elements.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><ul class="simple">
-<li><dl class="simple">
-<dt>sets (list[str | int], Optional): If defined, only scan the provided list, otherwise</dt><dd><p>scan all sets. Default: None.</p>
-</dd>
-</dl>
-</li>
-</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sets</strong> (<em>list</em><em>[</em><em>str</em><em> | </em><em>int</em><em>]</em><em>, </em><em>Optional</em>) – If defined, only scan the provided list, otherwise scan all sets. Default: None.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -169,87 +143,51 @@ are defined by having the same md5 hash, so this has no effect when <cite>get_md
 <span class="sig-name descname"><span class="pre">delete_image_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/dynamicdl/dynamicdl.html#DynamicData.delete_image_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicdl.DynamicData.delete_image_set" title="Link to this definition"></a></dt>
 <dd><p>Delete image set from all entries. If an entry has only that image set, replace with the
 default dataset.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><ul class="simple">
-<li><p>image_set (str, int): the image set to delete. Accepts both name and ID.</p></li>
-</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image_set</strong> (<em>str</em><em> | </em><em>int</em>) – The image set to delete. Accepts both name and ID.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dynamicdl.dynamicdl.DynamicData.get_dataloader">
-<span class="sig-name descname"><span class="pre">get_dataloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_invalid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preset_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_stats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataLoader</span></span></span><a class="reference internal" href="_modules/dynamicdl/dynamicdl.html#DynamicData.get_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicdl.DynamicData.get_dataloader" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_dataloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_invalid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preset_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_stats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataLoader</span></span></span><a class="reference internal" href="_modules/dynamicdl/dynamicdl.html#DynamicData.get_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicdl.DynamicData.get_dataloader" title="Link to this definition"></a></dt>
 <dd><p>Retrieve the PyTorch dataloader (torch.utils.data.DataLoader) for this dataset.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><ul class="simple">
-<li><dl class="simple">
-<dt><cite>mode</cite> (<cite>str</cite>): the mode of training to select. See available modes with</dt><dd><p><cite>available_modes</cite>.</p>
-</dd>
-</dl>
-</li>
-<li><p><cite>batch_size</cite> (<cite>int</cite>): the batch size of the image. Default: 4.</p></li>
-<li><p><cite>shuffle</cite> (<cite>bool</cite>): whether to shuffle the data before loading. Default: True.</p></li>
-<li><p><cite>num_workers</cite> (<cite>int</cite>): number of workers for the dataloader. Default: 1.</p></li>
-<li><dl class="simple">
-<dt><cite>remove_invalid</cite> (<cite>bool</cite>): if set to True, deletes any NaN/corrupt items in the image set</dt><dd><p>pertaining to the relevant mode. In the False case, either NaN values are substituted
-with empty values or an error is thrown, depending on the mode selected.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>store_dim</cite> (<cite>bool</cite>): if set to True, the labels in the dataset will return a dict with</dt><dd><p>two keys. ‘label’ contains the standard PyTorch labels and ‘dim’ contains the image’s
-former dimensions.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>preset_transform</cite> (<cite>bool</cite>): whether to use default preset transforms. Consists of</dt><dd><p>normalization with either calculated mean of the dataset about to be used or standard
-ImageNet statistics depending on <cite>calculate_stats</cite>. Default: True</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>calculate_stats</cite> (<cite>bool</cite>): whether to calculate mean and std for this dataset to be used</dt><dd><p>in normalization transforms. If False, uses ImageNet default weights. Only has effect
-when <cite>preset_transform</cite> is set to True. Default: True</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>mean</cite> (<cite>Tuple[float, …]</cite>): default mean statistics for the dataset. Has no effect when</dt><dd><p><cite>calculate_stats = True</cite>. Default: ImageNet values.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>std</cite> (<cite>Tuple[float, …]</cite>): default mean statistics for the dataset. Has no effect when</dt><dd><p><cite>calculate_stats = True</cite>. Default: ImageNet values.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>normalize</cite> (<cite>bool</cite>): when set to True, normalize the dataset according to some</dt><dd><p>mean/std values, either from calculated stats or ImageNet default. This statement is
-overriden when <cite>calculate_stats</cite> is set to True. Default: True.</p>
-</dd>
-</dl>
-</li>
-<li><p><cite>image_set</cite> (<cite>Optional[str]</cite>): the image set to pull from. Default: all images.</p></li>
-<li><p><cite>transform</cite> (<cite>Optional[Callable]</cite>): the transform operation to apply to the images.</p></li>
-<li><p><cite>target_transform</cite> (<cite>Optional[Callable]</cite>): the transform operation on the labels.</p></li>
-<li><dl class="simple">
-<dt><cite>transforms</cite> (<cite>Optional[tuple[Optional[Callable], …]]</cite>): tuple in the format</dt><dd><p><cite>(transform, target_transform)</cite>. Default PyTorch transforms are available in the
-CVTransforms class.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>resize</cite> (<cite>Optional[tuple[int, int]]</cite>): if provided, resize all images to exact</dt><dd><p>configuration.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>normalize_to</cite> (<cite>Optional[str]</cite>): if provided, normalize bounding box/segmentation</dt><dd><p>coordinates to a specific configuration. Options: ‘zeroone’, ‘full’</p>
-</dd>
-</dl>
-</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<em>str</em>) – The mode of training to select. See available modes with <cite>available_modes</cite>.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – The batch size of the image. Default: 16.</p></li>
+<li><p><strong>shuffle</strong> (<em>bool</em>) – Whether to shuffle the data before loading. Default: <cite>True</cite>.</p></li>
+<li><p><strong>num_workers</strong> (<em>int</em>) – Number of workers for the dataloader. Default: 0.</p></li>
+<li><p><strong>remove_invalid</strong> (<em>bool</em>) – If set to True, deletes any NaN/corrupt items in the image set
+pertaining to the relevant mode. In the False case, either NaN values are substituted
+with empty values or an error is thrown, depending on the mode selected.</p></li>
+<li><p><strong>store_dim</strong> (<em>bool</em>) – If set to True, the labels in the dataset will return a dict with two
+keys. <cite>label</cite> contains the standard PyTorch labels and <cite>dim</cite> contains the image’s
+former dimensions.</p></li>
+<li><p><strong>preset_transform</strong> (<em>bool</em>) – Whether to use default preset transforms. Consists of normalization
+with either calculated mean of the dataset about to be used or standard ImageNet
+statistics depending on <cite>calculate_stats</cite>. Default: <cite>True</cite></p></li>
+<li><p><strong>calculate_stats</strong> (<em>bool</em>) – Whether to calculate mean and std for this dataset to be used in
+normalization transforms. If False, uses ImageNet default weights. Only has effect
+when <cite>preset_transform</cite> is set to <cite>True</cite>. Default: <cite>True</cite></p></li>
+<li><p><strong>mean</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>...</em><em>]</em>) – Default mean statistics for the dataset. Has no effect when
+<cite>calculate_stats = True</cite>. Default: ImageNet values.</p></li>
+<li><p><strong>std</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>...</em><em>]</em>) – Default mean statistics for the dataset. Has no effect when
+<cite>calculate_stats = True</cite>. Default: ImageNet values.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – When set to True, normalize the dataset according to some mean/std values,
+either from calculated stats or ImageNet default. This statement is overriden when
+<cite>calculate_stats</cite> is set to T`rue. Default: <cite>True</cite>.</p></li>
+<li><p><strong>image_set</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The image set to pull from. Default: all images.</p></li>
+<li><p><strong>transform</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>]</em>) – The transform operation to apply to the images.</p></li>
+<li><p><strong>target_transform</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>]</em>) – The transform operation to apply to the labels.</p></li>
+<li><p><strong>transforms</strong> (<em>Optional</em><em>[</em><em>Tuple</em><em>[</em><em>Optional</em><em>[</em><em>Callable</em><em>]</em><em>, </em><em>...</em><em>]</em><em>]</em>) – Tuple in the format <cite>(transform, target_transform)</cite>. Obtain default
+transforms from <cite>DynamicData.get_transforms()</cite>, or supply your own.</p></li>
+<li><p><strong>resize</strong> (<em>Optional</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>...</em><em>]</em><em>]</em>) – If provided, resize all images to exact <cite>(width, height)</cite> configuration.</p></li>
+<li><p><strong>normalize_to</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – If provided, normalize bounding box/segmentation coordinates to a
+specific configuration. Options: ‘zeroone’, ‘full’</p></li>
 </ul>
 </dd>
 </dl>
@@ -258,73 +196,38 @@ CVTransforms class.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="dynamicdl.dynamicdl.DynamicData.get_dataset">
 <span class="sig-name descname"><span class="pre">get_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_invalid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preset_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_stats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#dynamicdl.dynamicds.DynamicDS" title="dynamicdl.dynamicds.DynamicDS"><span class="pre">DynamicDS</span></a></span></span><a class="reference internal" href="_modules/dynamicdl/dynamicdl.html#DynamicData.get_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicdl.DynamicData.get_dataset" title="Link to this definition"></a></dt>
-<dd><p>Retrieve the PyTorch dataset (torch.utils.data.Dataset) of a specific mode and image set.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><ul class="simple">
-<li><dl class="simple">
-<dt><cite>mode</cite> (<cite>str</cite>): the mode of training to select. See available modes with</dt><dd><p><cite>available_modes</cite>.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>remove_invalid</cite> (<cite>bool</cite>): if set to True, deletes any NaN/corrupt items in the image set</dt><dd><p>pertaining to the relevant mode. In the False case, either NaN values are substituted
-with empty values or an error is thrown, depending on the mode selected.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>store_dim</cite> (<cite>bool</cite>): if set to True, the labels in the dataset will return a dict with</dt><dd><p>two keys. ‘label’ contains the standard PyTorch labels and ‘dim’ contains the image’s
-former dimensions.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>preset_transform</cite> (<cite>bool</cite>): whether to use default preset transforms. Consists of</dt><dd><p>normalization with either calculated mean of the dataset about to be used or standard
-ImageNet statistics depending on <cite>calculate_stats</cite>. Default: True</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>calculate_stats</cite> (<cite>bool</cite>): whether to calculate mean and std for this dataset to be used</dt><dd><p>in normalization transforms. If False, uses ImageNet default weights. Only has effect
-when <cite>preset_transform</cite> is set to True. Default: True</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>mean</cite> (<cite>Tuple[float, …]</cite>): default mean statistics for the dataset. Has no effect when</dt><dd><p><cite>calculate_stats = True</cite>. Default: ImageNet values.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>std</cite> (<cite>Tuple[float, …]</cite>): default mean statistics for the dataset. Has no effect when</dt><dd><p><cite>calculate_stats = True</cite>. Default: ImageNet values.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>normalize</cite> (<cite>bool</cite>): when set to True, normalize the dataset according to some</dt><dd><p>mean/std values, either from calculated stats or ImageNet default. This statement is
-overriden when <cite>calculate_stats</cite> is set to True. Default: True.</p>
-</dd>
-</dl>
-</li>
-<li><p><cite>image_set</cite> (<cite>Optional[str]</cite>): the image set to pull from. Default: all images.</p></li>
-<li><p><cite>transform</cite> (<cite>Optional[Callable]</cite>): the transform operation to apply to the images.</p></li>
-<li><p><cite>target_transform</cite> (<cite>Optional[Callable]</cite>): the transform operation on the labels.</p></li>
-<li><dl class="simple">
-<dt><cite>transforms</cite> (<cite>Optional[tuple[Optional[Callable], …]]</cite>): tuple in the format</dt><dd><p><cite>(transform, target_transform)</cite>. Default PyTorch transforms are available in the
-CVTransforms class.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>resize</cite> (<cite>Optional[tuple[int, int]]</cite>): if provided, resize all images to exact</dt><dd><p>configuration.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>normalize_to</cite> (<cite>Optional[str]</cite>): if provided, normalize bounding box/segmentation</dt><dd><p>coordinates to a specific configuration. Options: ‘zeroone’, ‘full’</p>
-</dd>
-</dl>
-</li>
+<dd><p>Retrieve the PyTorch dataset (<cite>torch.utils.data.Dataset</cite>) of a specific mode and image set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<em>str</em>) – The mode of training to select. See available modes with <cite>available_modes</cite>.</p></li>
+<li><p><strong>remove_invalid</strong> (<em>bool</em>) – If set to True, deletes any NaN/corrupt items in the image set
+pertaining to the relevant mode. In the False case, either NaN values are substituted
+with empty values or an error is thrown, depending on the mode selected.</p></li>
+<li><p><strong>store_dim</strong> (<em>bool</em>) – If set to True, the labels in the dataset will return a dict with two
+keys. <cite>label</cite> contains the standard PyTorch labels and <cite>dim</cite> contains the image’s
+former dimensions.</p></li>
+<li><p><strong>preset_transform</strong> (<em>bool</em>) – Whether to use default preset transforms. Consists of normalization
+with either calculated mean of the dataset about to be used or standard ImageNet
+statistics depending on <cite>calculate_stats</cite>. Default: <cite>True</cite></p></li>
+<li><p><strong>calculate_stats</strong> (<em>bool</em>) – Whether to calculate mean and std for this dataset to be used in
+normalization transforms. If False, uses ImageNet default weights. Only has effect
+when <cite>preset_transform</cite> is set to <cite>True</cite>. Default: <cite>True</cite></p></li>
+<li><p><strong>mean</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>...</em><em>]</em>) – Default mean statistics for the dataset. Has no effect when
+<cite>calculate_stats = True</cite>. Default: ImageNet values.</p></li>
+<li><p><strong>std</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>...</em><em>]</em>) – Default mean statistics for the dataset. Has no effect when
+<cite>calculate_stats = True</cite>. Default: ImageNet values.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – When set to <cite>True</cite>, normalize the dataset according to some mean/std
+values, either from calculated stats or ImageNet default. This statement is overriden
+when <cite>calculate_stats</cite> is set to <cite>True</cite>. Default: <cite>True</cite>.</p></li>
+<li><p><strong>image_set</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The image set to pull from. Default: all images.</p></li>
+<li><p><strong>transform</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>]</em>) – The transform operation to apply to the images.</p></li>
+<li><p><strong>target_transform</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>]</em>) – The transform operation to apply to the labels.</p></li>
+<li><p><strong>transforms</strong> (<em>Optional</em><em>[</em><em>Tuple</em><em>[</em><em>Optional</em><em>[</em><em>Callable</em><em>]</em><em>, </em><em>...</em><em>]</em><em>]</em>) – Tuple in the format <cite>(transform, target_transform)</cite>. Obtain default
+transforms from <cite>DynamicData.get_transforms()</cite>, or supply your own.</p></li>
+<li><p><strong>resize</strong> (<em>Optional</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>...</em><em>]</em><em>]</em>) – If provided, resize all images to exact <cite>(width, height)</cite> configuration.</p></li>
+<li><p><strong>normalize_to</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – If provided, normalize bounding box/segmentation coordinates to a
+specific configuration. Options: ‘zeroone’, ‘full’</p></li>
 </ul>
 </dd>
 </dl>
@@ -334,60 +237,45 @@ CVTransforms class.</p>
 <dt class="sig sig-object py" id="dynamicdl.dynamicdl.DynamicData.get_image_set">
 <span class="sig-name descname"><span class="pre">get_image_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/dynamicdl/dynamicdl.html#DynamicData.get_image_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicdl.DynamicData.get_image_set" title="Link to this definition"></a></dt>
 <dd><p>Retrieve the sub-DataFrame which contains all images in a specific image set.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><ul class="simple">
-<li><p>image_set (str, int): the image set. Accepts both string and int.</p></li>
-</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image_set</strong> (<em>str</em><em> | </em><em>int</em>) – The image set. Accepts both string and int.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dynamicdl.dynamicdl.DynamicData.get_transforms">
-<span class="sig-name descname"><span class="pre">get_transforms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_stats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_invalid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/dynamicdl.html#DynamicData.get_transforms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicdl.DynamicData.get_transforms" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_transforms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_stats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.485,</span> <span class="pre">0.456,</span> <span class="pre">0.406)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0.229,</span> <span class="pre">0.224,</span> <span class="pre">0.225)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_invalid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dynamicdl/dynamicdl.html#DynamicData.get_transforms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicdl.DynamicData.get_transforms" title="Link to this definition"></a></dt>
 <dd><p>Retrieve the default standard image/label transforms for specified mode.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><ul class="simple">
-<li><dl class="simple">
-<dt><cite>mode</cite> (<cite>str</cite>): choose a mode out of available modes for the transforms. Each mode has</dt><dd><p>slightly altered standard transforms.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>calculate_stats</cite> (<cite>bool</cite>): when set to True, calculate the statistics for the entire</dt><dd><p>dataset, overriding default mean/std kwarg (defaults from ImageNet). Use this feature
-when dataset mean/std is unknown and differs significantly from ImageNet. Default: True.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>mean</cite> (<cite>Tuple[float, …]</cite>): default mean statistics for the dataset. Has no effect when</dt><dd><p><cite>calculate_stats = True</cite>. Default: ImageNet values.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>std</cite> (<cite>Tuple[float, …]</cite>): default mean statistics for the dataset. Has no effect when</dt><dd><p><cite>calculate_stats = True</cite>. Default: ImageNet values.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>normalize</cite> (<cite>bool</cite>): when set to True, normalize the dataset according to some</dt><dd><p>mean/std values, either from calculated stats or ImageNet default. This statement is
-overriden when <cite>calculate_stats</cite> is set to True. Default: True.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>remove_invalid</cite> (<cite>bool</cite>): remove invalid entries when calculating the statistics,</dt><dd><p>assuming <cite>calculate_stats</cite> is set to True. If <cite>calculate_stats</cite> is False, this value
-has no effect. Default: True.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>resize</cite> (<cite>Optional[tuple[int, int]]</cite>): resize to specific tuple dimensions before</dt><dd><p>calculating statistics, only when <cite>calculate_stats</cite> is set to True, just like
-<cite>remove_invalid</cite>. Default: None.</p>
-</dd>
-</dl>
-</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<em>str</em>) – Choose a mode out of available modes for the transforms. Each mode has
+slightly altered standard transforms.</p></li>
+<li><p><strong>calculate_stats</strong> (<em>bool</em>) – When set to True, calculate the statistics for the entire
+dataset, overriding default mean/std kwarg (defaults from ImageNet). Use this feature
+when dataset mean/std is unknown and differs significantly from ImageNet. Default: True.</p></li>
+<li><p><strong>mean</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>...</em><em>]</em>) – Default mean statistics for the dataset. Has no effect when
+<cite>calculate_stats = True</cite>. Default: ImageNet values.</p></li>
+<li><p><strong>std</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>...</em><em>]</em>) – Default mean statistics for the dataset. Has no effect when
+<cite>calculate_stats = True</cite>. Default: ImageNet values.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – When set to True, normalize the dataset according to some
+mean/std values, either from calculated stats or ImageNet default. This statement is
+overriden when <cite>calculate_stats</cite> is set to True. Default: True.</p></li>
+<li><p><strong>remove_invalid</strong> (<em>bool</em>) – Remove invalid entries when calculating the statistics, assuming
+<cite>calculate_stats</cite> is set to <cite>True</cite>. If <cite>calculate_stats</cite> is <cite>False</cite>, this value has no
+effect. Default: <cite>True</cite>.</p></li>
+<li><p><strong>resize</strong> (<em>Optional</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>...</em><em>]</em><em>]</em>) – Resize to specific tuple dimensions before calculating statistics, only when
+<cite>calculate_stats</cite> is set to True, just like <cite>remove_invalid</cite>. Default: <cite>None</cite>.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple of two callable transforms, the first being the standard image transform
+and the latter being the standard target transform.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[Optional[Callable], …]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -404,10 +292,9 @@ has no effect. Default: True.</p>
 <dd><p>Load a DynamicData object from file. Warning: do not load any json files that you did not
 create. This method uses jsonpickle, an insecure loading system with potential for arbitrary
 Python code execution.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><ul class="simple">
-<li><p>filename (str): the filename to load the data from.</p></li>
-</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – The filename to load the data from.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -417,13 +304,13 @@ Python code execution.</p>
 <span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">override</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/dynamicdl/dynamicdl.html#DynamicData.parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicdl.DynamicData.parse" title="Link to this definition"></a></dt>
 <dd><p>Must be called to instantiate the data in the dataset instance. Performs the recursive
 populate_data algorithm and creates the dataframe, and then cleans up the data.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><ul class="simple">
-<li><dl class="simple">
-<dt><cite>override</cite> (<cite>bool</cite>): whether to overwrite existing data if it has already been parsed and</dt><dd><p>cleaned. Default: False</p>
-</dd>
-</dl>
-</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>override</strong> (<em>bool</em>) – Whether to overwrite existing data if it has already been parsed and
+cleaned. Default: <cite>False</cite></p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Whether to show more details about the merging process. May have an impact
+on runtime. Default: <cite>False</cite></p></li>
 </ul>
 </dd>
 </dl>
@@ -433,15 +320,12 @@ populate_data algorithm and creates the dataframe, and then cleans up the data.<
 <dt class="sig sig-object py" id="dynamicdl.dynamicdl.DynamicData.sample_image">
 <span class="sig-name descname"><span class="pre">sample_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/dynamicdl/dynamicdl.html#DynamicData.sample_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicdl.DynamicData.sample_image" title="Link to this definition"></a></dt>
 <dd><p>Sample an image from the dataset.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><ul class="simple">
-<li><p><cite>dpi</cite> (<cite>float</cite>): the image display size, if not in segmentation mode.</p></li>
-<li><dl class="simple">
-<dt><cite>mode</cite> (<cite>Optional[str | list[str]]</cite>): pick from any of the available modes, or supply a</dt><dd><p>list of modes. Default: all modes.</p>
-</dd>
-</dl>
-</li>
-<li><p><cite>idx</cite> (<cite>Optional[int]</cite>): use a specific idx from the dataset. Default: a random image.</p></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dpi</strong> (<em>float</em>) – The image display size, if not in segmentation mode.</p></li>
+<li><p><strong>mode</strong> (<em>Optional</em><em>[</em><em>str</em><em> | </em><em>list</em><em>[</em><em>str</em><em>]</em><em>]</em>) – Pick from any of the available modes, or supply a list of modes. Default: all modes.</p></li>
+<li><p><strong>idx</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – Use a specific idx from the dataset. Default: a random image.</p></li>
 </ul>
 </dd>
 </dl>
@@ -451,15 +335,13 @@ populate_data algorithm and creates the dataframe, and then cleans up the data.<
 <dt class="sig sig-object py" id="dynamicdl.dynamicdl.DynamicData.save">
 <span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/dynamicdl/dynamicdl.html#DynamicData.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicdl.DynamicData.save" title="Link to this definition"></a></dt>
 <dd><p>Save the dataset into DynamicData json format.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><ul class="simple">
-<li><p>filename (str): the filename to save the dataset.</p></li>
-<li><p>overwrite (bool): whether to overwrite the file if it already exists. Default: False.</p></li>
-<li><dl class="simple">
-<dt>safe (bool): if True, do not encode <cite>form</cite> with jsonpickle. Then dataset cannot be</dt><dd><p>re-parsed, but is no longer subject to arbitrary code injection upon load.</p>
-</dd>
-</dl>
-</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – The filename to save the dataset.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) – Whether to overwrite the file if it already exists. Default: <cite>False</cite>.</p></li>
+<li><p><strong>safe</strong> (<em>bool</em>) – If <cite>True</cite>, do not encode <cite>form</cite> with jsonpickle. Then dataset cannot be
+re-parsed, but is no longer subject to arbitrary code injection upon load.</p></li>
 </ul>
 </dd>
 </dl>
@@ -471,26 +353,18 @@ populate_data algorithm and creates the dataframe, and then cleans up the data.<
 <dd><p>Split the existing image set into new image sets. If inplace is True, the existing image
 set will receive the percentage that is missing from the rest of the sets, or deleted if
 the other sets add up to 1.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><ul class="simple">
-<li><p><cite>image_set</cite> (<cite>str | int</cite>): the old image set name to split. Accepts both name and ID.</p></li>
-<li><dl class="simple">
-<dt><cite>new_sets</cite> (<cite>tuple[str, float]</cite>): each entry of new_sets has a name for the set</dt><dd><p>accompanied with a float to represent the percentage to split data into.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>inplace</cite> (<cite>bool</cite>): whether to perform the operation inplace on the existing image set.</dt><dd><p>If False, then the new sets are required to add up to exactly 100% of the compositions.
-If True, any remaining percentages less than 100% will be filled back into the old image
-set. Default: False.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><cite>seed</cite> (<cite>Optional[int]</cite>): the seed to use for the operation, in case consistent dataset</dt><dd><p>manipulation in memory is required. Default: None</p>
-</dd>
-</dl>
-</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image_set</strong> (<em>str</em><em> | </em><em>int</em>) – The old image set name to split. Accepts both name and ID.</p></li>
+<li><p><strong>new_sets</strong> (<em>Tuple</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>) – Each entry of <cite>new_sets</cite> has a name for the set accompanied with a float to
+represent the percentage to split data into.</p></li>
+<li><p><strong>inplace</strong> (<em>bool</em>) – Whether to perform the operation inplace on the existing image set. If
+<cite>False</cite>, then the new sets are required to add up to exactly 100% of the compositions.
+If <cite>True</cite>, any remaining percentages less than 100% will be filled back into the old
+image set. Default: <cite>False</cite>.</p></li>
+<li><p><strong>seed</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – The seed to use for the operation, in case consistent dataset manipulation
+in memory is required. Default: <cite>None</cite></p></li>
 </ul>
 </dd>
 </dl>
@@ -503,21 +377,26 @@ set. Default: False.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dynamicdl.dynamicds.</span></span><span class="sig-name descname"><span class="pre">DynamicDS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_mapping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'RGB'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'full'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_transform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dynamicdl/dynamicds.html#DynamicDS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dynamicdl.dynamicds.DynamicDS" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">VisionDataset</span></code></p>
 <p>Dataset implementation for the DynamicData environment.</p>
-<p>Args:
-- <cite>df</cite> (<cite>DataFrame</cite>): the dataframe from DynamicData.
-- <cite>root</cite> (<cite>str</cite>): the root of the dataset folder.
-- <cite>mode</cite> (<cite>str</cite>): the mode of the data to retrieve, i.e. classification, segmentation, etc.
-- <cite>id_mapping</cite> (<cite>dict[int, int]</cite>): the id mapping from the dataframe to retrieve class names.
-This is used primarily as a safety feature in order to make sure that used IDs are provided
-in order starting from 0 without holes so that training works properly.
-- <cite>image_type</cite> (<cite>str</cite>): the type of the image to export, to convert PIL images to.
-Default: ‘RGB’. Also accepts ‘L’ and ‘CMYK’.
-- <cite>normalization</cite> (<cite>str</cite>): the type of normalization that the dataset currently is formatted in,
-for box and polygon items. Accepts ‘full’ or ‘zeroone’.
-- <cite>normalize_to</cite> (<cite>str</cite>): the type of normalization that the dataset is to be resized to, for
-box and polygon items. Accepts ‘full’ or ‘zeroone’.
-- <cite>transform</cite> (<cite>Optional[Callable]</cite>): the transform operation to apply to the images.
-- <cite>target_transform</cite> (<cite>Optional[Callable]</cite>): the transform operation on the labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>DataFrame</em>) – The dataframe from DynamicData.</p></li>
+<li><p><strong>root</strong> (<em>str</em>) – The root of the dataset folder.</p></li>
+<li><p><strong>mode</strong> (<em>str</em>) – The mode of the data to retrieve, i.e. classification, segmentation, etc.</p></li>
+<li><p><strong>id_mapping</strong> (<em>dict</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) – The id mapping from the dataframe to retrieve class names. This is used
+primarily as a safety feature in order to make sure that used IDs are provided in order
+starting from 0 without holes so that training works properly.</p></li>
+<li><p><strong>image_type</strong> (<em>str</em>) – The type of the image to export, to convert PIL images to.
+Default: ‘RGB’. Also accepts ‘L’ and ‘CMYK’.</p></li>
+<li><p><strong>normalization</strong> (<em>str</em>) – The type of normalization that the dataset currently is formatted in,
+for box and polygon items. Accepts ‘full’ or ‘zeroone’.</p></li>
+<li><p><strong>normalize_to</strong> (<em>str</em>) – The type of normalization that the dataset is to be resized to, for
+box and polygon items. Accepts ‘full’ or ‘zeroone’.</p></li>
+<li><p><strong>transform</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>]</em>) – The transform operation to apply to the images.</p></li>
+<li><p><strong>target_transform</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>]</em>) – The transform operation on the labels.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

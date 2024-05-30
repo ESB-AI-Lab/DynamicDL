@@ -1,6 +1,5 @@
 import json
-from typing import Union, Any, Optional
-from tqdm import tqdm
+from typing import Union, Any
 
 from .._utils import load_config
 from ..data.datatype import DataType
