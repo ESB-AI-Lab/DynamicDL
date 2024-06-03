@@ -15,13 +15,19 @@ config = load_config()
 class CSVFile(DataFile):
     '''
     Utility functions for parsing csv files.
+    
+    :param form: A list of items which parses data, one for each column.
+    :type form: Iterable[Union[DataType, Static, Generic, Alias]]
+    :param header: Whether a header row is included. If included, the row will be skipped by
+        default. Default: `True`
+    :type header: bool
     '''
     def __init__(
         self,
         form: Iterable[Union[DataType, Static, Generic, Alias]],
         header: bool = True
     ) -> None:
-        self.form = []
+        self.form: list[Union[Static, Generic, Alias]] = []
         for generic in form:
             if isinstance(generic, DataType):
                 self.form.append(Generic('{}', generic))

@@ -95,13 +95,19 @@
 <span class="k">class</span> <span class="nc">CSVFile</span><span class="p">(</span><span class="n">DataFile</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Utility functions for parsing csv files.</span>
+<span class="sd">    </span>
+<span class="sd">    :param form: A list of items which parses data, one for each column.</span>
+<span class="sd">    :type form: Iterable[Union[DataType, Static, Generic, Alias]]</span>
+<span class="sd">    :param header: Whether a header row is included. If included, the row will be skipped by</span>
+<span class="sd">        default. Default: `True`</span>
+<span class="sd">    :type header: bool</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">form</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">DataType</span><span class="p">,</span> <span class="n">Static</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Alias</span><span class="p">]],</span>
         <span class="n">header</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Alias</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">generic</span> <span class="ow">in</span> <span class="n">form</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">generic</span><span class="p">,</span> <span class="n">DataType</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Generic</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">generic</span><span class="p">))</span>
