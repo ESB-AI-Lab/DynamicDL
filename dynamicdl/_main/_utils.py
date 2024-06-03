@@ -16,7 +16,6 @@ def unique(item: Union[DataType, DataItem, DataEntry]) -> Union[str, list[str]]:
         item = item.delimiter
     if isinstance(item, DataType):
         return item.desc if isinstance(item.token_type, UniqueToken) else ''
-    
 
 def key_has_data(item: Union[int, Static]) -> bool:
     '''

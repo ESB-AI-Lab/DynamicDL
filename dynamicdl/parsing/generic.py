@@ -131,7 +131,7 @@ class Generic:
         return True, result
 
     def __repr__(self) -> str:
-        return f'{self.pattern} | {self.data}'
+        return f'G[{self.pattern[1:-2].replace("(.+)", "{}")} | {self.data}]'
 
 class Folder(Generic):
     '''

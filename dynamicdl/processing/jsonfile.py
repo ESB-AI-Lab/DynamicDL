@@ -12,8 +12,8 @@ config = load_config()
 
 class JSONFile(DataFile):
     '''
-    Annotation file notator. The `JSONFile` class has the simplest conversion from the form up to
-    parsing. Data essentially follows the dict/list format in Python.
+    The `JSONFile` class represents an annotation object and has the simplest conversion from the
+    form to parsing. Data essentially follows the dict/list format in Python.
     
     Example:
     
@@ -63,11 +63,11 @@ class JSONFile(DataFile):
     which can represent data items respectively.
     
     :param form: The form which matches the data to be read from JSONFile.
-    :type form: dict[str | DataType | Static | Generic | Alias, Any]
+    :type form: dict[str | DataType | Static | Generic | Alias, Any] | list[Any]
     '''
     def __init__(
         self,
-        form: dict[Union[str, DataType, Static, Generic, Alias], Any]
+        form: Union[dict[Union[str, DataType, Static, Generic, Alias], Any], list[Any]]
     ) -> None:
         self.form = form
 

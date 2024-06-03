@@ -39,3 +39,11 @@ def check_map(it, num):
 def load_config():
     '''Load config object'''
     return config
+
+def key_has_data(item) -> bool:
+    '''
+    Check whether key has data.
+    '''
+    if isinstance(item, int):
+        return False
+    return item.data != []

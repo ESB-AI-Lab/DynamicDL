@@ -24,6 +24,8 @@ Classes:
 
 * AmbiguousList
 
+* ImpliedList
+
 * Pairing
 
 '''
@@ -34,4 +36,5 @@ from .namespace import Namespace
 from .genericlist import GenericList
 from .segmentationobject import SegmentationObject
 from .ambiguouslist import AmbiguousList
+from .impliedlist import ImpliedList
 from .pairing import Pairing

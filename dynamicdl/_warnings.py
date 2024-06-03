@@ -61,8 +61,6 @@ class Warnings:
     file_exists = ('File already exists: {filename}. Set overwrite=True to overwrite the file.',
                    OSError)
     is_none = ('{desc} cannot be None!', TypeError)
-    fail_generic_match = ('Failed to match: {dataset} to {root}', MergeError)
-    static_missing = ('Static value {value} not found in dataset', ValueError)
     inappropriate_type = ('Inappropriate type found for value {value}', TypeError)
     nonredundant_add = ('Cannot add to item which is not redundant', ValueError)
     data_invalid = ('Value {value} is invalid for given delimiter type {delimiter}', ValueError)
@@ -93,6 +91,20 @@ class Warnings:
                          MergeError)
     type_exists = ('Attempted to initialize a DataType object which already exists: {desc}',
                    RuntimeError)
+
+    # pairing errors
+    empty_pairing = ('Attempted to apply Pairing object at path {path}, but had no pairings stored',
+                     RuntimeError)
+
+    # engine processes
+    static_missing = (
+        'Expected static value {value} but was not found at path {path}',
+        ValueError
+    )
+    fail_generic_match = (
+        'Parsing {value} with generic {generic} failed; pattern does not match at path {path}',
+        MergeError
+    )
 
     @staticmethod
     def warn(name: str, **kwargs: str) -> None:

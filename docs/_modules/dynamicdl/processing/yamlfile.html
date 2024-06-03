@@ -91,7 +91,42 @@
 <a class="viewcode-back" href="../../../processing.html#dynamicdl.processing.yamlfile.YAMLFile">[docs]</a>
 <span class="k">class</span> <span class="nc">YAMLFile</span><span class="p">(</span><span class="n">DataFile</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Utility functions for parsing yaml files.</span>
+<span class="sd">    The `XMLFile` class represents an annotation object and is similar to the `JSONFile` class</span>
+<span class="sd">    in terms of hierarchical structure and parsing.</span>
+<span class="sd">    </span>
+<span class="sd">    The structure follows suit to the hierarchy, just as in `JSONFile`. Here is a snippet from the</span>
+<span class="sd">    Tomato Leaf Diseases Dataset:</span>
+<span class="sd">    </span>
+<span class="sd">    .. code-block:: yaml</span>
+<span class="sd">    </span>
+<span class="sd">        train: ../train/images</span>
+<span class="sd">        val: ../valid/images</span>
+<span class="sd">        test: ../test/images</span>
+
+<span class="sd">        nc: 7</span>
+<span class="sd">        names: [&#39;Bacterial Spot&#39;, &#39;Early_Blight&#39;, &#39;Healthy&#39;, &#39;Late_blight&#39;, &#39;Leaf Mold&#39;, \</span>
+<span class="sd">&#39;Target_Spot&#39;, &#39;black spot&#39;]</span>
+
+<span class="sd">        roboflow:</span>
+<span class="sd">        workspace: sylhet-agricultural-university</span>
+<span class="sd">        project: tomato-leaf-diseases-detect</span>
+<span class="sd">        version: 3</span>
+<span class="sd">        license: Public Domain</span>
+<span class="sd">    </span>
+<span class="sd">    Of particular interest is the `names` list, in which we need an `ImpliedList` to set up a</span>
+<span class="sd">    pairing between class ID and class name. We do exactly that:</span>
+<span class="sd">    </span>
+<span class="sd">    .. code-block:: python</span>
+<span class="sd">    </span>
+<span class="sd">        YAMLFile({</span>
+<span class="sd">            &#39;names&#39;: Pairing(</span>
+<span class="sd">                ImpliedList([DT.BBOX_CLASS_NAME], indexer=DT.BBOX_CLASS_ID),</span>
+<span class="sd">                DT.BBOX_CLASS_NAME, DT.BBOX_CLASS_ID</span>
+<span class="sd">            )</span>
+<span class="sd">        })</span>
+<span class="sd">    </span>
+<span class="sd">    :param form: The form which matches the data to be read from JSONFile.</span>
+<span class="sd">    :type form: dict[str | DataType | Static | Generic | Alias, Any] | list[Any]</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="n">Generic</span><span class="p">],</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="n">form</span>

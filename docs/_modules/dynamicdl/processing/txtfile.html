@@ -84,6 +84,7 @@
 <span class="kn">from</span> <span class="nn">..data.datatypes</span> <span class="kn">import</span> <span class="n">DataTypes</span>
 <span class="kn">from</span> <span class="nn">..parsing.static</span> <span class="kn">import</span> <span class="n">Static</span>
 <span class="kn">from</span> <span class="nn">..parsing.generic</span> <span class="kn">import</span> <span class="n">Generic</span>
+<span class="kn">from</span> <span class="nn">..parsing.alias</span> <span class="kn">import</span> <span class="n">Alias</span>
 <span class="kn">from</span> <span class="nn">.datafile</span> <span class="kn">import</span> <span class="n">DataFile</span>
 <span class="kn">from</span> <span class="nn">..parsing.pairing</span> <span class="kn">import</span> <span class="n">Pairing</span>
 
@@ -93,11 +94,102 @@
 <a class="viewcode-back" href="../../../processing.html#dynamicdl.processing.txtfile.TXTFile">[docs]</a>
 <span class="k">class</span> <span class="nc">TXTFile</span><span class="p">(</span><span class="n">DataFile</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Utility functions for parsing txt files.</span>
+<span class="sd">    The `TXTFile` class is an annotation object notator specifically for `.txt` file parsing. It</span>
+<span class="sd">    also can parse anything that is represented in plaintext, i.e. with UTF-8 encoding. It takes</span>
+<span class="sd">    a form similar to any nested dict structure, but it is also dangerous and should be noted</span>
+<span class="sd">    that distinct lines must take distinct forms for differentiation and disambiguation.</span>
+<span class="sd">    </span>
+<span class="sd">    An example of a txt file that we want to parse:</span>
+<span class="sd">    </span>
+<span class="sd">    .. code-block:: </span>
+<span class="sd">    </span>
+<span class="sd">        imageset1</span>
+<span class="sd">        class1</span>
+<span class="sd">        image1</span>
+<span class="sd">        1.0 2.0 3.0 4.0</span>
+<span class="sd">        5.0 6.0 7.0 8.0</span>
+<span class="sd">        image2</span>
+<span class="sd">        2.0 3.0 5.6 2.43</span>
+<span class="sd">        image3</span>
+<span class="sd">        5.4 12.4 543.2 12.3</span>
+<span class="sd">        2.0 3.0 5.6 2.44</span>
+<span class="sd">        2.0 3.0 5.6 2.46</span>
+<span class="sd">        2.0 3.0 5.6 2.48</span>
+<span class="sd">        class2</span>
+<span class="sd">        image4</span>
+<span class="sd">        32.54 21.4 32.43 12.23</span>
+<span class="sd">        image5</span>
+<span class="sd">        imageset2</span>
+<span class="sd">        class1</span>
+<span class="sd">        image6</span>
+<span class="sd">        32.54 21.4 32.43 12.256</span>
+
+<span class="sd">        classes</span>
+<span class="sd">        class1 abc</span>
+<span class="sd">        class2 def</span>
+<span class="sd">        class3 ghi</span>
+<span class="sd">        </span>
+<span class="sd">    Observe that each line can be distinctly classified in a hierarchical sense. That is, each</span>
+<span class="sd">    individual line can be attributed to a single purpose.</span>
+<span class="sd">    </span>
+<span class="sd">    .. code-block:: python</span>
+<span class="sd">    </span>
+<span class="sd">        TXTFile({</span>
+<span class="sd">            Generic(&#39;imageset{}&#39;, DT.IMAGE_SET_ID): {</span>
+<span class="sd">                Generic(&#39;class{}&#39;, DT.CLASS_ID): {</span>
+<span class="sd">                    Generic(&#39;image{}&#39;, DT.IMAGE_ID): [</span>
+<span class="sd">                        Generic(&#39;{} {} {} {}&#39;, DT.X1, DT.X2, DT.Y1, DT.Y2)</span>
+<span class="sd">                    ]</span>
+<span class="sd">                }</span>
+<span class="sd">            },</span>
+<span class="sd">            &#39;classes&#39;: Pairing([</span>
+<span class="sd">                Generic(&#39;class{} {}&#39;, DT.CLASS_ID, DT.CLASS_NAME)</span>
+<span class="sd">            ], DT.CLASS_ID, DT.CLASS_NAME)</span>
+<span class="sd">        })</span>
+<span class="sd">        </span>
+<span class="sd">    Notice the natural structure which is inherited. Each generic ends up distinct from each other,</span>
+<span class="sd">    so the dataset is not ambiguous. A hierarchical structure would look as follows:</span>
+<span class="sd">    </span>
+<span class="sd">    .. code-block:: </span>
+<span class="sd">    </span>
+<span class="sd">        imageset1</span>
+<span class="sd">            class1</span>
+<span class="sd">                image1</span>
+<span class="sd">                    1.0 2.0 3.0 4.0</span>
+<span class="sd">                    5.0 6.0 7.0 8.0</span>
+<span class="sd">                image2</span>
+<span class="sd">                    2.0 3.0 5.6 2.43</span>
+<span class="sd">                image3</span>
+<span class="sd">                    5.4 12.4 543.2 12.3</span>
+<span class="sd">                    2.0 3.0 5.6 2.44</span>
+<span class="sd">                    2.0 3.0 5.6 2.46</span>
+<span class="sd">                    2.0 3.0 5.6 2.48</span>
+<span class="sd">            class2</span>
+<span class="sd">                image4</span>
+<span class="sd">                    32.54 21.4 32.43 12.23</span>
+<span class="sd">                image5</span>
+<span class="sd">        imageset2</span>
+<span class="sd">            class1</span>
+<span class="sd">                image6</span>
+<span class="sd">                    32.54 21.4 32.43 12.256</span>
+<span class="sd">        classes</span>
+<span class="sd">            class1 abc</span>
+<span class="sd">            class2 def</span>
+<span class="sd">            class3 ghi</span>
+<span class="sd">        </span>
+<span class="sd">    Notice that this is exactly the structure reflected in the above code used to parse the file.</span>
+<span class="sd">    We can also specify an `ignore_type` such that any line which matches the Generic or string</span>
+<span class="sd">    passed in is skipped.</span>
+<span class="sd">    </span>
+<span class="sd">    :param form: The form which matches the data to be read from `TXTFile`.</span>
+<span class="sd">    :type form: dict[str | DataType | Static | Generic | Alias, Any] | list[Any]</span>
+<span class="sd">    :param ignore_type: A list, or one value of Generic/str objects which if matched will ignore</span>
+<span class="sd">        the line parsed.</span>
+<span class="sd">    :type ignore_type: Optional[Union[list[Union[Generic, str]], Generic, str]]</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">form</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">],</span>
+        <span class="n">form</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">Static</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Alias</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span>
         <span class="n">ignore_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Generic</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">Generic</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="n">form</span>

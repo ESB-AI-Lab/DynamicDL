@@ -18,6 +18,7 @@ Data
    :members:
    :undoc-members:
    :show-inheritance:
+   :exclude-members: types
 
 .. automodule:: dynamicdl.data.datatypes
    :members:

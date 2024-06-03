@@ -80,12 +80,12 @@
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
 <span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">load_config</span>
-<span class="kn">from</span> <span class="nn">.._warnings</span> <span class="kn">import</span> <span class="n">Warnings</span>
+<span class="kn">from</span> <span class="nn">.._warnings</span> <span class="kn">import</span> <span class="n">Warnings</span><span class="p">,</span> <span class="n">MergeError</span>
 <span class="kn">from</span> <span class="nn">..data.tokens</span> <span class="kn">import</span> <span class="n">RedundantToken</span>
 <span class="kn">from</span> <span class="nn">..data.datatype</span> <span class="kn">import</span> <span class="n">DataType</span>
-<span class="kn">from</span> <span class="nn">..data.datatypes</span> <span class="kn">import</span> <span class="n">DataTypes</span>
 <span class="kn">from</span> <span class="nn">..data.dataitem</span> <span class="kn">import</span> <span class="n">DataItem</span>
 <span class="kn">from</span> <span class="nn">..data.dataentry</span> <span class="kn">import</span> <span class="n">DataEntry</span>
+<span class="kn">from</span> <span class="nn">.._utils</span> <span class="kn">import</span> <span class="n">key_has_data</span><span class="p">,</span> <span class="n">union</span>
 <span class="kn">from</span> <span class="nn">.static</span> <span class="kn">import</span> <span class="n">Static</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
@@ -121,11 +121,13 @@
 <a class="viewcode-back" href="../../../parsing.html#dynamicdl.parsing.pairing.Pairing.update_pairing">[docs]</a>
     <span class="k">def</span> <span class="nf">update_pairing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="n">DataEntry</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Update a data entry with pairing values, and does nothing if the pairing does not aplpy.</span>
+<span class="sd">        Update a data entry with pairing values, and does nothing if the pairing does not apply.</span>
 <span class="sd">        </span>
 <span class="sd">        :param entry: The entry to apply this pairing</span>
 <span class="sd">        :type entry: DataEntry</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pairs</span><span class="p">:</span>
+            <span class="n">Warnings</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;empty_pairing&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pairing_path</span><span class="p">)</span>
         <span class="n">entry_vals</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">overlap</span> <span class="o">=</span> <span class="n">entry_vals</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paired_desc</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">overlap</span><span class="p">:</span>
@@ -151,7 +153,7 @@
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">overlap</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pairing</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pairs</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="n">pairing</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">overlap</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="n">pairing</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">overlap</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
                     <span class="n">index</span> <span class="o">=</span> <span class="n">i</span>
                     <span class="k">break</span>
             <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
@@ -159,29 +161,57 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">check</span> <span class="ow">in</span> <span class="n">overlap</span><span class="p">:</span>
-                <span class="n">res</span> <span class="o">=</span> <span class="n">pairing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">check</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">v</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="p">:</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">pairing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">check</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">item</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">v</span><span class="p">:</span>
                     <span class="k">return</span>
         <span class="k">for</span> <span class="n">empty</span> <span class="ow">in</span> <span class="n">to_fill</span><span class="p">:</span>
             <span class="n">entry</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">empty</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataItem</span><span class="p">(</span>
-                <span class="nb">getattr</span><span class="p">(</span><span class="n">DataTypes</span><span class="p">,</span> <span class="n">empty</span><span class="p">),</span>
+                <span class="n">DataType</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="n">empty</span><span class="p">],</span>
                 <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pairs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">empty</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                  <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
             <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_find_pairings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pairings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataEntry</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">Static</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">Static</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">pairings</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
-            <span class="n">data_items</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">pairings</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">data_items</span> <span class="o">+=</span> <span class="n">key</span><span class="o">.</span><span class="n">data</span> <span class="o">+</span> <span class="n">val</span><span class="o">.</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Static</span><span class="p">)</span> <span class="k">else</span> <span class="n">val</span><span class="o">.</span><span class="n">data</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">DataEntry</span><span class="p">(</span><span class="n">data_items</span><span class="p">)]</span>
-        <span class="n">pairs</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">pairings</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">Static</span><span class="p">):</span>
-                <span class="n">pairs</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_pairings</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">pairs</span>
+    <span class="k">def</span> <span class="nf">_merge</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Static</span><span class="p">],</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataItem</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataEntry</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="n">DataEntry</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">Static</span><span class="p">):</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="n">DataEntry</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">entry</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">DataEntry</span><span class="p">([])</span>
+
+        <span class="n">uniques</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataEntry</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">lists</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">DataEntry</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge</span><span class="p">(</span>
+                <span class="n">val</span><span class="p">,</span>
+                <span class="n">data</span> <span class="o">+</span> <span class="n">key</span><span class="o">.</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Static</span><span class="p">)</span> <span class="k">else</span> <span class="p">[]</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">key_has_data</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">apply_tokens</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">uniques</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lists</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">uniques</span><span class="p">:</span>
+                <span class="n">lists</span><span class="p">[</span><span class="n">entry</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+            <span class="k">return</span> <span class="n">lists</span>
+
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">DataEntry</span><span class="p">([])</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">uniques</span><span class="p">:</span>
+                <span class="n">entry</span><span class="o">.</span><span class="n">apply_tokens</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">entry</span>
+        <span class="k">except</span> <span class="n">MergeError</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">uniques</span><span class="p">:</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">apply_tokens</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">lists</span><span class="p">[</span><span class="n">entry</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+            <span class="k">return</span> <span class="n">lists</span>
 
 <div class="viewcode-block" id="Pairing.find_pairings">
 <a class="viewcode-back" href="../../../parsing.html#dynamicdl.parsing.pairing.Pairing.find_pairings">[docs]</a>
@@ -220,12 +250,23 @@
                 <span class="n">pbar</span><span class="p">,</span>
                 <span class="n">depth</span> <span class="o">=</span> <span class="n">depth</span>
             <span class="p">)</span>
-        <span class="n">pairs_try</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_pairings</span><span class="p">(</span><span class="n">expanded</span><span class="p">)</span>
+        <span class="n">pairs_try</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">DataEntry</span><span class="p">],</span> <span class="n">DataEntry</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge</span><span class="p">(</span><span class="n">expanded</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">redundant</span><span class="p">:</span>
+            <span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">items</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">v</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+                               <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pairs_try</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">()]):</span>
+                <span class="n">dataitems</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+                    <span class="n">dataitems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DataItem</span><span class="p">(</span><span class="o">*</span><span class="n">item</span><span class="p">))</span>
+                <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DataEntry</span><span class="p">(</span><span class="n">dataitems</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">entries</span> <span class="o">=</span> <span class="n">union</span><span class="p">(</span><span class="n">pairs_try</span><span class="p">)</span>
         <span class="n">pairs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataEntry</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">pairs_try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">paired</span><span class="o">.</span><span class="n">issubset</span><span class="p">({</span><span class="n">item</span><span class="o">.</span><span class="n">delimiter</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">pair</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">()}):</span>
                 <span class="n">pairs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DataEntry</span><span class="p">([</span><span class="n">pair</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="o">.</span><span class="n">desc</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">paired</span><span class="p">]))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pairs</span> <span class="o">=</span> <span class="n">pairs</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pairs</span> <span class="o">=</span> <span class="n">pairs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pairing_path</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">if</span> <span class="n">in_file</span> <span class="k">else</span> <span class="n">path</span></div>
 </div>
 
 </pre></div>

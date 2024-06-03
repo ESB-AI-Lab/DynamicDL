@@ -1,7 +1,6 @@
 from typing import Union, Any
 
 from .._warnings import Warnings
-from .._main._engine import expand_generics
 from ..data.datatype import DataType
 from .genericlist import GenericList
 from .static import Static
@@ -17,6 +16,7 @@ class ImpliedList:
         self.form = form if isinstance(form, GenericList) else GenericList(form)
         self.indexer = indexer
         self.start = start
+        self.length = len(self.form.form)
 
     def expand(
         self,
@@ -32,10 +32,13 @@ class ImpliedList:
             to lists of length 1. Note: for consistency lists are converted to dicts with int keys.
         :rtype: dict[int, Any]
         '''
+        from .._main._engine import expand_generics
         if not isinstance(dataset, list):
             Warnings.error('incorrect_type', path=path, got=type(dataset))
-        form = dict(enumerate(self.form.form, start=self.start))
-        dataset = dict(enumerate(dataset, start=self.start))
+
+        form = {self.indexer: self.form}
+        dataset = {str(i + self.start): dataset[self.length * i : self.length * (i + 1)]
+                   for i in range(len(dataset) // self.length)}
         return expand_generics(
             path,
             dataset,

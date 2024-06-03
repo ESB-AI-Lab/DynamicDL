@@ -17,6 +17,7 @@ from ..parsing.genericlist import GenericList
 from ..parsing.segmentationobject import SegmentationObject
 from ..parsing.pairing import Pairing
 from ..parsing.ambiguouslist import AmbiguousList
+from ..parsing.impliedlist import ImpliedList
 from ..processing.images import ImageEntry, SegmentationImage
 from ..processing.datafile import DataFile
 from ._utils import unique, key_has_data
@@ -24,11 +25,13 @@ from ._utils import unique, key_has_data
 config = load_config()
 unique_identifiers: list[DataType] = [var for var in vars(DataTypes).values() if
     isinstance(var, DataType) and isinstance(var.token_type, UniqueToken)]
+list_types = (GenericList, AmbiguousList, ImpliedList, SegmentationObject)
 
 def expand_generics(
     path: list[str],
     dataset: Any,
-    root: Any
+    root: Any,
+    xml: bool = False
 ) -> Union[dict, Static]:
     '''
     Expand all generics and replace with statics, inplace.
@@ -36,8 +39,8 @@ def expand_generics(
      - `root` (`Any`): the format of the dataset, in accordance with valid DynamicData syntax
     '''
     if isinstance(root, list):
-        root = GenericList(root)
-    if isinstance(root, (GenericList, SegmentationObject)):
+        root = AmbiguousList(root) if xml else GenericList(root)
+    if isinstance(root, list_types):
         return root.expand(
             path,
             dataset
@@ -47,7 +50,7 @@ def expand_generics(
     if isinstance(root, (Generic, Namespace)):
         success, tokens = root.match(str(dataset))
         if not success:
-            Warnings.error('fail_generic_match', dataset=dataset, root=root)
+            Warnings.error('fail_generic_match', value=dataset, generic=root, path=".".join(path))
         return Static(str(dataset), tokens), []
     expanded_root: dict[Static, Any] = {}
     generics: list[Generic] = []
@@ -67,7 +70,7 @@ def expand_generics(
         val = root[key]
 
         # convert str to Static
-        if isinstance(key, str):
+        if isinstance(key, (str, int)):
             key = Static(key)
 
         # add Static directly to expanded root
@@ -75,7 +78,7 @@ def expand_generics(
             names.add(key.name)
             expanded_root[key] = val
             continue
-        Warnings.error('static_missing', value=key)
+        Warnings.error('static_missing', value=key, path=".".join(path))
 
      # expand Generics
     while len(generics) != 0:
@@ -110,7 +113,7 @@ def expand_generics(
             )
             expanded_root[key] = uniques
             pairings += pairing
-        elif isinstance(value, (GenericList, AmbiguousList, SegmentationObject)):
+        elif isinstance(value, list_types):
             uniques, pairing = value.expand(
                 path + [key.name if isinstance(key, Static) else str(key)],
                 dataset[key.name]
@@ -191,7 +194,7 @@ def expand_file_generics(
             names.add(key.name)
             expanded_root[key] = val
             continue
-        Warnings.error('static_missing', value=key)
+        Warnings.error('static_missing', value=key, path=path)
 
     # expand Generics
     while len(generics) != 0:
@@ -297,7 +300,7 @@ def _merge(
         pbar = None
     if pbar:
         pbar.set_description(f'Merging | {"/".join(path)}')
-    
+
     uniques: list[DataEntry] = []
     lists: dict[DataEntry, tuple[str, str]] = {}
     others: DataEntry = DataEntry([])
@@ -320,8 +323,10 @@ def _merge(
         else:
             others.apply_tokens(res.data.values())
     if lists:
-        # need to clean up assert
-        assert len(uniques) == 0, 'Cannot have unique values when unmergeables already exist'
+        # if we have lists and also have uniques then uniques cannot merge anymore, so add to hmap
+        for item in uniques:
+            entry, key = _add_to_hashmap(hmap, item)
+            lists[entry] = key
         for item in lists:
             item.apply_tokens(others.data.values())
         return lists
@@ -366,14 +371,14 @@ def populate_data(root_dir: str, form: dict, verbose: bool = False) -> list[Data
             form,
             pbar if verbose else None
         )
-        # from .._utils import get_str
-        # print(get_str(data))
+        if verbose:
+            from .._utils import get_str
+            print("Expanded data to:")
+            print(get_str(data))
         pbar.update(1)
         pbar.set_description('Merging data')
         hmap: dict[str, dict[str, DataEntry]] = {id.desc:{} for id in unique_identifiers}
         data = _merge(data, [], [], hmap, pbar, depth=1)
-        # from .._utils import get_str
-        # print(get_str(data))
         if isinstance(data, DataEntry):
             Warnings.error('merged_all')
         data = [hmap[hloc][name] for hloc, name in data.values()]

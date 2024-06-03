@@ -6,6 +6,7 @@ from ..data.datatype import DataType
 from ..data.datatypes import DataTypes
 from ..parsing.static import Static
 from ..parsing.generic import Generic
+from ..parsing.alias import Alias
 from .datafile import DataFile
 from ..parsing.pairing import Pairing
 
@@ -13,11 +14,102 @@ config = load_config()
 
 class TXTFile(DataFile):
     '''
-    Utility functions for parsing txt files.
+    The `TXTFile` class is an annotation object notator specifically for `.txt` file parsing. It
+    also can parse anything that is represented in plaintext, i.e. with UTF-8 encoding. It takes
+    a form similar to any nested dict structure, but it is also dangerous and should be noted
+    that distinct lines must take distinct forms for differentiation and disambiguation.
+    
+    An example of a txt file that we want to parse:
+    
+    .. code-block:: 
+    
+        imageset1
+        class1
+        image1
+        1.0 2.0 3.0 4.0
+        5.0 6.0 7.0 8.0
+        image2
+        2.0 3.0 5.6 2.43
+        image3
+        5.4 12.4 543.2 12.3
+        2.0 3.0 5.6 2.44
+        2.0 3.0 5.6 2.46
+        2.0 3.0 5.6 2.48
+        class2
+        image4
+        32.54 21.4 32.43 12.23
+        image5
+        imageset2
+        class1
+        image6
+        32.54 21.4 32.43 12.256
+
+        classes
+        class1 abc
+        class2 def
+        class3 ghi
+        
+    Observe that each line can be distinctly classified in a hierarchical sense. That is, each
+    individual line can be attributed to a single purpose.
+    
+    .. code-block:: python
+    
+        TXTFile({
+            Generic('imageset{}', DT.IMAGE_SET_ID): {
+                Generic('class{}', DT.CLASS_ID): {
+                    Generic('image{}', DT.IMAGE_ID): [
+                        Generic('{} {} {} {}', DT.X1, DT.X2, DT.Y1, DT.Y2)
+                    ]
+                }
+            },
+            'classes': Pairing([
+                Generic('class{} {}', DT.CLASS_ID, DT.CLASS_NAME)
+            ], DT.CLASS_ID, DT.CLASS_NAME)
+        })
+        
+    Notice the natural structure which is inherited. Each generic ends up distinct from each other,
+    so the dataset is not ambiguous. A hierarchical structure would look as follows:
+    
+    .. code-block:: 
+    
+        imageset1
+            class1
+                image1
+                    1.0 2.0 3.0 4.0
+                    5.0 6.0 7.0 8.0
+                image2
+                    2.0 3.0 5.6 2.43
+                image3
+                    5.4 12.4 543.2 12.3
+                    2.0 3.0 5.6 2.44
+                    2.0 3.0 5.6 2.46
+                    2.0 3.0 5.6 2.48
+            class2
+                image4
+                    32.54 21.4 32.43 12.23
+                image5
+        imageset2
+            class1
+                image6
+                    32.54 21.4 32.43 12.256
+        classes
+            class1 abc
+            class2 def
+            class3 ghi
+        
+    Notice that this is exactly the structure reflected in the above code used to parse the file.
+    We can also specify an `ignore_type` such that any line which matches the Generic or string
+    passed in is skipped.
+    
+    :param form: The form which matches the data to be read from `TXTFile`.
+    :type form: dict[str | DataType | Static | Generic | Alias, Any] | list[Any]
+    :param ignore_type: A list, or one value of Generic/str objects which if matched will ignore
+        the line parsed.
+    :type ignore_type: Optional[Union[list[Union[Generic, str]], Generic, str]]
     '''
     def __init__(
         self,
-        form: Union[dict, list],
+        form: Union[dict[Union[str, DataType, Static, Generic, Alias], Any], list[Any]],
         ignore_type: Optional[Union[list[Union[Generic, str]], Generic, str]] = None
     ) -> None:
         self.form = form

@@ -92,8 +92,8 @@
 <a class="viewcode-back" href="../../../processing.html#dynamicdl.processing.jsonfile.JSONFile">[docs]</a>
 <span class="k">class</span> <span class="nc">JSONFile</span><span class="p">(</span><span class="n">DataFile</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Annotation file notator. The `JSONFile` class has the simplest conversion from the form up to</span>
-<span class="sd">    parsing. Data essentially follows the dict/list format in Python.</span>
+<span class="sd">    The `JSONFile` class represents an annotation object and has the simplest conversion from the</span>
+<span class="sd">    form to parsing. Data essentially follows the dict/list format in Python.</span>
 <span class="sd">    </span>
 <span class="sd">    Example:</span>
 <span class="sd">    </span>
@@ -143,11 +143,11 @@
 <span class="sd">    which can represent data items respectively.</span>
 <span class="sd">    </span>
 <span class="sd">    :param form: The form which matches the data to be read from JSONFile.</span>
-<span class="sd">    :type form: dict[str | DataType | Static | Generic | Alias, Any]</span>
+<span class="sd">    :type form: dict[str | DataType | Static | Generic | Alias, Any] | list[Any]</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">form</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">Static</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Alias</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span>
+        <span class="n">form</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">Static</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Alias</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="n">form</span>
 

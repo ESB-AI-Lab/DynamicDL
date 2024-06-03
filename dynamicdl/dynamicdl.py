@@ -115,12 +115,12 @@ class DynamicData:
         end = time.time()
         print(f'[DynamicData] Parsed! ({(end - start):.3f}s)')
         start = time.time()
-        self._cleanup()
+        self._cleanup(verbose = True)
         end = time.time()
         print(f'[DynamicData] Cleaned! ({(end - start):.3f}s)')
         print(self._get_statistics())
 
-    def _cleanup(self) -> None:
+    def _cleanup(self, verbose: bool = False) -> None:
         '''
         Run cleanup and sanity checks on all data. Assigns IDs to name-only values.
         '''
@@ -156,9 +156,9 @@ class DynamicData:
 
         # assign ids
         self._cleanup_id()
-        self._process_ids('CLASS', redundant=False)
-        self._process_ids('SEG_CLASS', redundant=True)
-        self._process_ids('BBOX_CLASS', redundant=True)
+        self._process_ids('CLASS', redundant=False, verbose=verbose)
+        self._process_ids('SEG_CLASS', redundant=True, verbose=verbose)
+        self._process_ids('BBOX_CLASS', redundant=True, verbose=verbose)
 
         # check available columns to determine mode availability
         self.available_modes = DynamicData._get_modes(self.dataframe)
@@ -189,7 +189,7 @@ class DynamicData:
             data += f'       | Segmentation object scaling option: {self.seg_scale_option}\n'
         return data.strip()
 
-    def _process_ids(self, name: str, redundant: bool = False) -> None:
+    def _process_ids(self, name: str, redundant: bool = False, verbose: bool = False) -> None:
         if f'{name}_NAME' in self.dataframe:
             if f'{name}_ID' not in self.dataframe:
                 call = partial(self._assign_ids, redundant=redundant)
@@ -213,7 +213,8 @@ class DynamicData:
             name,
             getattr(self, f'{name.lower()}_to_idx'),
             getattr(self, f'idx_to_{name.lower()}'),
-            redundant=redundant
+            redundant=redundant,
+            verbose=verbose
         )
 
     def _get_img_sizes(self) -> None:

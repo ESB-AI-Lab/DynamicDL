@@ -1,22 +1,12 @@
 File Processing
 ===============
 
-.. automodule:: dynamicdl.processing.csvfile
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. automodule:: dynamicdl.processing.datafile
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. automodule:: dynamicdl.processing.images
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 .. automodule:: dynamicdl.processing.jsonfile
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: dynamicdl.processing.csvfile
    :members:
    :undoc-members:
    :show-inheritance:
@@ -32,6 +22,11 @@ File Processing
    :show-inheritance:
 
 .. automodule:: dynamicdl.processing.yamlfile
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: dynamicdl.processing.images
    :members:
    :undoc-members:
    :show-inheritance:

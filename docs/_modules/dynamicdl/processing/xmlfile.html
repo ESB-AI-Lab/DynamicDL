@@ -90,7 +90,68 @@
 <a class="viewcode-back" href="../../../processing.html#dynamicdl.processing.xmlfile.XMLFile">[docs]</a>
 <span class="k">class</span> <span class="nc">XMLFile</span><span class="p">(</span><span class="n">DataFile</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Utility functions for parsing xml files.</span>
+<span class="sd">    The `XMLFile` class represents an annotation object and is similar to the `JSONFile` class</span>
+<span class="sd">    in terms of hierarchical structure and parsing. The one key difference is the needed usage of</span>
+<span class="sd">    `AmbiguousList` over `GenericList`, as the presence of multiple tags of the same name will be</span>
+<span class="sd">    parsed as a list, while tags of one name will be parsed as an item. The algorithm appropriately</span>
+<span class="sd">    interprets list objects as `AmbiguousList` for this exact reason in `XMLFile`, but if one</span>
+<span class="sd">    desires a `GenericList` it will have to be instantiated manually.</span>
+<span class="sd">    </span>
+<span class="sd">    The structure follows suit to the hierarchy, just as in `JSONFile`. Here is a snippet from the</span>
+<span class="sd">    Oxford-IIIT Pets Dataset:</span>
+<span class="sd">    </span>
+<span class="sd">    .. code-block:: xml</span>
+<span class="sd">    </span>
+<span class="sd">        &lt;annotation&gt;</span>
+<span class="sd">            &lt;folder&gt;OXIIIT&lt;/folder&gt;</span>
+<span class="sd">            &lt;filename&gt;Abyssinian_1.jpg&lt;/filename&gt;</span>
+<span class="sd">            &lt;source&gt;</span>
+<span class="sd">                &lt;database&gt;OXFORD-IIIT Pet Dataset&lt;/database&gt;</span>
+<span class="sd">                &lt;annotation&gt;OXIIIT&lt;/annotation&gt;</span>
+<span class="sd">                &lt;image&gt;flickr&lt;/image&gt;</span>
+<span class="sd">            &lt;/source&gt;</span>
+<span class="sd">            &lt;size&gt;</span>
+<span class="sd">                &lt;width&gt;600&lt;/width&gt;</span>
+<span class="sd">                &lt;height&gt;400&lt;/height&gt;</span>
+<span class="sd">                &lt;depth&gt;3&lt;/depth&gt;</span>
+<span class="sd">            &lt;/size&gt;</span>
+<span class="sd">            &lt;segmented&gt;0&lt;/segmented&gt;</span>
+<span class="sd">            &lt;object&gt;</span>
+<span class="sd">                &lt;name&gt;cat&lt;/name&gt;</span>
+<span class="sd">                &lt;pose&gt;Frontal&lt;/pose&gt;</span>
+<span class="sd">                &lt;truncated&gt;0&lt;/truncated&gt;</span>
+<span class="sd">                &lt;occluded&gt;0&lt;/occluded&gt;</span>
+<span class="sd">                &lt;bndbox&gt;</span>
+<span class="sd">                    &lt;xmin&gt;333&lt;/xmin&gt;</span>
+<span class="sd">                    &lt;ymin&gt;72&lt;/ymin&gt;</span>
+<span class="sd">                    &lt;xmax&gt;425&lt;/xmax&gt;</span>
+<span class="sd">                    &lt;ymax&gt;158&lt;/ymax&gt;</span>
+<span class="sd">                &lt;/bndbox&gt;</span>
+<span class="sd">                &lt;difficult&gt;0&lt;/difficult&gt;</span>
+<span class="sd">            &lt;/object&gt;</span>
+<span class="sd">        &lt;/annotation&gt;</span>
+<span class="sd">    </span>
+<span class="sd">    Here we do not specify the extraneous information and get straight to the point:</span>
+<span class="sd">    </span>
+<span class="sd">    .. code-block:: python</span>
+<span class="sd">    </span>
+<span class="sd">        XMLFile({</span>
+<span class="sd">            &quot;annotation&quot;: {</span>
+<span class="sd">                &quot;filename&quot;: Generic(&quot;{}.jpg&quot;, DT.IMAGE_NAME),</span>
+<span class="sd">                &quot;object&quot;: AmbiguousList({</span>
+<span class="sd">                    &quot;name&quot;: DT.BBOX_CLASS_NAME,</span>
+<span class="sd">                    &quot;bndbox&quot;: {</span>
+<span class="sd">                        &quot;xmin&quot;: DT.XMIN,</span>
+<span class="sd">                        &quot;ymin&quot;: DT.YMIN,</span>
+<span class="sd">                        &quot;xmax&quot;: DT.XMAX,</span>
+<span class="sd">                        &quot;ymax&quot;: DT.YMAX</span>
+<span class="sd">                    }</span>
+<span class="sd">                })</span>
+<span class="sd">            }</span>
+<span class="sd">        })</span>
+<span class="sd">    </span>
+<span class="sd">    :param form: The form which matches the data to be read from `XMLFile`.</span>
+<span class="sd">    :type form: dict[str | DataType | Static | Generic | Alias, Any] | list[Any]</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Static</span><span class="p">,</span> <span class="n">Generic</span><span class="p">],</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="n">form</span>
@@ -108,7 +169,8 @@
         <span class="k">return</span> <span class="n">expand_generics</span><span class="p">(</span>
             <span class="n">curr_path</span><span class="p">,</span>
             <span class="n">data</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">form</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">,</span>
+            <span class="n">xml</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="p">)</span></div>
 </div>
 
