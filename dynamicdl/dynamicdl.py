@@ -115,7 +115,7 @@ class DynamicData:
         end = time.time()
         print(f'[DynamicData] Parsed! ({(end - start):.3f}s)')
         start = time.time()
-        self._cleanup(verbose = True)
+        self._cleanup(verbose=verbose)
         end = time.time()
         print(f'[DynamicData] Cleaned! ({(end - start):.3f}s)')
         print(self._get_statistics())
