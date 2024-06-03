@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.poetry]
 name = "dynamicdl"
-version = "0.1.1-alpha"
+version = "0.1.1-alpha-1"
 description = "A PyTorch-based dynamic dataloading library"
 authors = ["Anthony Tong <atong28.usa@gmail.com>"]
 license = "Apache-2.0"

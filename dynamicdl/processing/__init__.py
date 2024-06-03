@@ -5,6 +5,8 @@ a File key indicator.
 
 Classes:
 
+* CSVFile
+
 * JSONFile
 
 * TXTFile
@@ -18,6 +20,7 @@ Classes:
 * SegmentationImage
 
 '''
+from .csvfile import CSVFile
 from .jsonfile import JSONFile
 from .txtfile import TXTFile
 from .xmlfile import XMLFile
