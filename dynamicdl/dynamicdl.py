@@ -4,7 +4,7 @@ import json
 from hashlib import md5
 from functools import partial
 import random
-from typing import Union, Optional, Callable, Iterable, Tuple, Any
+from typing import Union, Optional, Callable, Iterable, Tuple
 
 import cv2
 from tqdm import tqdm
@@ -472,7 +472,7 @@ class DynamicData:
 
     def get_transforms(
         self,
-        mode: str,
+        mode: str = 'inference',
         calculate_stats: bool = True,
         mean: Tuple[float, ...] = (0.485, 0.456, 0.406),
         std: Tuple[float, ...] = (0.229, 0.224, 0.225),
@@ -549,7 +549,7 @@ class DynamicData:
 
     def get_dataset(
         self,
-        mode: str,
+        mode: str = 'inference',
         remove_invalid: bool = True,
         store_dim: bool = False,
         preset_transform: bool = True,
@@ -686,7 +686,7 @@ class DynamicData:
 
     def get_dataloader(
         self,
-        mode: str,
+        mode: str = 'inference',
         batch_size: int = 16,
         shuffle: bool = True,
         num_workers: int = 0,
@@ -880,7 +880,8 @@ class DynamicData:
         '''
         Clear image sets from the dict if they contain no elements.
 
-        :param sets: If defined, only scan the provided list, otherwise scan all sets. Default: None.
+        :param sets: If defined, only scan the provided list, otherwise scan all sets.
+            Default: `None`.
         :type sets: list[str | int], Optional
         '''
         to_pop = []
@@ -940,7 +941,7 @@ class DynamicData:
 
     def save(
         self,
-        filename: str,
+        filename: str = '',
         overwrite: bool = False,
         safe: bool = True
     ) -> None:
@@ -982,7 +983,7 @@ class DynamicData:
             f.write(json.dumps(this))
 
     @classmethod
-    def load(cls, filename: str) -> Self:
+    def load(cls, filename: str = '') -> Self:
         '''
         Load a DynamicData object from file. Warning: do not load any json files that you did not
         create. This method uses jsonpickle, an insecure loading system with potential for arbitrary
@@ -1037,7 +1038,8 @@ class DynamicData:
 
         :param dpi: The image display size, if not in segmentation mode.
         :type dpi: float
-        :param mode: Pick from any of the available modes, or supply a list of modes. Default: all modes.
+        :param mode: Pick from any of the available modes, or supply a list of modes. Default:
+            all modes.
         :type mode: Optional[str | list[str]]
         :param idx: Use a specific idx from the dataset. Default: a random image.
         :type idx: Optional[int]
@@ -1087,49 +1089,5 @@ class DynamicData:
                                 color=class_id)
             mask = torch.from_numpy(np.asarray(mask))
             axarr[1].imshow(mask)
-        else:
-            plt.imshow(image.permute(1, 2, 0))
-
-    def inference(
-        self,
-        image: torch.Tensor,
-        label: Any,
-        result: Any,
-        dpi: float = 1200,
-        mode: str = None
-    ) -> None:
-        '''
-        Plot an image output. Not implemented yet
-        '''
-        if not self.cleaned:
-            self.parse()
-        if mode is None:
-            Warnings.error('is_none', desc='Mode')
-        if mode not in self.available_modes:
-            Warnings.error('mode_unavailable', mode=mode)
-        plt.figure(dpi=dpi)
-        if mode == 'classification':
-            _, pred = torch.max(result, dim=1)
-            print(f'[DynamicData] Image Class ID/Name: {pred}/{self.idx_to_class[pred]}')
-        elif mode == 'detection':
-            boxes = result['boxes']
-            labels = result['labels']
-            if len(boxes) != 0:
-                image = draw_bounding_boxes(
-                    image,
-                    boxes,
-                    width=3,
-                    colors='red',
-                    labels=[self.idx_to_bbox_class[label] for label in labels]
-                )
-            else: print('[DynamicData] Warning: Image has no bounding boxes.')
-        if mode == 'segmentation_poly' or mode == 'segmentation_mask':
-            _, axarr = plt.subplots(ncols=2)
-            axarr[0].imshow(image.permute(1, 2, 0))
-            mask = result['out'] if isinstance(result, dict) and 'out' in result else result
-            if not isinstance(mask, torch.Tensor):
-                raise ValueError('Cannot infer output mask tensor.')
-            mask = torch.argmax(mask, dim=1)
-            axarr[1].imshow(mask.permute(1, 2, 0))
         else:
             plt.imshow(image.permute(1, 2, 0))
